@@ -4,6 +4,7 @@ import { formatTimeAgo } from '../utils/date';
 import { RichContent } from './content/RichContent';
 import { ContextMenu, postMenuItems } from './ContextMenu';
 import { Snackbar } from './Snackbar';
+import { CachedAvatar } from './CachedAvatar';
 
 interface PostItemProps {
   post: Post;
@@ -129,15 +130,13 @@ export const PostItem = ({ post, isNew = false }: PostItemProps) => {
         <div className="flex gap-3">
           <a
             href={`/profile/@${post.author.handle}`}
-            className="avatar avatar-md flex-shrink-0 hover:opacity-80 transition-opacity"
+            className="flex-shrink-0 hover:opacity-80 transition-opacity"
           >
-            <img
-              src={post.author.avatar || 'https://via.placeholder.com/48'}
+            <CachedAvatar
+              src={post.author.avatar}
               alt={post.author.displayName || post.author.handle}
-              onError={(e) => {
-                e.stopPropagation();
-                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48';
-              }}
+              handle={post.author.handle}
+              size="md"
             />
           </a>
           <div className="flex-1 min-w-0">

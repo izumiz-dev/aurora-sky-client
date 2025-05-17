@@ -5,6 +5,7 @@ import type { Post } from '../types/post';
 import type { SessionData } from '../types/session';
 import { useInfiniteScroll } from './useInfiniteScroll';
 import { cacheConfig, cacheKeys } from '../lib/cacheConfig';
+import { useAvatarPreload } from './useAvatar';
 
 export const useTimeline = (session: SessionData | null, isAuthenticated: boolean) => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -184,6 +185,14 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
     hasMore,
     isLoading: isLoadingMore,
   });
+
+  // アバターのプリロード
+  useAvatarPreload(
+    posts.map(post => ({
+      url: post.author.avatar,
+      handle: post.author.handle,
+    }))
+  );
 
   return {
     posts,

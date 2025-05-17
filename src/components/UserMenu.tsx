@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import { route } from 'preact-router';
 import { useAuth } from '../context/AuthContext';
+import { CachedAvatar } from './CachedAvatar';
 
 export const UserMenu = () => {
   const { session, logout } = useAuth();
@@ -18,16 +19,13 @@ export const UserMenu = () => {
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         className="rounded-lg p-2 hover:bg-white/10 transition-all duration-200 backdrop-filter backdrop-blur-lg bg-white/5 border border-white/10"
       >
-        <div className="avatar avatar-sm">
-          <img
-            src={session?.avatar || 'https://via.placeholder.com/32'}
-            alt={session?.handle || 'User'}
-            onError={(e) => {
-              e.stopPropagation();
-              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/32';
-            }}
-          />
-        </div>
+        <CachedAvatar
+          src={session?.avatar}
+          alt={session?.handle || 'User'}
+          handle={session?.handle}
+          size="sm"
+          fallback="https://via.placeholder.com/32"
+        />
         <span className="hidden md:block text-sm font-medium text-white/90">
           @{session?.handle.split('.')[0]}
         </span>
