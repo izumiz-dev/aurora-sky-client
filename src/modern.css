@@ -1,6 +1,79 @@
 /* Modern UI Design System */
 @import 'tailwindcss';
 
+/* Aurora gradient background - 実際のオーロラの色に基づく */
+.aurora-gradient-bg {
+  background: linear-gradient(
+    112deg,
+    #172347 0%,      /* 深夜の空 */
+    #025385 12%,     /* ミッドナイトブルー */
+    #19646A 24%,     /* ブルーサファイア（青色オーロラ） */
+    #038298 36%,     /* メタリックシーウィード */
+    #0EF3C5 48%,     /* シーグリーン（緑色オーロラ - 最も一般的） */
+    #04E2B7 60%,     /* ロビンエッグブルー */
+    #00CF52 72%,     /* マラカイト */
+    #88f0f1 84%,     /* 淡い青緑 */
+    #f472b6 92%,     /* 淡いピンク（低高度窒素） */
+    #630019 100%     /* 深い赤（高高度酸素） */
+  ) !important;
+  background-size: 300% 300%;
+  animation: aurora-dance 20s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ヘッダーに輝きを追加 */
+.aurora-gradient-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 55%,
+    transparent 100%
+  );
+  animation: aurora-shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes aurora-dance {
+  0%, 100% {
+    background-position: 0% 0%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  20% {
+    background-position: 50% 100%;
+    filter: hue-rotate(-10deg) brightness(1.1);
+  }
+  40% {
+    background-position: 100% 50%;
+    filter: hue-rotate(5deg) brightness(0.95);
+  }
+  60% {
+    background-position: 0% 100%;
+    filter: hue-rotate(-5deg) brightness(1.05);
+  }
+  80% {
+    background-position: 100% 0%;
+    filter: hue-rotate(10deg) brightness(0.98);
+  }
+}
+
+@keyframes aurora-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 @layer base {
   :root {
     /* Color System */

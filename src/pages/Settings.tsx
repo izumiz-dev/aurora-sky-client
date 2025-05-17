@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'preact/hooks';
 import { useAuth } from '../context/AuthContext';
 import { getPreferences, updatePreferences } from '../lib/api';
+import { route } from 'preact-router';
 
 // 言語コードと表示名のマッピング
 const LANGUAGE_OPTIONS = [
@@ -17,7 +18,7 @@ const LANGUAGE_OPTIONS = [
 ];
 
 export const SettingsPage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const [contentLanguages, setContentLanguages] = useState<string[]>(['ja']);
   const [postLanguage, setPostLanguage] = useState<string>('ja');
   const [isLoading, setIsLoading] = useState(true);
@@ -97,6 +98,11 @@ export const SettingsPage = () => {
     });
   };
 
+  const handleLogout = () => {
+    logout();
+    route('/login');
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="max-w-2xl mx-auto px-4 pt-6">
@@ -169,6 +175,23 @@ export const SettingsPage = () => {
           <p className="text-sm text-white/60 mt-2">
             タイムラインに表示される投稿の言語をフィルタリングします
           </p>
+        </div>
+      </div>
+
+      {/* アカウントセクション */}
+      <div className="glass-card p-6 mb-6">
+        <h2 className="text-xl font-semibold text-white mb-4">アカウント</h2>
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-white">ログアウト</p>
+            <p className="text-sm text-white/60">現在のアカウントからログアウトします</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-400"
+          >
+            ログアウト
+          </button>
         </div>
       </div>
 

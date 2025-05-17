@@ -2,6 +2,7 @@ import { useState, useEffect } from 'preact/hooks';
 import { useAuth } from '../context/AuthContext';
 import { useLanguagePreferences } from '../context/LanguagePreferences';
 import { AppIcon } from '../components/AppIcon';
+import { route } from 'preact-router';
 
 // 言語コードと表示名のマッピング
 const LANGUAGE_OPTIONS = [
@@ -18,7 +19,7 @@ const LANGUAGE_OPTIONS = [
 ];
 
 export const ModernSettingsPage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { preferences, updatePreferences: updateLangPrefs, isLoading } = useLanguagePreferences();
   const [contentLanguages, setContentLanguages] = useState<string[]>([]);
   const [showAllLanguages, setShowAllLanguages] = useState(true);
@@ -71,6 +72,11 @@ export const ModernSettingsPage = () => {
     if (!showAllLanguages) {
       setContentLanguages([]);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    route('/login');
   };
 
   if (!isAuthenticated) {
@@ -209,6 +215,39 @@ export const ModernSettingsPage = () => {
           <p className="text-sm text-white/60 mt-3">
             タイムラインに表示される投稿の言語をフィルタリングします
           </p>
+        </div>
+      </div>
+
+      {/* アカウントセクション */}
+      <div className="glass-card p-6 mb-6 ambient-fade-in">
+        <div className="flex items-center mb-6">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-white mr-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
+          </svg>
+          <h2 className="text-xl font-semibold text-white">アカウント</h2>
+        </div>
+        <div className="flex justify-between items-center p-4 glass rounded-lg hover-lift">
+          <div>
+            <p className="text-white font-medium">ログアウト</p>
+            <p className="text-sm text-white/60">現在のアカウントからログアウトします</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2"
+          >
+            ログアウト
+          </button>
         </div>
       </div>
 

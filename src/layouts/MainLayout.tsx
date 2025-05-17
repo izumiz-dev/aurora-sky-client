@@ -3,6 +3,7 @@ import { useState, useEffect } from 'preact/hooks';
 import { Link, route } from 'preact-router';
 import { useAuth } from '../context/AuthContext';
 import { AppIcon } from '../components/AppIcon';
+import { FloatingSettings } from '../components/FloatingSettings';
 
 interface MainLayoutProps {
   children?: preact.ComponentChildren;
@@ -10,7 +11,7 @@ interface MainLayoutProps {
 }
 
 export const MainLayout: FunctionalComponent<MainLayoutProps> = ({ children, path = '' }) => {
-  const { isAuthenticated, logout, session } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -36,7 +37,11 @@ export const MainLayout: FunctionalComponent<MainLayoutProps> = ({ children, pat
     <div className="min-h-screen flex flex-col">
       {/* ヘッダー */}
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/10' : 'bg-transparent'} backdrop-blur-sm border-b border-white/10`}
+        className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'aurora-gradient-bg' : 'bg-transparent'} border-b border-white/10`}
+        style={{
+          backdropFilter: 'blur(10px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(10px) saturate(150%)',
+        }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between h-14">
@@ -44,7 +49,7 @@ export const MainLayout: FunctionalComponent<MainLayoutProps> = ({ children, pat
               <Link href="/" className="flex items-center group">
                 <div className="flex items-center gap-2">
                   <AppIcon size="sm" className="shadow-md" />
-                  <span className="text-xl font-semibold text-white group-hover:text-blue-300 transition-colors">
+                  <span className="text-xl font-semibold text-white group-hover:text-white/90 transition-all">
                     AuroraSky
                   </span>
                 </div>
@@ -61,28 +66,12 @@ export const MainLayout: FunctionalComponent<MainLayoutProps> = ({ children, pat
               </Link>
 
               {isAuthenticated ? (
-                <div className="flex items-center gap-4">
-                  {session && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 overflow-hidden rounded-full">
-                        <img
-                          src="/default-avatar.png"
-                          alt="User Avatar"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <span className="text-sm font-medium text-white/90">
-                        @{session.handle.split('.')[0]}
-                      </span>
-                    </div>
-                  )}
-                  <button
-                    onClick={handleLogout}
-                    className="text-sm text-white/80 hover:text-white transition-colors"
-                  >
-                    ログアウト
-                  </button>
-                </div>
+                <button
+                  onClick={handleLogout}
+                  className="text-sm text-white/80 hover:text-white transition-colors"
+                >
+                  ログアウト
+                </button>
               ) : (
                 <Link href="/login" className="btn-primary-small">
                   ログイン
@@ -182,6 +171,9 @@ export const MainLayout: FunctionalComponent<MainLayoutProps> = ({ children, pat
           </div>
         </div>
       </footer>
+
+      {/* 浮かぶ設定ボタン */}
+      {isAuthenticated && <FloatingSettings />}
     </div>
   );
 };

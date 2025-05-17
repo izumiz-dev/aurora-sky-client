@@ -1,9 +1,9 @@
 import type { FunctionalComponent } from 'preact';
 import { Link } from 'preact-router';
 import { useAuth } from '../context/AuthContext';
-import { UserMenu } from '../components/UserMenu';
 import { AppIcon } from '../components/AppIcon';
 import { BackgroundParticles } from '../components/BackgroundParticles';
+import { FloatingSettings } from '../components/FloatingSettings';
 
 interface ModernLayoutProps {
   children?: preact.ComponentChildren;
@@ -17,7 +17,12 @@ export const ModernLayout: FunctionalComponent<ModernLayoutProps> = ({ children 
     <div className="min-h-screen animated-bg">
       <BackgroundParticles />
       <div className="animated-gradient"></div>
-      <header className="glass-header">
+      <header className="aurora-gradient-bg sticky top-0 z-50 border-b border-white/10 shadow-lg"
+        style={{
+          backdropFilter: 'saturate(180%) blur(20px)',
+          WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+          color: 'white'
+        }}>
         <div className="max-w-screen-xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
@@ -31,9 +36,7 @@ export const ModernLayout: FunctionalComponent<ModernLayoutProps> = ({ children 
             </div>
 
             <div className="flex items-center gap-4">
-              {isAuthenticated ? (
-                <UserMenu />
-              ) : (
+              {!isAuthenticated && (
                 <Link href="/login" className="glass-button btn-primary">
                   ログイン
                 </Link>
@@ -44,6 +47,9 @@ export const ModernLayout: FunctionalComponent<ModernLayoutProps> = ({ children 
       </header>
 
       <main>{children}</main>
+
+      {/* 浮かぶ設定ボタン */}
+      {isAuthenticated && <FloatingSettings />}
     </div>
   );
 };
