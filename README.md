@@ -2,7 +2,7 @@
 
 # AuroraSky - A Beautiful Bluesky Client
 
-![AuroraSky](https://img.shields.io/badge/AuroraSky-Bluesky%20Client-1185fe)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-aurora.izumiz.dev-1185fe)](https://aurora.izumiz.dev)
 ![Preact](https://img.shields.io/badge/Preact-10.x-673ab8)
 ![Vite](https://img.shields.io/badge/Vite-6.x-646cff)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6)
