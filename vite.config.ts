@@ -39,7 +39,7 @@ export default defineConfig({
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // 開発環境用に緩和
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "img-src 'self' data: https: blob:",
-        "connect-src 'self' https://*.bsky.social https://*.bsky.network wss://*.bsky.social wss://*.bsky.network",
+        "connect-src https://bsky.social https://*.bsky.social https://*.bsky.network wss://bsky.social wss://*.bsky.social wss://*.bsky.network http://localhost:* https://localhost:*",
         "font-src 'self' https://fonts.gstatic.com",
         "object-src 'none'",
         "base-uri 'self'",
