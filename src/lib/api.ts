@@ -1,4 +1,4 @@
-import { BskyAgent } from '@atproto/api';
+import { BskyAgent, RichText } from '@atproto/api';
 import { parseApiError } from './api-error-handler';
 
 export const agent = new BskyAgent({
@@ -40,8 +40,17 @@ export const fetchTimeline = async (params: { limit?: number; cursor?: string } 
 
 export const createPost = async (text: string, langs?: string[]) => {
   const agent = await getAgent();
+  
+  // RichTextを使って自動的にリンクとメンションを検出
+  const richText = new RichText({
+    text: text,
+  });
+  
+  await richText.detectFacets(agent);
+  
   return agent.post({
-    text,
+    text: richText.text,
+    facets: richText.facets,
     langs,
     createdAt: new Date().toISOString(),
   });
@@ -89,6 +98,13 @@ export const createPostWithImages = async (
 ) => {
   const agent = await getAgent();
 
+  // RichTextを使って自動的にリンクとメンションを検出
+  const richText = new RichText({
+    text: text,
+  });
+  
+  await richText.detectFacets(agent);
+
   const embed = {
     $type: 'app.bsky.embed.images',
     images: images.map(({ alt, blob }) => ({
@@ -98,7 +114,8 @@ export const createPostWithImages = async (
   };
 
   return agent.post({
-    text,
+    text: richText.text,
+    facets: richText.facets,
     embed,
     langs,
     createdAt: new Date().toISOString(),
