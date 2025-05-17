@@ -88,7 +88,9 @@ body {
         rgba(16, 185, 129, 0.08) 0%,
         transparent 60%
       );
-  animation: aurora 360s ease-in-out infinite;
+  /* animation: aurora 360s ease-in-out infinite; */
+  /* パフォーマンス向上のため、アニメーションを無効化 */
+  transform: translate(-25px, -40px) scale(1.05) rotate(5deg);  /* 静的な位置に固定 */
   pointer-events: none;
   z-index: 0;
   filter: blur(40px);
@@ -733,6 +735,27 @@ button {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.15);
+}
+
+/* アニメーションを減らしたいユーザー向けの設定 */
+@media (prefers-reduced-motion: reduce) {
+  .animated-gradient {
+    animation: none !important;
+  }
+  
+  .like-animation,
+  .repost-animation,
+  .ambient-fade-in,
+  .ambient-glow::after,
+  .shimmer-text::after {
+    animation: none !important;
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Icon button styles */
