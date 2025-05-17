@@ -4,6 +4,7 @@ import { PostItem } from '../components/PostItem';
 import { Snackbar } from '../components/Snackbar';
 import { useTimeline } from '../hooks/useTimeline';
 import { AppIcon } from '../components/AppIcon';
+import { DevelopmentNotice } from '../components/DevelopmentNotice';
 
 export const ModernHomePage = () => {
   const { isAuthenticated, session } = useAuth();
@@ -39,6 +40,7 @@ export const ModernHomePage = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-6">
+      <DevelopmentNotice />
       <PostComposer onPostSuccess={refreshTimeline} />
 
       {newPostsCount > 0 && (

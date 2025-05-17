@@ -2,6 +2,7 @@ import { useState, useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
 import { useAuth } from '../context/AuthContext';
 import { AppIcon } from '../components/AppIcon';
+import { DevelopmentNotice } from '../components/DevelopmentNotice';
 
 export const ModernLoginPage = () => {
   const [identifier, setIdentifier] = useState('');
@@ -46,6 +47,9 @@ export const ModernLoginPage = () => {
     <div className="min-h-screen flex items-center justify-center animated-bg px-4">
       <div className="animated-gradient"></div>
       <div className="max-w-md w-full relative">
+        {/* 開発中の注意書き */}
+        <DevelopmentNotice />
+        
         {/* ロゴセクション */}
         <div className="text-center mb-8">
           <AppIcon size="lg" withGradientBg={false} className="mb-4" />

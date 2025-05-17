@@ -2,6 +2,7 @@ import { useState, useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
 import { useAuth } from '../context/AuthContext';
 import { AppIcon } from '../components/AppIcon';
+import { DevelopmentNotice } from '../components/DevelopmentNotice';
 
 export const LoginPage = () => {
   const [identifier, setIdentifier] = useState('');
@@ -44,13 +45,15 @@ export const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-indigo-purple px-4">
-      <div className="max-w-md w-full space-y-8 glass-card-simple p-8">
-        <div className="text-center">
-          <div className="flex justify-center mb-6">
-            <AppIcon size="lg" />
+      <div className="max-w-md w-full space-y-8">
+        <DevelopmentNotice />
+        <div className="glass-card-simple p-8">
+          <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <AppIcon size="lg" />
+            </div>
+            <h2 className="text-2xl font-semibold text-white mb-2">AuroraSkyにログイン</h2>
           </div>
-          <h2 className="text-2xl font-semibold text-white mb-2">AuroraSkyにログイン</h2>
-        </div>
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-100 px-4 py-3 rounded-lg text-sm">
