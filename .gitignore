@@ -25,3 +25,13 @@ dist-ssr
 
 # Claude AI settings
 .claude/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.production.local
+
+# Temporary files
+*.tmp
+*.temp

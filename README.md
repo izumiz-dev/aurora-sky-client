@@ -140,6 +140,23 @@ All Bluesky API calls are wrapped in `src/lib/api.ts` for consistent error handl
 - Preact Signals for reactive client state
 - Context API for authentication state
 
+## 🔐 Security
+
+### Security Features
+
+- **Session Encryption**: All session data is encrypted using Web Crypto API
+- **Content Security Policy**: Strict CSP headers to prevent XSS attacks
+- **Input Validation**: Comprehensive validation for all user inputs
+- **HTTPS Only**: Automatic redirect to HTTPS in production
+- **Secure Headers**: X-Frame-Options, X-Content-Type-Options, etc.
+
+### Best Practices
+
+1. **Environment Variables**: Use `.env.example` as a template
+2. **Session Keys**: Generate secure random keys for production
+3. **Regular Updates**: Run `npm audit` regularly
+4. **Security Documentation**: See [docs/SECURITY.md](docs/SECURITY.md)
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

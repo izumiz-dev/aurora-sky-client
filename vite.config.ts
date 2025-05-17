@@ -33,6 +33,26 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    headers: {
+      'Content-Security-Policy': [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // 開発環境用に緩和
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: https: blob:",
+        "connect-src 'self' https://bsky.social wss://bsky.social",
+        "font-src 'self'",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+        "frame-src https://www.youtube.com https://youtube.com",
+        "media-src 'self' https:",
+      ].join('; '),
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Referrer-Policy': 'no-referrer-when-downgrade',
+    },
   },
   build: {
     target: 'es2020',
