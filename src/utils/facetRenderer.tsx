@@ -17,33 +17,33 @@ export function renderTextWithFacets(text: string, facets?: Facet[]) {
 
   // Sort facets by byte start position
   const sortedFacets = [...facets].sort((a, b) => a.index.byteStart - b.index.byteStart);
-  
+
   const elements: preact.JSX.Element[] = [];
   let lastIndex = 0;
-  
+
   // Convert string to bytes for proper indexing
   const encoder = new TextEncoder();
   const textBytes = encoder.encode(text);
-  
+
   sortedFacets.forEach((facet, i) => {
     const { byteStart, byteEnd } = facet.index;
-    
+
     // Add text before this facet
     if (byteStart > lastIndex) {
       const beforeBytes = textBytes.slice(lastIndex, byteStart);
       const beforeText = new TextDecoder().decode(beforeBytes);
       elements.push(<span key={`text-${i}`}>{beforeText}</span>);
     }
-    
+
     // Get the facet text
     const facetBytes = textBytes.slice(byteStart, byteEnd);
     const facetText = new TextDecoder().decode(facetBytes);
-    
+
     // Render the facet based on its type
     const feature = facet.features[0];
     if (feature.$type === 'app.bsky.richtext.facet#link' && feature.uri) {
       elements.push(
-        <a 
+        <a
           key={`link-${i}`}
           href={feature.uri}
           target="_blank"
@@ -55,7 +55,7 @@ export function renderTextWithFacets(text: string, facets?: Facet[]) {
       );
     } else if (feature.$type === 'app.bsky.richtext.facet#mention' && feature.did) {
       elements.push(
-        <a 
+        <a
           key={`mention-${i}`}
           href={`https://bsky.app/profile/${feature.did}`}
           target="_blank"
@@ -68,16 +68,16 @@ export function renderTextWithFacets(text: string, facets?: Facet[]) {
     } else {
       elements.push(<span key={`facet-${i}`}>{facetText}</span>);
     }
-    
+
     lastIndex = byteEnd;
   });
-  
+
   // Add remaining text
   if (lastIndex < textBytes.length) {
     const remainingBytes = textBytes.slice(lastIndex);
     const remainingText = new TextDecoder().decode(remainingBytes);
     elements.push(<span key="text-final">{remainingText}</span>);
   }
-  
+
   return <>{elements}</>;
 }

@@ -6,17 +6,17 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-blur: 16px;
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-  
+
   /* Dark text colors */
   --text-primary: rgba(255, 255, 255, 0.95);
   --text-secondary: rgba(255, 255, 255, 0.75);
   --text-tertiary: rgba(255, 255, 255, 0.5);
-  
+
   /* Accent colors */
   --accent-primary: #3b82f6;
   --accent-secondary: #8b5cf6;
   --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  
+
   /* Engagement colors */
   --engagement-reply: #3b82f6;
   --engagement-repost: #10b981;
@@ -59,30 +59,26 @@ body {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(
-    circle at 20% 80%,
-    rgba(59, 130, 246, 0.15) 0%,
-    transparent 40%
-  ),
-  radial-gradient(
-    circle at 80% 20%,
-    rgba(139, 92, 246, 0.15) 0%,
-    transparent 40%
-  ),
-  radial-gradient(
-    circle at 40% 40%,
-    rgba(236, 72, 153, 0.1) 0%,
-    transparent 40%
-  );
+  background:
+    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.1) 0%, transparent 40%);
   animation: float 30s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
 }
 
 @keyframes float {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  33% { transform: translate(-30px, -30px) scale(1.05) rotate(120deg); }
-  66% { transform: translate(20px, -20px) scale(0.95) rotate(240deg); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(-30px, -30px) scale(1.05) rotate(120deg);
+  }
+  66% {
+    transform: translate(20px, -20px) scale(0.95) rotate(240deg);
+  }
 }
 
 /* Header glass effect */
@@ -106,7 +102,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0.75rem;
   box-shadow: var(--glass-shadow);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   color: var(--text-primary);
 }
 
@@ -277,8 +273,12 @@ body {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Utility classes */
@@ -303,33 +303,28 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.05),
-    transparent
-  );
-  transition: left 0.6s ease;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.4s ease;
 }
 
 .ambient-hover:hover::before {
   left: 100%;
 }
 
-/* Ambient animations for new posts */
+/* Ambient animations for new posts - moderate speed */
 .ambient-fade-in {
-  animation: ambientFadeIn 2s ease-out forwards;
+  animation: ambientFadeIn 1s ease-out forwards;
 }
 
 @keyframes ambientFadeIn {
   0% {
     opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-    filter: blur(10px);
+    transform: translateY(-16px) scale(0.96);
+    filter: blur(8px);
   }
-  50% {
-    opacity: 0.7;
-    filter: blur(3px);
+  40% {
+    opacity: 0.6;
+    filter: blur(2px);
   }
   100% {
     opacity: 1;
@@ -352,11 +347,11 @@ body {
   height: 300%;
   background: radial-gradient(
     circle,
-    rgba(59, 130, 246, 0.2) 0%,
-    rgba(139, 92, 246, 0.2) 25%,
+    rgba(59, 130, 246, 0.15) 0%,
+    rgba(139, 92, 246, 0.15) 25%,
     transparent 70%
   );
-  animation: ambientGlow 3s ease-in-out;
+  animation: ambientGlow 2s ease-in-out;
   pointer-events: none;
 }
 
@@ -387,13 +382,8 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
-  animation: shimmer 2s ease-out;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 1.2s ease-out;
 }
 
 @keyframes shimmer {
@@ -404,7 +394,9 @@ body {
 
 /* Snackbar ambient animation */
 .ambient-snackbar {
-  animation: snackbarIn 0.5s ease-out forwards, snackbarOut 0.5s ease-in 4.5s forwards;
+  animation:
+    snackbarIn 0.5s ease-out forwards,
+    snackbarOut 0.5s ease-in 4.5s forwards;
 }
 
 @keyframes snackbarIn {
@@ -445,13 +437,8 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
-  animation: snackbarShimmer 3s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: snackbarShimmer 2s ease-in-out infinite;
 }
 
 @keyframes snackbarShimmer {
@@ -467,19 +454,40 @@ body {
 }
 
 /* Ensure all text elements are white in dark theme */
-h1, h2, h3, h4, h5, h6,
-p, span, div, label,
-a, button {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div,
+label,
+a,
+button {
   color: var(--text-primary);
 }
 
 /* Override Tailwind's dark mode text colors */
-.text-gray-900 { color: var(--text-primary) !important; }
-.text-gray-800 { color: var(--text-primary) !important; }
-.text-gray-700 { color: var(--text-secondary) !important; }
-.text-gray-600 { color: var(--text-secondary) !important; }
-.text-gray-500 { color: var(--text-tertiary) !important; }
-.text-gray-400 { color: var(--text-tertiary) !important; }
+.text-gray-900 {
+  color: var(--text-primary) !important;
+}
+.text-gray-800 {
+  color: var(--text-primary) !important;
+}
+.text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+.text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+.text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+.text-gray-400 {
+  color: var(--text-tertiary) !important;
+}
 
 /* Dark theme scrollbar */
 ::-webkit-scrollbar {

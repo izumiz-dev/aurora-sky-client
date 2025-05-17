@@ -63,9 +63,7 @@ export const ModernLoginPage = () => {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Blueskyへようこそ
-          </h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Blueskyへようこそ</h1>
           <p className="text-white/70">ソーシャルメディアの新しい形</p>
         </div>
 
@@ -94,9 +92,7 @@ export const ModernLoginPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
-                パスワード
-              </label>
+              <label className="block text-sm font-medium text-white/80 mb-2">パスワード</label>
               <input
                 type="password"
                 value={password}
@@ -114,9 +110,7 @@ export const ModernLoginPage = () => {
                   type="checkbox"
                   className="w-4 h-4 text-blue-600 border-white/30 rounded focus:ring-blue-500 bg-white/10"
                 />
-                <span className="ml-2 text-sm text-white/60">
-                  ログイン状態を保持
-                </span>
+                <span className="ml-2 text-sm text-white/60">ログイン状態を保持</span>
               </label>
 
               <a href="#" className="text-sm text-blue-400 hover:underline">
@@ -124,7 +118,11 @@ export const ModernLoginPage = () => {
               </a>
             </div>
 
-            <button type="submit" disabled={isLoading} className="w-full glass-button btn-primary py-3">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full glass-button btn-primary py-3"
+            >
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <svg
@@ -161,7 +159,9 @@ export const ModernLoginPage = () => {
                 <div className="w-full border-t border-white/10"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 rounded-lg text-white/70 backdrop-filter backdrop-blur-lg bg-white/5 border border-white/10">または</span>
+                <span className="px-4 rounded-lg text-white/70 backdrop-filter backdrop-blur-lg bg-white/5 border border-white/10">
+                  または
+                </span>
               </div>
             </div>
 
@@ -199,10 +199,7 @@ export const ModernLoginPage = () => {
 
           <p className="mt-8 text-center text-sm text-white/60">
             アカウントをお持ちでない場合は{' '}
-            <a
-              href="https://bsky.app/"
-              className="font-medium text-blue-400 hover:underline"
-            >
+            <a href="https://bsky.app/" className="font-medium text-blue-400 hover:underline">
               公式アプリから登録
             </a>
           </p>

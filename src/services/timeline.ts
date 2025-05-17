@@ -20,7 +20,6 @@ export const fetchTimeline = async (
     const post = item.post as AppBskyFeedDefs.PostView;
     const record = post.record as any;
 
-
     return {
       uri: post.uri,
       cid: post.cid,

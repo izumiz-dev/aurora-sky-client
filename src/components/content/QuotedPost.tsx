@@ -2,6 +2,7 @@ import { formatTimeAgo } from '../../utils/date';
 
 interface QuotedPostProps {
   record: {
+    $type?: string;
     uri: string;
     cid: string;
     author?: {
@@ -11,10 +12,12 @@ interface QuotedPostProps {
       avatar?: string;
     };
     value?: {
+      $type?: string;
       text?: string;
       createdAt?: string;
       [key: string]: any;
     };
+    // AT Protocol view format
     record?: {
       text?: string;
       createdAt?: string;
@@ -24,12 +27,13 @@ interface QuotedPostProps {
 }
 
 export const QuotedPost = ({ record }: QuotedPostProps) => {
-  // Handle different record structures for API view responses
-  const isViewRecord = record.$type === 'app.bsky.embed.record#viewRecord';
+  // View format has nested structure
   const author = record.author;
+
+  // Extract text and createdAt from either value or record
   const postData = record.value || record.record || {};
-  const text = postData.text || postData.$text || '';
-  const createdAt = postData.createdAt || postData.created_at || record.indexedAt;
+  const text = postData.text || '';
+  const createdAt = postData.createdAt;
 
   if (!author && !text) {
     return (
@@ -39,17 +43,22 @@ export const QuotedPost = ({ record }: QuotedPostProps) => {
     );
   }
 
+  // Extract post ID from URI for navigation
+  const postId = record.uri.split('/').pop();
+
   return (
-    <div 
+    <div
       className="glass-card p-4 mt-3 cursor-pointer hover:bg-white/5 transition-all duration-300 ambient-fade-in hover-lift"
-      onClick={() => window.open(`https://bsky.app/profile/${author?.handle}/post/${record.uri.split('/').pop()}`, '_blank')}
+      onClick={() =>
+        window.open(`https://bsky.app/profile/${author?.handle}/post/${postId}`, '_blank')
+      }
     >
       {author && (
         <div className="flex items-center gap-2 mb-2">
           {author.avatar && (
             <div className="w-8 h-8 rounded-full overflow-hidden glass-card">
-              <img 
-                src={author.avatar} 
+              <img
+                src={author.avatar}
                 alt={author.displayName || author.handle}
                 className="w-full h-full object-cover"
               />
@@ -60,24 +69,16 @@ export const QuotedPost = ({ record }: QuotedPostProps) => {
               <span className="font-medium text-sm text-white truncate">
                 {author.displayName || author.handle}
               </span>
-              <span className="text-xs text-white/60">
-                @{author.handle}
-              </span>
+              <span className="text-xs text-white/60">@{author.handle}</span>
             </div>
             {createdAt && (
-              <div className="text-xs text-white/50">
-                {formatTimeAgo(new Date(createdAt))}
-              </div>
+              <div className="text-xs text-white/50">{formatTimeAgo(new Date(createdAt))}</div>
             )}
           </div>
         </div>
       )}
-      
-      {text && (
-        <p className="text-sm text-white/90 whitespace-pre-wrap break-words">
-          {text}
-        </p>
-      )}
+
+      {text && <p className="text-sm text-white/90 whitespace-pre-wrap break-words">{text}</p>}
     </div>
   );
 };

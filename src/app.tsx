@@ -35,18 +35,18 @@ export function App() {
         <Router>
           <Route path="/login" component={ModernLoginPage} />
           <Route
-            path="/"
-            component={() => (
-              <ModernLayout>
-                <ModernHomePage />
-              </ModernLayout>
-            )}
-          />
-          <Route
             path="/test-embeds"
             component={() => (
               <ModernLayout>
                 <TestEmbedsPage />
+              </ModernLayout>
+            )}
+          />
+          <Route
+            path="/"
+            component={() => (
+              <ModernLayout>
+                <ModernHomePage />
               </ModernLayout>
             )}
           />

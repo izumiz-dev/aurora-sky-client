@@ -51,33 +51,35 @@ export interface Post {
         [key: string]: any;
       };
     };
-    external?: {
-      external: {
-        uri: string;
-        title: string;
-        description: string;
-        thumb?: {
-          $type: string;
-          ref: {
-            $link: string;
+    external?:
+      | {
+          external: {
+            uri: string;
+            title: string;
+            description: string;
+            thumb?: {
+              $type: string;
+              ref: {
+                $link: string;
+              };
+              mimeType: string;
+              size: number;
+            };
           };
-          mimeType: string;
-          size: number;
+        }
+      | {
+          uri: string;
+          title: string;
+          description: string;
+          thumb?: {
+            $type: string;
+            ref: {
+              $link: string;
+            };
+            mimeType: string;
+            size: number;
+          };
         };
-      };
-    } | {
-      uri: string;
-      title: string;
-      description: string;
-      thumb?: {
-        $type: string;
-        ref: {
-          $link: string;
-        };
-        mimeType: string;
-        size: number;
-      };
-    };
     images?: Array<{
       thumb: string | { ref: { $link: string } };
       fullsize: string | { ref: { $link: string } };

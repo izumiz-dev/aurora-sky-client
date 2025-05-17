@@ -6,22 +6,19 @@ import { useTimeline } from '../hooks/useTimeline';
 
 export const ModernHomePage = () => {
   const { isAuthenticated, session } = useAuth();
-  const { 
-    posts, 
-    isLoading, 
-    error, 
-    isLoadingMore, 
-    hasMore, 
-    loadError, 
-    newPostsCount, 
-    loadNewPosts, 
+  const {
+    posts,
+    isLoading,
+    error,
+    isLoadingMore,
+    hasMore,
+    loadError,
+    newPostsCount,
+    loadNewPosts,
     newPostIds,
     showSnackbar,
-    handleCloseSnackbar
-  } = useTimeline(
-    session,
-    isAuthenticated
-  );
+    handleCloseSnackbar,
+  } = useTimeline(session, isAuthenticated);
 
   if (!isAuthenticated) {
     return (
@@ -43,12 +40,8 @@ export const ModernHomePage = () => {
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">
-            Blueskyへようこそ
-          </h2>
-          <p className="text-white/70 mb-6">
-            タイムラインを表示するにはログインしてください
-          </p>
+          <h2 className="text-2xl font-bold text-white mb-2">Blueskyへようこそ</h2>
+          <p className="text-white/70 mb-6">タイムラインを表示するにはログインしてください</p>
           <a href="/login" className="glass-button btn-primary">
             ログインする
           </a>
@@ -60,16 +53,14 @@ export const ModernHomePage = () => {
   return (
     <div className="max-w-2xl mx-auto px-4 pt-6">
       <PostComposer />
-      
+
       {newPostsCount > 0 && (
         <div className="mb-4 ambient-fade-in">
           <button
             onClick={loadNewPosts}
             className="glass-button w-full py-3 text-center hover:scale-[1.02] transition-transform ambient-glow"
           >
-            <span className="shimmer-text">
-              {newPostsCount}件の新しい投稿を表示
-            </span>
+            <span className="shimmer-text">{newPostsCount}件の新しい投稿を表示</span>
           </button>
         </div>
       )}
@@ -81,26 +72,16 @@ export const ModernHomePage = () => {
           </div>
         ) : error ? (
           <div className="glass-card p-6 text-center">
-            <p className="text-red-400 mb-4">
-              タイムラインの読み込みに失敗しました
-            </p>
+            <p className="text-red-400 mb-4">タイムラインの読み込みに失敗しました</p>
           </div>
         ) : posts.length === 0 ? (
           <div className="glass-card p-12 text-center">
-            <h3 className="text-lg font-semibold text-white mb-2">
-              タイムラインは空です
-            </h3>
-            <p className="text-white/70">
-              フォローしているユーザーの投稿がここに表示されます
-            </p>
+            <h3 className="text-lg font-semibold text-white mb-2">タイムラインは空です</h3>
+            <p className="text-white/70">フォローしているユーザーの投稿がここに表示されます</p>
           </div>
         ) : (
           posts.map((post) => (
-            <PostItem 
-              key={post.uri} 
-              post={post} 
-              isNew={newPostIds.has(post.uri)}
-            />
+            <PostItem key={post.uri} post={post} isNew={newPostIds.has(post.uri)} />
           ))
         )}
       </div>
@@ -112,15 +93,11 @@ export const ModernHomePage = () => {
       )}
 
       {!hasMore && posts.length > 0 && (
-        <div className="text-center py-8 text-white/60">
-          これ以上の投稿はありません
-        </div>
+        <div className="text-center py-8 text-white/60">これ以上の投稿はありません</div>
       )}
 
-      {loadError && (
-        <div className="text-center py-4 text-red-400">{loadError}</div>
-      )}
-      
+      {loadError && <div className="text-center py-4 text-red-400">{loadError}</div>}
+
       {showSnackbar && (
         <Snackbar
           message={`${newPostsCount}件の新しい投稿があります`}

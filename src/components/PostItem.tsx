@@ -28,11 +28,7 @@ export const PostItem = ({ post, isNew = false }: PostItemProps) => {
             </span>
           </div>
           <div className="text-white">
-            <RichContent 
-              text={post.record.text} 
-              embed={post.embed}
-              facets={post.record.facets}
-            />
+            <RichContent text={post.record.text} embed={post.embed} facets={post.record.facets} />
           </div>
         </div>
       </div>

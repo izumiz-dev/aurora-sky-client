@@ -83,7 +83,7 @@ export const HomePage = () => {
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['timeline', cursor, session?.did],
-    queryFn: () => fetchTimeline(session, cursor || undefined),
+    queryFn: () => fetchTimeline(session!, cursor || undefined),
     enabled: isAuthenticated && !!session,
   });
 

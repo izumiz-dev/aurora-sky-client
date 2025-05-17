@@ -17,11 +17,7 @@ export const PostComposer = () => {
           />
         </div>
         <div className="flex-1">
-          <textarea
-            className="glass-input resize-none"
-            rows={3}
-            placeholder="今どうしてる？"
-          />
+          <textarea className="glass-input resize-none" rows={3} placeholder="今どうしてる？" />
           <div className="flex items-center justify-between mt-3">
             <div className="flex gap-2">
               <button className="glass-button glass-button-ghost icon-btn">

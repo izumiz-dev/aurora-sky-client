@@ -41,15 +41,15 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
   // Check for new posts every minute
   const checkForNewPosts = useCallback(async () => {
     if (!session || !isAuthenticated || posts.length === 0) return;
-    
+
     try {
       const response = await fetchTimeline(session);
       if (response.feed.length > 0) {
         const latestPostTime = new Date(posts[0].record.createdAt).getTime();
         const newPosts = response.feed.filter(
-          post => new Date(post.record.createdAt).getTime() > latestPostTime
+          (post) => new Date(post.record.createdAt).getTime() > latestPostTime
         );
-        
+
         if (newPosts.length > 0) {
           setNewPostsCount(newPosts.length);
           setShowSnackbar(true);
@@ -63,21 +63,21 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
   // Load new posts when user clicks the notification
   const loadNewPosts = useCallback(async () => {
     if (!session) return;
-    
+
     try {
       const response = await fetchTimeline(session);
       if (response.feed.length > 0) {
         const latestPostTime = new Date(posts[0].record.createdAt).getTime();
         const newPosts = response.feed.filter(
-          post => new Date(post.record.createdAt).getTime() > latestPostTime
+          (post) => new Date(post.record.createdAt).getTime() > latestPostTime
         );
-        
+
         if (newPosts.length > 0) {
-          const newIds = new Set(newPosts.map(post => post.uri));
+          const newIds = new Set(newPosts.map((post) => post.uri));
           setNewPostIds(newIds);
           setPosts([...newPosts, ...posts]);
           setNewPostsCount(0);
-          
+
           // Clear new post IDs after animation completes
           setTimeout(() => {
             setNewPostIds(new Set());
@@ -93,7 +93,7 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
   useEffect(() => {
     if (isAuthenticated && session && posts.length > 0) {
       intervalIdRef.current = setInterval(checkForNewPosts, 60000); // Check every minute
-      
+
       return () => {
         if (intervalIdRef.current) {
           clearInterval(intervalIdRef.current);
@@ -115,7 +115,7 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
       lastLoadTimeRef.current = now;
 
       try {
-        const moreData = await fetchTimeline(session, cursor);
+        const moreData = await fetchTimeline(session!, cursor);
         if (moreData.feed.length === 0) {
           setHasMore(false);
         } else {

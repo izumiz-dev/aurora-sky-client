@@ -57,8 +57,4 @@ export interface RecordWithMediaEmbed {
   media: ExternalEmbed | ImagesEmbed;
 }
 
-export type Embed = 
-  | ExternalEmbed 
-  | ImagesEmbed 
-  | RecordEmbed 
-  | RecordWithMediaEmbed;
+export type Embed = ExternalEmbed | ImagesEmbed | RecordEmbed | RecordWithMediaEmbed;

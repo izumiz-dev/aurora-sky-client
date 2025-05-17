@@ -50,32 +50,22 @@ export const UrlPreview = ({ url }: UrlPreviewProps) => {
   }
 
   return (
-    <a 
-      href={url} 
-      target="_blank" 
+    <a
+      href={url}
+      target="_blank"
       rel="noopener noreferrer"
       className="block glass-card p-4 mt-2 hover:bg-white/5 transition-colors"
     >
       <div className="flex gap-4">
         {preview.image && (
-          <img 
-            src={preview.image} 
-            alt={preview.title}
-            className="w-20 h-20 rounded object-cover"
-          />
+          <img src={preview.image} alt={preview.title} className="w-20 h-20 rounded object-cover" />
         )}
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-white truncate">
-            {preview.title}
-          </h4>
+          <h4 className="font-medium text-white truncate">{preview.title}</h4>
           {preview.description && (
-            <p className="text-sm text-white/70 line-clamp-2 mt-1">
-              {preview.description}
-            </p>
+            <p className="text-sm text-white/70 line-clamp-2 mt-1">{preview.description}</p>
           )}
-          <p className="text-xs text-white/50 mt-2">
-            {preview.siteName}
-          </p>
+          <p className="text-xs text-white/50 mt-2">{preview.siteName}</p>
         </div>
       </div>
     </a>
