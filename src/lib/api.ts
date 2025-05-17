@@ -1,4 +1,5 @@
 import { BskyAgent } from '@atproto/api';
+import { parseApiError } from './api-error-handler';
 
 export const agent = new BskyAgent({
   service: 'https://bsky.social',
@@ -12,11 +13,28 @@ export const getAgent = async () => {
   return agent;
 };
 
+// APIコールをエラーハンドリング付きでラップ
+const wrapApiCall = async <T>(apiCall: () => Promise<T>): Promise<T> => {
+  try {
+    return await apiCall();
+  } catch (error) {
+    const parsedError = parseApiError(error);
+    // エラーに追加情報を含めて再スロー
+    const enrichedError = Object.assign(new Error(parsedError.message), {
+      ...parsedError,
+      originalError: error
+    });
+    throw enrichedError;
+  }
+};
+
 export const fetchTimeline = async (params: { limit?: number; cursor?: string } = {}) => {
-  const agent = await getAgent();
-  return agent.getTimeline({
-    limit: params.limit || 30,
-    cursor: params.cursor,
+  return wrapApiCall(async () => {
+    const agent = await getAgent();
+    return agent.getTimeline({
+      limit: params.limit || 30,
+      cursor: params.cursor,
+    });
   });
 };
 

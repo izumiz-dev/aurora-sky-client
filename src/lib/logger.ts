@@ -46,9 +46,12 @@ export class Logger {
    */
   static error(message: string, error?: unknown): void {
     if (this.currentLevel <= this.logLevels.ERROR) {
+      const timestamp = new Date().toISOString();
+      const errorData = this.extractErrorData(error);
+      
       if (this.isDevelopment) {
         // 開発環境では詳細なエラー情報を表示
-        console.error(`[ERROR] ${message}`, error);
+        console.error(`[${timestamp}] ERROR: ${message}`, error);
         if (error instanceof Error) {
           console.error('Stack trace:', error.stack);
         }
@@ -58,7 +61,38 @@ export class Logger {
         // エラー監視サービスへの送信
         this.sendToErrorTracking(message, error);
       }
+
+      // レート制限エラーの統計を記録
+      if (errorData.isRateLimit) {
+        this.incrementRateLimitCounter();
+      }
     }
+  }
+
+  /**
+   * エラー情報の抽出
+   */
+  private static extractErrorData(error: unknown): {
+    message?: string;
+    statusCode?: number;
+    isRateLimit?: boolean;
+    retryAfter?: number;
+    stack?: string;
+  } {
+    if (!error) return {};
+    
+    if (error instanceof Error) {
+      const anyError = error as any;
+      return {
+        message: error.message,
+        stack: error.stack,
+        statusCode: anyError.statusCode,
+        isRateLimit: anyError.isRateLimit,
+        retryAfter: anyError.retryAfter,
+      };
+    }
+    
+    return {};
   }
 
   /**
@@ -180,6 +214,67 @@ export class Logger {
       }).catch(() => {
         // 送信失敗は無視
       });
+    }
+  }
+
+  // レート制限エラーのカウンター
+  private static rateLimitCount = 0;
+  private static rateLimitResetTime = Date.now() + 3600000; // 1時間後
+
+  /**
+   * レート制限エラーのカウンターをインクリメント
+   */
+  private static incrementRateLimitCounter(): void {
+    const now = Date.now();
+    
+    // リセット時間を過ぎたらカウンターをリセット
+    if (now > this.rateLimitResetTime) {
+      this.rateLimitCount = 0;
+      this.rateLimitResetTime = now + 3600000;
+    }
+    
+    this.rateLimitCount++;
+    
+    // 10回以上レート制限に達した場合は警告
+    if (this.rateLimitCount >= 10) {
+      this.warn(`Rate limit hit ${this.rateLimitCount} times in the last hour`);
+    }
+  }
+
+  /**
+   * エラーの統計情報を取得
+   */
+  static getErrorStats() {
+    return {
+      rateLimitCount: this.rateLimitCount,
+      rateLimitResetTime: new Date(this.rateLimitResetTime).toISOString()
+    };
+  }
+
+  /**
+   * API呼び出しのログ
+   */
+  static api(method: string, endpoint: string, params?: any, response?: any, error?: any): void {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      method,
+      endpoint,
+      params,
+      response: response ? { status: response.status, data: response.data } : undefined,
+      error: error ? this.extractErrorData(error) : undefined
+    };
+
+    if (this.isDevelopment) {
+      if (error) {
+        console.error('[API Error]', logEntry);
+      } else {
+        console.log('[API Call]', logEntry);
+      }
+    }
+
+    // レート制限エラーの場合は追加処理
+    if (error?.isRateLimit) {
+      this.incrementRateLimitCounter();
     }
   }
 }

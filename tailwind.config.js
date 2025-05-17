@@ -6,6 +6,16 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        // モバイル用のフォントサイズ
+        'xs-mobile': ['0.75rem', { lineHeight: '1rem' }],
+        'sm-mobile': ['0.8125rem', { lineHeight: '1.15rem' }],
+        'base-mobile': ['0.875rem', { lineHeight: '1.25rem' }],
+        'lg-mobile': ['1rem', { lineHeight: '1.375rem' }],
+        'xl-mobile': ['1.125rem', { lineHeight: '1.5rem' }],
+        '2xl-mobile': ['1.375rem', { lineHeight: '1.75rem' }],
+        '3xl-mobile': ['1.75rem', { lineHeight: '2rem' }],
+      },
       colors: {
         // 基本色の設定を追加
         white: '#ffffff',

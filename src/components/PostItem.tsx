@@ -137,22 +137,22 @@ export const PostItem = ({ post, isNew = false }: PostItemProps) => {
             />
           </a>
           <div className="flex-1 min-w-0">
-            <div className="flex items-baseline gap-2 mb-1">
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mb-1">
               <a
                 href={`/profile/@${post.author.handle}`}
-                className={`font-semibold text-white ${isNew ? 'shimmer-text' : ''} hover:underline`}
+                className={`font-semibold text-white ${isNew ? 'shimmer-text' : ''} hover:underline max-w-[150px] sm:max-w-none truncate`}
               >
                 {post.author.displayName || post.author.handle}
               </a>
-              <a
-                href={`/profile/@${post.author.handle}`}
-                className="text-sm text-white/60 hover:underline"
-              >
-                @{post.author.handle}
-              </a>
-              <span className="text-sm text-white/60">
-                · {formatTimeAgo(new Date(post.record.createdAt))}
-              </span>
+              <div className="flex items-baseline gap-1 text-sm text-white/60">
+                <a
+                  href={`/profile/@${post.author.handle}`}
+                  className="hover:underline max-w-[120px] sm:max-w-none truncate"
+                >
+                  @{post.author.handle}
+                </a>
+                <span>· {formatTimeAgo(new Date(post.record.createdAt))}</span>
+              </div>
             </div>
             <div className="text-white">
               <RichContent text={post.record.text} embed={post.embed} facets={post.record.facets} />

@@ -20,6 +20,20 @@
     --glass-bg: rgba(255, 255, 255, 0.08);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-shadow: rgba(0, 0, 0, 0.1);
+    
+    /* モバイル用の変数 */
+    --mobile-font-scale: 0.9;
+    --mobile-padding-scale: 0.85;
+    --mobile-blur-amount: 8px;
+  }
+  
+  /* モバイルデバイス用の調整 */
+  @media (max-width: 640px) {
+    :root {
+      --mobile-font-scale: 0.85;
+      --mobile-padding-scale: 0.8;
+      --mobile-blur-amount: 6px;
+    }
   }
 
   /* Smooth scrolling */

@@ -7,6 +7,21 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; connect-src https://bsky.social https://*.bsky.social https://*.bsky.network wss://bsky.social wss://*.bsky.social wss://*.bsky.network https://aurora-sky-client.pages.dev https://aurora.izumiz.dev; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src https://www.youtube.com https://youtube.com; media-src 'self' https:;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <!-- PWA設定 -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AuroraSky" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    
+    <!-- OGP設定 -->
+    <meta property="og:title" content="AuroraSky - こころがやすまるBlueskyクライアント" />
+    <meta property="og:description" content="美しいグラデーションとアニメーションで、Blueskyをより楽しく" />
+    <meta property="og:image" content="/butterfly.svg" />
+    <meta property="og:type" content="website" />
+    
     <title>AuroraSky - A Beautiful Social Client</title>
   </head>
   <body>
