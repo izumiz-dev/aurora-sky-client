@@ -3,6 +3,7 @@ import { route } from 'preact-router';
 import { useAuth } from '../context/AuthContext';
 import { AppIcon } from '../components/AppIcon';
 import { DevelopmentNotice } from '../components/DevelopmentNotice';
+import { AuroraLoader } from '../components/AuroraLoader';
 
 export const ModernLoginPage = () => {
   const [identifier, setIdentifier] = useState('');
@@ -37,7 +38,7 @@ export const ModernLoginPage = () => {
   if (authLoading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center fade-enter">
-        <div className="glass-spinner"></div>
+        <AuroraLoader />
       </div>
     );
   }

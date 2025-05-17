@@ -1,0 +1,194 @@
+/* オーロラらしい波動アニメーション */
+.aurora-loader-container {
+  position: relative;
+  width: 300px;
+  height: 150px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at top, rgba(10, 15, 30, 0.3) 0%, transparent 60%);
+}
+
+.aurora-curtain {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.curtain-layer {
+  position: absolute;
+  width: 120%;
+  height: 100%;
+  left: -10%;
+  opacity: 0.8;
+  mix-blend-mode: screen;
+}
+
+/* オーロラの波動エフェクト */
+.curtain-layer.layer-1 {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 200, 0.3) 20%,
+    rgba(0, 200, 255, 0.4) 40%,
+    rgba(100, 150, 255, 0.3) 60%,
+    rgba(0, 255, 150, 0.3) 80%,
+    transparent 100%
+  );
+  animation: aurora-wave-1 12s ease-in-out infinite;
+  filter: blur(8px);
+}
+
+.curtain-layer.layer-2 {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(150, 100, 255, 0.3) 15%,
+    rgba(0, 255, 200, 0.4) 35%,
+    rgba(50, 200, 255, 0.35) 55%,
+    rgba(200, 150, 255, 0.3) 75%,
+    transparent 100%
+  );
+  animation: aurora-wave-2 15s ease-in-out infinite;
+  filter: blur(10px);
+}
+
+.curtain-layer.layer-3 {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 220, 255, 0.35) 25%,
+    rgba(100, 255, 200, 0.35) 45%,
+    rgba(180, 120, 255, 0.4) 65%,
+    rgba(0, 255, 220, 0.3) 85%,
+    transparent 100%
+  );
+  animation: aurora-wave-3 18s ease-in-out infinite;
+  filter: blur(12px);
+}
+
+.curtain-layer.layer-4 {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 180, 255, 0.3) 18%,
+    rgba(50, 255, 180, 0.35) 38%,
+    rgba(200, 100, 255, 0.4) 58%,
+    rgba(0, 220, 255, 0.35) 78%,
+    transparent 100%
+  );
+  animation: aurora-wave-4 20s ease-in-out infinite;
+  filter: blur(6px);
+}
+
+.curtain-layer.layer-5 {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(80, 200, 255, 0.2) 0%,
+    rgba(160, 150, 255, 0.25) 30%,
+    rgba(0, 255, 220, 0.2) 60%,
+    transparent 80%
+  );
+  animation: aurora-pulse 8s ease-in-out infinite;
+  filter: blur(15px);
+}
+
+/* ゆったりとした波動アニメーション */
+@keyframes aurora-wave-1 {
+  0%, 100% { 
+    transform: translateX(-20%) scaleY(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: translateX(20%) scaleY(0.8);
+    opacity: 0.6;
+  }
+}
+
+@keyframes aurora-wave-2 {
+  0%, 100% { 
+    transform: translateX(30%) scaleY(0.9);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: translateX(-30%) scaleY(1.1);
+    opacity: 0.9;
+  }
+}
+
+@keyframes aurora-wave-3 {
+  0%, 100% { 
+    transform: translateX(-40%) scaleY(1.1);
+    opacity: 0.6;
+  }
+  50% { 
+    transform: translateX(40%) scaleY(0.9);
+    opacity: 0.8;
+  }
+}
+
+@keyframes aurora-wave-4 {
+  0%, 100% { 
+    transform: translateX(50%) scaleY(0.85);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: translateX(-50%) scaleY(1.15);
+    opacity: 0.5;
+  }
+}
+
+@keyframes aurora-pulse {
+  0%, 100% { 
+    transform: scale(1) translateY(0);
+    opacity: 0.4;
+  }
+  50% { 
+    transform: scale(1.2) translateY(-10px);
+    opacity: 0.6;
+  }
+}
+
+/* 縦方向の波動を追加 */
+.aurora-vertical-wave {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 255, 200, 0.15) 30%,
+    rgba(100, 200, 255, 0.2) 50%,
+    rgba(200, 150, 255, 0.15) 70%,
+    transparent 100%
+  );
+  animation: vertical-flow 10s linear infinite;
+  filter: blur(20px);
+}
+
+@keyframes vertical-flow {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(-100%); }
+}
+
+/* 全体的な光沢効果 */
+.aurora-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 60%
+  );
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(200%); }
+}

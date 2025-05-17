@@ -7,6 +7,7 @@ import { useTimeline } from '../hooks/useTimeline';
 import { useSelfThreads } from '../hooks/useSelfThreads';
 import { AppIcon } from '../components/AppIcon';
 import { DevelopmentNotice } from '../components/DevelopmentNotice';
+import { AuroraLoader } from '../components/AuroraLoader';
 
 export const ModernHomePage = () => {
   const { isAuthenticated, session } = useAuth();
@@ -61,7 +62,7 @@ export const ModernHomePage = () => {
       <div className="space-y-4">
         {isLoading && posts.length === 0 ? (
           <div className="flex justify-center py-12">
-            <div className="glass-spinner"></div>
+            <AuroraLoader />
           </div>
         ) : error ? (
           <div className="glass-card p-6 text-center">

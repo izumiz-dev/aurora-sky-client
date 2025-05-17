@@ -1,0 +1,255 @@
+/* オーロラローディングアニメーション */
+.aurora-loader-container {
+  position: relative;
+  width: 300px;
+  height: 120px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at center, rgba(10, 15, 40, 0.2) 0%, transparent 70%);
+}
+
+/* フェードイン効果 */
+.aurora-loader-container {
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.aurora-curtain {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.curtain-layer {
+  position: relative;
+  width: 20%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 255, 150, 0.1) 20%,
+    rgba(0, 200, 255, 0.3) 50%,
+    rgba(150, 100, 255, 0.2) 80%,
+    transparent 100%
+  );
+  transform-origin: top center;
+  filter: blur(3px);
+  opacity: 0.8;
+}
+
+/* 各レイヤーのオーロラらしい波動 */
+.curtain-layer.layer-1 {
+  animation: aurora-flow-1 3s ease-in-out infinite;
+  animation-delay: 0s;
+  transform: scaleY(0.9) skewX(1deg);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 255, 200, 0.2) 25%,
+    rgba(100, 200, 255, 0.35) 55%,
+    rgba(200, 150, 255, 0.25) 80%,
+    transparent 100%
+  );
+}
+
+.curtain-layer.layer-2 {
+  animation: aurora-flow-2 3.5s ease-in-out infinite;
+  animation-delay: 0.1s;
+  transform: scaleY(1.05) skewX(-0.5deg);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 255, 150, 0.25) 30%,
+    rgba(50, 200, 255, 0.4) 60%,
+    rgba(150, 100, 255, 0.3) 85%,
+    transparent 100%
+  );
+}
+
+.curtain-layer.layer-3 {
+  animation: aurora-flow-3 4s ease-in-out infinite;
+  animation-delay: 0.2s;
+  transform: scaleY(0.95) skewX(0.8deg);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(100, 255, 200, 0.22) 35%,
+    rgba(0, 220, 255, 0.38) 65%,
+    rgba(180, 120, 255, 0.28) 90%,
+    transparent 100%
+  );
+}
+
+.curtain-layer.layer-4 {
+  animation: aurora-flow-4 3.2s ease-in-out infinite;
+  animation-delay: 0.3s;
+  transform: scaleY(1.02) skewX(-1deg);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(50, 255, 180, 0.24) 28%,
+    rgba(0, 180, 255, 0.36) 58%,
+    rgba(200, 100, 255, 0.32) 83%,
+    transparent 100%
+  );
+}
+
+.curtain-layer.layer-5 {
+  animation: aurora-flow-5 4.5s ease-in-out infinite;
+  animation-delay: 0.4s;
+  transform: scaleY(0.97) skewX(0.5deg);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 255, 220, 0.2) 32%,
+    rgba(80, 200, 255, 0.4) 62%,
+    rgba(160, 150, 255, 0.26) 88%,
+    transparent 100%
+  );
+}
+
+/* オーロラの流れるようなアニメーション - すぐに効果が見える */
+@keyframes aurora-flow-1 {
+  0% { transform: scaleY(0.9) translateY(-2px) skewX(1deg); }
+  25% { transform: scaleY(1.1) translateY(3px) skewX(-1.5deg); }
+  50% { transform: scaleY(0.85) translateY(-4px) skewX(2deg); }
+  75% { transform: scaleY(1.05) translateY(1px) skewX(-0.5deg); }
+  100% { transform: scaleY(0.9) translateY(-2px) skewX(1deg); }
+}
+
+@keyframes aurora-flow-2 {
+  0% { transform: scaleY(1.05) translateY(1px) skewX(-0.5deg); }
+  20% { transform: scaleY(0.92) translateY(-3px) skewX(1.8deg); }
+  40% { transform: scaleY(1.08) translateY(2px) skewX(-1.2deg); }
+  60% { transform: scaleY(0.88) translateY(-4px) skewX(2.2deg); }
+  80% { transform: scaleY(1.03) translateY(1px) skewX(-0.8deg); }
+  100% { transform: scaleY(1.05) translateY(1px) skewX(-0.5deg); }
+}
+
+@keyframes aurora-flow-3 {
+  0% { transform: scaleY(0.95) translateY(-1px) skewX(0.8deg); }
+  30% { transform: scaleY(1.06) translateY(3px) skewX(-1.8deg); }
+  50% { transform: scaleY(0.9) translateY(-3px) skewX(1.5deg); }
+  70% { transform: scaleY(1.1) translateY(2px) skewX(-1deg); }
+  100% { transform: scaleY(0.95) translateY(-1px) skewX(0.8deg); }
+}
+
+@keyframes aurora-flow-4 {
+  0% { transform: scaleY(1.02) translateY(0px) skewX(-1deg); }
+  35% { transform: scaleY(0.93) translateY(-2px) skewX(1.5deg); }
+  55% { transform: scaleY(1.08) translateY(3px) skewX(-2deg); }
+  85% { transform: scaleY(0.91) translateY(-1px) skewX(0.5deg); }
+  100% { transform: scaleY(1.02) translateY(0px) skewX(-1deg); }
+}
+
+@keyframes aurora-flow-5 {
+  0% { transform: scaleY(0.97) translateY(-1px) skewX(0.5deg); }
+  25% { transform: scaleY(1.12) translateY(4px) skewX(-1.7deg); }
+  45% { transform: scaleY(0.88) translateY(-3px) skewX(2deg); }
+  65% { transform: scaleY(1.04) translateY(1px) skewX(-0.7deg); }
+  85% { transform: scaleY(0.92) translateY(-2px) skewX(1.2deg); }
+  100% { transform: scaleY(0.97) translateY(-1px) skewX(0.5deg); }
+}
+
+/* 光の脈動効果 */
+.aurora-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 255, 200, 0.05) 0%,
+    rgba(100, 200, 255, 0.03) 40%,
+    transparent 70%
+  );
+  animation: glow-pulse 10s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+/* 縦の流れ効果 */
+.aurora-vertical-wave {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 255, 200, 0.08) 30%,
+    rgba(100, 200, 255, 0.1) 50%,
+    rgba(200, 150, 255, 0.08) 70%,
+    transparent 100%
+  );
+  animation: vertical-aurora 15s linear infinite;
+  filter: blur(10px);
+}
+
+@keyframes vertical-aurora {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(-100%); }
+}
+
+/* きらめき効果 */
+.aurora-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 60%
+  );
+  animation: shimmer 8s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(200%); }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 640px) {
+  .aurora-loader-container {
+    width: 250px;
+    height: 100px;
+  }
+}
+
+/* 全画面ローダー */
+.aurora-loader-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.aurora-loader-fullscreen .aurora-loader-container {
+  width: 500px;
+  height: 200px;
+}
