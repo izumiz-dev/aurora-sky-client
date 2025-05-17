@@ -36,11 +36,11 @@ export default defineConfig({
     headers: {
       'Content-Security-Policy': [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // 開発環境用に緩和
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // 開発環境用
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com http://fonts.googleapis.com",
         "img-src 'self' data: https: blob:",
-        "connect-src https://bsky.social https://*.bsky.social https://*.bsky.network wss://bsky.social wss://*.bsky.social wss://*.bsky.network http://localhost:* https://localhost:* https://aurora.izumiz.dev",
-        "font-src 'self' https://fonts.gstatic.com",
+        "connect-src 'self' https://bsky.social https://*.bsky.social https://*.bsky.network https://cdn.bsky.app wss://bsky.social wss://*.bsky.social wss://*.bsky.network http://localhost:* https://localhost:* ws://localhost:* wss://localhost:* https://aurora.izumiz.dev",
+        "font-src 'self' https://fonts.gstatic.com http://fonts.gstatic.com",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",

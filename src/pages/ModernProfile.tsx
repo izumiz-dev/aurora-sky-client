@@ -2,11 +2,13 @@ import { useState } from 'preact/hooks';
 import { route } from 'preact-router';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { PostItem } from '../components/PostItem';
+import { SelfThreadItem } from '../components/SelfThreadItem';
 import { useAuth } from '../context/AuthContext';
 import { getProfile, getAuthorFeed } from '../lib/api';
 import type { UserProfile } from '../types/profile';
 import type { Post } from '../types/post';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { useSelfThreads } from '../hooks/useSelfThreads';
 import { cacheConfig, cacheKeys } from '../lib/cacheConfig';
 
 interface ProfilePageProps {
@@ -60,7 +62,14 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
     feed: any[];
     cursor?: string;
   }
-  const posts = feedData?.pages?.flatMap((page: FeedPage) => page.feed) || [];
+  const feedItems = feedData?.pages?.flatMap((page: FeedPage) => page.feed) || [];
+  const posts = feedItems.map((item) => ({
+    ...item.post,
+    reason: item.reason,
+    reply: item.reply,
+  } as Post));
+  
+  const threadGroups = useSelfThreads(posts);
 
   useInfiniteScroll({
     onLoadMore: () => {
@@ -196,20 +205,25 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
 
       {/* 投稿リスト */}
       <div className="space-y-4">
-        {posts.length === 0 ? (
+        {feedItems.length === 0 ? (
           <div className="glass-card p-12 text-center">
             <h3 className="text-lg font-semibold text-white mb-2">投稿がありません</h3>
             <p className="text-white/70">このユーザーはまだ投稿していません</p>
           </div>
         ) : (
-          posts.map((item) => {
-            const post = {
-              ...item.post,
-              reason: item.reason,
-              reply: item.reply,
-            } as Post;
-            return <PostItem key={post.uri} post={post} />;
-          })
+          threadGroups.map((group) => (
+            group.type === 'thread' ? (
+              <SelfThreadItem 
+                key={group.id} 
+                posts={group.posts}
+              />
+            ) : (
+              <PostItem 
+                key={group.posts[0].uri} 
+                post={group.posts[0]} 
+              />
+            )
+          ))
         )}
       </div>
 

@@ -1,8 +1,10 @@
 import { useAuth } from '../context/AuthContext';
 import { PostComposer } from '../components/PostComposer';
 import { PostItem } from '../components/PostItem';
+import { SelfThreadItem } from '../components/SelfThreadItem';
 import { Snackbar } from '../components/Snackbar';
 import { useTimeline } from '../hooks/useTimeline';
+import { useSelfThreads } from '../hooks/useSelfThreads';
 import { AppIcon } from '../components/AppIcon';
 import { DevelopmentNotice } from '../components/DevelopmentNotice';
 
@@ -22,6 +24,8 @@ export const ModernHomePage = () => {
     handleCloseSnackbar,
     refreshTimeline,
   } = useTimeline(session, isAuthenticated);
+  
+  const threadGroups = useSelfThreads(posts);
 
   if (!isAuthenticated) {
     return (
@@ -69,8 +73,20 @@ export const ModernHomePage = () => {
             <p className="text-white/70">フォローしているユーザーの投稿がここに表示されます</p>
           </div>
         ) : (
-          posts.map((post) => (
-            <PostItem key={post.uri} post={post} isNew={newPostIds.has(post.uri)} />
+          threadGroups.map((group) => (
+            group.type === 'thread' ? (
+              <SelfThreadItem 
+                key={group.id} 
+                posts={group.posts} 
+                isNew={group.posts.some(p => newPostIds.has(p.uri))}
+              />
+            ) : (
+              <PostItem 
+                key={group.posts[0].uri} 
+                post={group.posts[0]} 
+                isNew={newPostIds.has(group.posts[0].uri)} 
+              />
+            )
           ))
         )}
       </div>

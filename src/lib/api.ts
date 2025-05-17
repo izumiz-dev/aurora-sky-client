@@ -156,3 +156,18 @@ export const getAuthorFeed = async (params: {
     filter: params.filter,
   });
 };
+
+export const getPostThread = async (params: {
+  uri: string;
+  depth?: number;
+  parentHeight?: number;
+}) => {
+  return wrapApiCall(async () => {
+    const agent = await getAgent();
+    return agent.getPostThread({
+      uri: params.uri,
+      depth: params.depth || 6,
+      parentHeight: params.parentHeight || 3,
+    });
+  });
+};
