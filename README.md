@@ -169,7 +169,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### 免責事項 / Disclaimer
+
+本ソフトウェアは「現状のまま」で提供されます。詳細は[DISCLAIMER.md](DISCLAIMER.md)をご確認ください。
+
+This software is provided "as is". See [DISCLAIMER.md](DISCLAIMER.md) for more information.
 
 ## 🙏 Acknowledgments
 
