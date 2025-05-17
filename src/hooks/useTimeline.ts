@@ -4,6 +4,7 @@ import { fetchTimeline } from '../services/timeline';
 import type { Post } from '../types/post';
 import type { SessionData } from '../types/session';
 import { useInfiniteScroll } from './useInfiniteScroll';
+import { cacheConfig, cacheKeys } from '../lib/cacheConfig';
 
 export const useTimeline = (session: SessionData | null, isAuthenticated: boolean) => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -21,11 +22,10 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
   const intervalIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['timeline', session?.did],
+    queryKey: cacheKeys.timeline(session?.did),
     queryFn: () => (session ? fetchTimeline(session) : Promise.reject(new Error('No session'))),
     enabled: isAuthenticated && !!session,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
+    ...cacheConfig.timeline,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });

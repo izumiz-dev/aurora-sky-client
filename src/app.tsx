@@ -9,6 +9,7 @@ import { ModernLayout } from './layouts/ModernLayout';
 import { ModernHomePage } from './pages/ModernHome';
 import { ModernLoginPage } from './pages/ModernLogin';
 import { ModernSettingsPage } from './pages/ModernSettings';
+import { ModernProfilePage } from './pages/ModernProfile';
 import { NotFoundPage } from './pages/NotFound';
 import { TestEmbedsPage } from './pages/TestEmbeds';
 
@@ -58,6 +59,14 @@ export function App() {
             component={() => (
               <ModernLayout>
                 <ModernSettingsPage />
+              </ModernLayout>
+            )}
+          />
+          <Route
+            path="/profile/:handle"
+            component={({handle}: {handle: string}) => (
+              <ModernLayout>
+                <ModernProfilePage handle={handle} />
               </ModernLayout>
             )}
           />

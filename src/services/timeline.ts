@@ -16,7 +16,7 @@ export const fetchTimeline = async (
 
   const response = await agent.getTimeline({ cursor, limit: 20 });
 
-  const feed = response.data.feed.map((item: { post: AppBskyFeedDefs.PostView }) => {
+  const feed = response.data.feed.map((item: any) => {
     const post = item.post as AppBskyFeedDefs.PostView;
     const record = post.record as any;
 
@@ -33,12 +33,14 @@ export const fetchTimeline = async (
         text: record.text || '',
         createdAt: record.createdAt || new Date().toISOString(),
         facets: record.facets || [],
+        reply: record.reply || undefined,
       },
       likeCount: post.likeCount || 0,
       replyCount: post.replyCount || 0,
       repostCount: post.repostCount || 0,
       viewer: post.viewer,
       embed: post.embed as any,
+      reply: item.reply || undefined,
     } as Post;
   });
 

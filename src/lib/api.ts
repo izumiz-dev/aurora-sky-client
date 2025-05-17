@@ -92,3 +92,23 @@ export const updatePreferences = async (preferences: any[]) => {
   const agent = await getAgent();
   return agent.setPreferences(preferences);
 };
+
+export const getProfile = async (actor: string) => {
+  const agent = await getAgent();
+  return agent.getProfile({ actor });
+};
+
+export const getAuthorFeed = async (params: {
+  actor: string;
+  limit?: number;
+  cursor?: string;
+  filter?: 'posts_with_replies' | 'posts_no_replies' | 'posts_with_media' | 'posts_and_author_threads';
+}) => {
+  const agent = await getAgent();
+  return agent.getAuthorFeed({
+    actor: params.actor,
+    limit: params.limit || 30,
+    cursor: params.cursor,
+    filter: params.filter,
+  });
+};

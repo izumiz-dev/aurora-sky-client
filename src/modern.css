@@ -116,6 +116,11 @@
     height: 4rem;
   }
 
+  .avatar-xl {
+    width: 5rem;
+    height: 5rem;
+  }
+
   /* Button System */
   .btn {
     display: inline-flex;

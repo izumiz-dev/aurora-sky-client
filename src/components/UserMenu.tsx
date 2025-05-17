@@ -37,7 +37,12 @@ export const UserMenu = () => {
         <div className="absolute right-0 mt-2 w-48 rounded-lg backdrop-filter backdrop-blur-lg bg-white/5 border border-white/10">
           <div className="py-1">
             <a
-              href="#"
+              href={`/profile/@${session?.handle}`}
+              onClick={(e) => {
+                e.preventDefault();
+                route(`/profile/@${session?.handle}`);
+                setIsMenuOpen(false);
+              }}
               className="block px-4 py-2 text-sm text-gray-100 hover:bg-white/10 transition-colors"
             >
               プロフィール

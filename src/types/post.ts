@@ -21,6 +21,16 @@ export interface Post {
         did?: string;
       }>;
     }>;
+    reply?: {
+      parent: {
+        uri: string;
+        cid: string;
+      };
+      root: {
+        uri: string;
+        cid: string;
+      };
+    };
   };
   likeCount?: number;
   replyCount?: number;
@@ -28,6 +38,22 @@ export interface Post {
   viewer?: {
     like?: string;
     repost?: string;
+  };
+  reply?: {
+    parent: {
+      uri: string;
+      cid: string;
+      author: {
+        did: string;
+        handle: string;
+        displayName?: string;
+        avatar?: string;
+      };
+      record?: {
+        text?: string;
+        createdAt?: string;
+      };
+    };
   };
   embed?: {
     $type: string;
