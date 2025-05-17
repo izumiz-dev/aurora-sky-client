@@ -1,6 +1,9 @@
+import { useState } from 'preact/hooks';
 import type { Post } from '../types/post';
 import { formatTimeAgo } from '../utils/date';
 import { RichContent } from './content/RichContent';
+import { ContextMenu, postMenuItems } from './ContextMenu';
+import { Snackbar } from './Snackbar';
 
 interface PostItemProps {
   post: Post;
@@ -8,8 +11,94 @@ interface PostItemProps {
 }
 
 export const PostItem = ({ post, isNew = false }: PostItemProps) => {
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [snackbar, setSnackbar] = useState<{ message: string } | null>(null);
+  const [liked, setLiked] = useState(post.viewer?.like ?? false);
+  const [reposted, setReposted] = useState(post.viewer?.repost ?? false);
+  const [animateAction, setAnimateAction] = useState<'like' | 'repost' | null>(null);
+
+  const handleContextMenu = (e: MouseEvent) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  const handleMenuAction = async (actionId: string) => {
+    switch (actionId) {
+      case 'reply':
+        // TODO: リプライ機能の実装
+        console.log('Reply to:', post.uri);
+        break;
+      case 'repost':
+        // すぐにアニメーションを開始
+        setReposted(true);
+        setAnimateAction('repost');
+        
+        // API呼び出しは非同期で
+        (async () => {
+          try {
+            const { repost } = await import('../lib/api');
+            await repost(post.uri, post.cid);
+            setSnackbar({ message: 'リポストしました' });
+          } catch (error) {
+            console.error('Failed to repost:', error);
+            setReposted(false); // 失敗時は元に戻す
+            setSnackbar({ message: 'リポストに失敗しました' });
+          }
+        })();
+        
+        // アニメーション後にリセット（5秒に延長）
+        setTimeout(() => setAnimateAction(null), 5000);
+        break;
+      case 'like':
+        // すぐにアニメーションを開始
+        setLiked(true);
+        setAnimateAction('like');
+        
+        // API呼び出しは非同期で
+        (async () => {
+          try {
+            const { likePost } = await import('../lib/api');
+            await likePost(post.uri, post.cid);
+            setSnackbar({ message: 'いいねしました' });
+          } catch (error) {
+            console.error('Failed to like:', error);
+            setLiked(false); // 失敗時は元に戻す
+            setSnackbar({ message: 'いいねに失敗しました' });
+          }
+        })();
+        
+        // アニメーション後にリセット（5秒に延長）
+        setTimeout(() => setAnimateAction(null), 5000);
+        break;
+      case 'copy-link':
+        // bsky.appの投稿URLを生成してコピー
+        const postUrl = `https://bsky.app/profile/${post.author.handle}/post/${post.uri.split('/').pop()}`;
+        try {
+          await navigator.clipboard.writeText(postUrl);
+          setSnackbar({ message: 'リンクをコピーしました' });
+        } catch (error) {
+          console.error('Failed to copy link:', error);
+          setSnackbar({ message: 'リンクのコピーに失敗しました' });
+        }
+        break;
+    }
+    closeContextMenu();
+  };
+  
   return (
-    <div className={`glass-card p-6 ${isNew ? 'ambient-fade-in ambient-glow' : ''}`}>
+    <>
+      <div 
+        className={`glass-card p-6 ${isNew ? 'ambient-fade-in ambient-glow' : ''} ${
+          liked ? 'liked-post' : ''
+        } ${reposted ? 'reposted-post' : ''} ${
+          animateAction === 'like' ? 'like-animation' : ''
+        } ${animateAction === 'repost' ? 'repost-animation' : ''}`}
+        onContextMenu={handleContextMenu}
+      >
       {/* 返信先の表示 */}
       {(post.reply?.parent || post.record?.reply) && (
         <div className="flex items-center gap-2 mb-3 text-white/60 text-sm">
@@ -77,5 +166,20 @@ export const PostItem = ({ post, isNew = false }: PostItemProps) => {
         </div>
       </div>
     </div>
+    {contextMenu && (
+      <ContextMenu 
+        items={postMenuItems}
+        position={contextMenu}
+        onClose={closeContextMenu}
+        onItemClick={handleMenuAction}
+      />
+    )}
+    {snackbar && (
+      <Snackbar
+        message={snackbar.message}
+        onClose={() => setSnackbar(null)}
+      />
+    )}
+  </>
   );
 };
