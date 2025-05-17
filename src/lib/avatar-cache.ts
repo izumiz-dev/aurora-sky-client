@@ -77,6 +77,7 @@ class AvatarCacheManager {
    */
   private async fetchImageAsBlob(url: string, retryCount = 0): Promise<Blob> {
     try {
+      // First try fetch API
       const response = await fetch(url, {
         mode: 'cors',
         cache: 'no-cache',
@@ -88,13 +89,68 @@ class AvatarCacheManager {
       }
 
       return await response.blob();
-    } catch (error) {
+    } catch (error: any) {
+      // Check if this is a CSP violation
+      if (error.name === 'SecurityError' || error.message?.includes('CSP') || error.message?.includes('blocked')) {
+        console.error(`CSP violation for URL: ${url}, trying alternative method`, error);
+        
+        // Alternative method: use img element and canvas
+        try {
+          return await this.fetchImageViaCanvas(url);
+        } catch (canvasError) {
+          console.error(`Canvas method also failed for URL: ${url}`, canvasError);
+          throw new Error('CSP_VIOLATION');
+        }
+      }
+      
       if (retryCount < MAX_RETRIES) {
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)));
         return this.fetchImageAsBlob(url, retryCount + 1);
       }
       throw error;
     }
+  }
+
+  /**
+   * 画像をimg要素とCanvasを使って取得（CSP回避のため）
+   */
+  private async fetchImageViaCanvas(url: string): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      img.onload = async () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Failed to get canvas context'));
+            return;
+          }
+          
+          ctx.drawImage(img, 0, 0);
+          
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Failed to convert canvas to blob'));
+            }
+          }, 'image/jpeg', 0.9);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      
+      img.onerror = () => {
+        reject(new Error('Failed to load image'));
+      };
+      
+      img.src = url;
+    });
   }
 
   /**
@@ -206,6 +262,11 @@ class AvatarCacheManager {
       return url;
     }
 
+    // CSPの問題により、一時的にキャッシュを無効化
+    // TODO: CSP設定を調整してキャッシュを再度有効化する
+    return url;
+
+    /*
     // すでに処理中の場合は待機
     const pending = this.pendingRequests.get(url);
     if (pending) {
@@ -222,6 +283,7 @@ class AvatarCacheManager {
     } finally {
       this.pendingRequests.delete(url);
     }
+    */
   }
 
   /**
@@ -251,7 +313,12 @@ class AvatarCacheManager {
       const blob = await this.fetchImageAsBlob(url);
       await this.saveToCache(url, blob, handle);
       return this.memoryCache.get(url) || url;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === 'CSP_VIOLATION') {
+        console.warn(`CSP violation for avatar ${url}, using original URL`);
+        // For CSP violations, return the original URL directly
+        return url;
+      }
       console.error('Failed to fetch avatar:', error);
       // フォールバックとして元のURLを返す
       return url;
