@@ -21,7 +21,7 @@ const RETRY_DELAY = 1000; // 1秒
 class AvatarCacheManager {
   private memoryCache: Map<string, string> = new Map();
   private db: IDBDatabase | null = null;
-  private pendingRequests: Map<string, Promise<string>> = new Map();
+  // private pendingRequests: Map<string, Promise<string>> = new Map();
 
   constructor() {
     this.initDB();
@@ -251,7 +251,7 @@ class AvatarCacheManager {
   /**
    * アバター画像を取得（キャッシュ対応）
    */
-  public async getAvatar(url: string, handle?: string): Promise<string> {
+  public async getAvatar(url: string, _handle?: string): Promise<string> {
     // プレースホルダーURLの場合はそのまま返す
     if (!url || url.includes('placeholder')) {
       return url;
@@ -289,7 +289,8 @@ class AvatarCacheManager {
   /**
    * アバター取得の実処理
    */
-  private async processAvatarRequest(url: string, handle?: string): Promise<string> {
+  // @ts-expect-error - temporarily disabled method
+  private async processAvatarRequest(url: string, _handle?: string): Promise<string> {
     // 1. メモリキャッシュを確認
     const memoryUrl = this.getFromMemory(url);
     if (memoryUrl) {
@@ -311,7 +312,7 @@ class AvatarCacheManager {
     // 3. ネットワークから取得
     try {
       const blob = await this.fetchImageAsBlob(url);
-      await this.saveToCache(url, blob, handle);
+      await this.saveToCache(url, blob, _handle);
       return this.memoryCache.get(url) || url;
     } catch (error: any) {
       if (error.message === 'CSP_VIOLATION') {
