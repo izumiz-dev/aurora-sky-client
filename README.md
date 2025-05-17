@@ -1,3 +1,5 @@
+> **NOTE**: This application is currently in testing. You may encounter unexpected behavior or issues.
+
 # AuroraSky - A Beautiful Bluesky Client
 
 ![AuroraSky](https://img.shields.io/badge/AuroraSky-Bluesky%20Client-1185fe)
