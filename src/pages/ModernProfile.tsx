@@ -56,7 +56,11 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
     ...cacheConfig.feed,
   });
 
-  const posts = feedData?.pages?.flatMap((page: any) => page.feed) || [];
+  interface FeedPage {
+    feed: any[];
+    cursor?: string;
+  }
+  const posts = feedData?.pages?.flatMap((page: FeedPage) => page.feed) || [];
 
   useInfiniteScroll({
     onLoadMore: () => {
@@ -199,14 +203,6 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
           </div>
         ) : (
           posts.map((item) => {
-            // デバッグ用ログ
-            if (item.post?.record?.reply) {
-              console.log('返信投稿データ:', {
-                post: item.post,
-                reply: item.reply,
-                recordReply: item.post.record.reply,
-              });
-            }
             const post = {
               ...item.post,
               reason: item.reason,

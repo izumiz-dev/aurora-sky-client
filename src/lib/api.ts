@@ -66,7 +66,7 @@ export const uploadImage = async (file: File) => {
 
 export const createPostWithImages = async (
   text: string,
-  images: { alt: string; blob: any }[],
+  images: { alt: string; blob: unknown }[],
   langs?: string[]
 ) => {
   const agent = await getAgent();
@@ -92,10 +92,10 @@ export const getPreferences = async () => {
   return agent.getPreferences();
 };
 
-export const updatePreferences = async (preferences: any[]) => {
+export const updatePreferences = async (preferences: unknown[]) => {
   const agent = await getAgent();
   // The BskyAgent doesn't have setPreferences, we need to use the app API directly
-  return agent.app.bsky.actor.putPreferences({ preferences });
+  return agent.app.bsky.actor.putPreferences({ preferences: preferences as any });
 };
 
 export const getProfile = async (actor: string) => {

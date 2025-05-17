@@ -32,7 +32,17 @@ export const LanguagePreferencesProvider = ({
   const [showAllLanguages, setShowAllLanguages] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ローカルストレージから設定を読み込む
+  interface LanguagesPref {
+  $type: string;
+  primaryLanguages?: string[];
+  contentLanguages?: string[];
+}
+
+interface PrefsWithPreferences {
+  preferences?: LanguagesPref[];
+}
+
+// ローカルストレージから設定を読み込む
   useEffect(() => {
     const loadFromLocalStorage = () => {
       const savedPrefs = localStorage.getItem('language-preferences');
@@ -64,10 +74,10 @@ export const LanguagePreferencesProvider = ({
         const prefs = await getPreferences();
         // Loaded preferences from server
 
-        const prefs_any = prefs as any;
-        if (prefs_any.preferences) {
-          const langPref = prefs_any.preferences.find(
-            (p: any) => p.$type === 'app.bsky.actor.defs#languagesPref'
+        const prefsTyped = prefs as PrefsWithPreferences;
+        if (prefsTyped.preferences) {
+          const langPref = prefsTyped.preferences.find(
+            (p) => p.$type === 'app.bsky.actor.defs#languagesPref'
           );
 
           if (langPref) {
@@ -128,8 +138,8 @@ export const LanguagePreferencesProvider = ({
     if (isAuthenticated) {
       try {
         const currentPrefs = await getPreferences();
-        const currentPrefs_any = currentPrefs as any;
-        const newPreferences = [...(currentPrefs_any.preferences || [])];
+        const currentPrefsTyped = currentPrefs as PrefsWithPreferences;
+        const newPreferences = [...(currentPrefsTyped.preferences || [])];
 
         const langPrefIndex = newPreferences.findIndex(
           (p) => p.$type === 'app.bsky.actor.defs#languagesPref'

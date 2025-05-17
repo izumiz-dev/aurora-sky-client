@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'preact/hooks';
+import { createElement } from 'preact';
 import {
   ChatBubbleOvalLeftIcon,
   ArrowPathRoundedSquareIcon,
@@ -21,7 +22,7 @@ interface ContextMenuProps {
 export interface MenuItem {
   id: string;
   label: string;
-  icon: any;
+  icon: preact.ComponentType | string;
   className?: string;
   divider?: boolean;
 }
@@ -93,7 +94,11 @@ export const ContextMenu = ({ items, position, onClose, onItemClick }: ContextMe
             onClose();
           }}
         >
-          <item.icon className="w-4 h-4" />
+          {typeof item.icon === 'string' ? (
+            <span className="w-4 h-4">{item.icon}</span>
+          ) : (
+            createElement(item.icon as any, { className: "w-4 h-4" })
+          )}
           <span className="flex-1 text-left">{item.label}</span>
         </button>
       ))}

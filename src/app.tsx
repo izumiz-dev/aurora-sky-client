@@ -11,7 +11,6 @@ import { ModernLoginPage } from './pages/ModernLogin';
 import { ModernSettingsPage } from './pages/ModernSettings';
 import { ModernProfilePage } from './pages/ModernProfile';
 import { NotFoundPage } from './pages/NotFound';
-import { TestEmbedsPage } from './pages/TestEmbeds';
 
 // 認証
 import { AuthProvider } from './context/AuthContext';
@@ -38,14 +37,6 @@ export function App() {
         <LanguagePreferencesProvider>
           <Router>
             <Route path="/login" component={ModernLoginPage} />
-            <Route
-              path="/test-embeds"
-              component={() => (
-                <ModernLayout>
-                  <TestEmbedsPage />
-                </ModernLayout>
-              )}
-            />
             <Route
               path="/"
               component={() => (

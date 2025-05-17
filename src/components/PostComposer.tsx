@@ -11,7 +11,7 @@ interface PostComposerProps {
 interface UploadedImage {
   file: File;
   preview: string;
-  blob?: any;
+  blob?: unknown;
   alt: string;
 }
 

@@ -15,13 +15,13 @@ interface QuotedPostProps {
       $type?: string;
       text?: string;
       createdAt?: string;
-      [key: string]: any;
+      [key: string]: unknown;
     };
     // AT Protocol view format
     record?: {
       text?: string;
       createdAt?: string;
-      [key: string]: any;
+      [key: string]: unknown;
     };
   };
 }

@@ -10,10 +10,11 @@ interface RichContentProps {
   text: string;
   embed?: {
     $type: string;
-    record?: any;
-    external?: any;
-    images?: any[];
-    media?: any;
+    record?: unknown;
+    external?: unknown;
+    images?: unknown[];
+    media?: unknown;
+    [key: string]: unknown;
   };
   facets?: Array<{
     index: {
@@ -36,7 +37,15 @@ export const RichContent = ({ text, embed, facets }: RichContentProps) => {
   // Debug logging removed
 
   // Handle different embed types based on $type
-  const embedType = embed?.$type;
+  const embedTyped = embed as {
+    $type?: string;
+    record?: { record?: unknown };
+    media?: { $type?: string; images?: unknown; external?: unknown };
+    external?: unknown;
+    images?: unknown[];
+  };
+  
+  const embedType = embedTyped?.$type;
 
   // Check for view formats (AT Protocol returns data in view format)
   const isQuotePost = embedType === 'app.bsky.embed.record#view';
@@ -49,24 +58,24 @@ export const RichContent = ({ text, embed, facets }: RichContentProps) => {
   let externalData = null;
   let imageData = null;
 
-  if (isQuotePost && embed?.record) {
-    quotedRecord = embed.record;
-  } else if (isQuoteWithMedia && embed) {
-    quotedRecord = embed.record?.record;
+  if (isQuotePost && embedTyped?.record) {
+    quotedRecord = embedTyped.record;
+  } else if (isQuoteWithMedia && embedTyped) {
+    quotedRecord = embedTyped.record?.record;
     // Handle media in recordWithMedia
-    if (embed.media?.$type === 'app.bsky.embed.images#view') {
-      imageData = embed.media.images;
-    } else if (embed.media?.$type === 'app.bsky.embed.external#view') {
-      externalData = embed.media.external;
+    if (embedTyped.media?.$type === 'app.bsky.embed.images#view') {
+      imageData = embedTyped.media.images;
+    } else if (embedTyped.media?.$type === 'app.bsky.embed.external#view') {
+      externalData = embedTyped.media.external;
     }
   }
 
-  if (isExternalEmbed && embed?.external) {
-    externalData = embed.external;
+  if (isExternalEmbed && embedTyped?.external) {
+    externalData = embedTyped.external;
   }
 
-  if (isImageEmbed && embed?.images) {
-    imageData = embed.images;
+  if (isImageEmbed && embedTyped?.images) {
+    imageData = embedTyped.images;
   }
 
   return (
@@ -78,19 +87,25 @@ export const RichContent = ({ text, embed, facets }: RichContentProps) => {
               <ContentRenderer
                 key={index}
                 segment={segment}
-                skipUrlPreview={!!externalData && segment.content === externalData.uri}
+                skipUrlPreview={!!externalData && segment.content === (externalData as any).uri}
               />
             ))}
       </div>
 
       {/* Handle quoted posts */}
-      {quotedRecord && <QuotedPost record={quotedRecord} />}
+      {quotedRecord && <QuotedPost record={quotedRecord as any} />}
 
       {/* Handle external embeds (link cards) */}
-      {externalData && <ExternalEmbed embed={externalData} />}
+      {externalData && (
+        <ExternalEmbed 
+          embed={externalData as { uri: string; title: string; description: string; thumb?: string }} 
+        />
+      )}
 
       {/* Handle images */}
-      {imageData && imageData.length > 0 && <ImageViewer images={imageData} />}
+      {imageData && Array.isArray(imageData) && imageData.length > 0 && (
+        <ImageViewer images={imageData as any} />
+      )}
     </div>
   );
 };
