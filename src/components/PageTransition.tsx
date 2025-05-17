@@ -1,4 +1,4 @@
-import { FunctionalComponent } from 'preact';
+import type { FunctionalComponent } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 interface PageTransitionProps {
