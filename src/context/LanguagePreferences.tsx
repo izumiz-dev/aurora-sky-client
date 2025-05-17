@@ -9,17 +9,23 @@ interface LanguagePreferencesType {
     contentLanguages: string[];
     showAllLanguages: boolean;
   };
-  updatePreferences: (prefs: Partial<{
-    postLanguage: string;
-    contentLanguages: string[];
-    showAllLanguages: boolean;
-  }>) => Promise<void>;
+  updatePreferences: (
+    prefs: Partial<{
+      postLanguage: string;
+      contentLanguages: string[];
+      showAllLanguages: boolean;
+    }>
+  ) => Promise<void>;
   isLoading: boolean;
 }
 
 const LanguagePreferencesContext = createContext<LanguagePreferencesType | undefined>(undefined);
 
-export const LanguagePreferencesProvider = ({ children }: { children: preact.ComponentChildren }) => {
+export const LanguagePreferencesProvider = ({
+  children,
+}: {
+  children: preact.ComponentChildren;
+}) => {
   const { isAuthenticated } = useAuth();
   const [postLanguage, setPostLanguage] = useState<string>('ja');
   const [contentLanguages, setContentLanguages] = useState<string[]>([]);
@@ -57,12 +63,13 @@ export const LanguagePreferencesProvider = ({ children }: { children: preact.Com
       try {
         const prefs = await getPreferences();
         // Loaded preferences from server
-        
-        if (prefs.preferences) {
-          const langPref = prefs.preferences.find(
+
+        const prefs_any = prefs as any;
+        if (prefs_any.preferences) {
+          const langPref = prefs_any.preferences.find(
             (p: any) => p.$type === 'app.bsky.actor.defs#languagesPref'
           );
-          
+
           if (langPref) {
             if (langPref.primaryLanguages && langPref.primaryLanguages.length > 0) {
               setPostLanguage(langPref.primaryLanguages[0]);
@@ -76,12 +83,12 @@ export const LanguagePreferencesProvider = ({ children }: { children: preact.Com
                 setContentLanguages(langPref.contentLanguages);
               }
             }
-            
+
             // ローカルストレージにも保存
             const localPrefs = {
               postLanguage: langPref.primaryLanguages?.[0] || 'ja',
               contentLanguages: langPref.contentLanguages || [],
-              showAllLanguages: langPref.contentLanguages?.length === 0
+              showAllLanguages: langPref.contentLanguages?.length === 0,
             };
             localStorage.setItem('language-preferences', JSON.stringify(localPrefs));
           }
@@ -96,11 +103,13 @@ export const LanguagePreferencesProvider = ({ children }: { children: preact.Com
     loadFromServer();
   }, [isAuthenticated]);
 
-  const updateLanguagePreferences = async (prefs: Partial<{
-    postLanguage: string;
-    contentLanguages: string[];
-    showAllLanguages: boolean;
-  }>) => {
+  const updateLanguagePreferences = async (
+    prefs: Partial<{
+      postLanguage: string;
+      contentLanguages: string[];
+      showAllLanguages: boolean;
+    }>
+  ) => {
     // 状態を更新
     if (prefs.postLanguage !== undefined) setPostLanguage(prefs.postLanguage);
     if (prefs.contentLanguages !== undefined) setContentLanguages(prefs.contentLanguages);
@@ -110,7 +119,8 @@ export const LanguagePreferencesProvider = ({ children }: { children: preact.Com
     const localPrefs = {
       postLanguage: prefs.postLanguage || postLanguage,
       contentLanguages: prefs.contentLanguages || contentLanguages,
-      showAllLanguages: prefs.showAllLanguages !== undefined ? prefs.showAllLanguages : showAllLanguages
+      showAllLanguages:
+        prefs.showAllLanguages !== undefined ? prefs.showAllLanguages : showAllLanguages,
     };
     localStorage.setItem('language-preferences', JSON.stringify(localPrefs));
 
@@ -118,26 +128,29 @@ export const LanguagePreferencesProvider = ({ children }: { children: preact.Com
     if (isAuthenticated) {
       try {
         const currentPrefs = await getPreferences();
-        const newPreferences = [...(currentPrefs.preferences || [])];
-        
+        const currentPrefs_any = currentPrefs as any;
+        const newPreferences = [...(currentPrefs_any.preferences || [])];
+
         const langPrefIndex = newPreferences.findIndex(
-          p => p.$type === 'app.bsky.actor.defs#languagesPref'
+          (p) => p.$type === 'app.bsky.actor.defs#languagesPref'
         );
-        
+
         const languagesPref = {
           $type: 'app.bsky.actor.defs#languagesPref',
           primaryLanguages: [prefs.postLanguage || postLanguage],
-          contentLanguages: (prefs.showAllLanguages !== undefined ? prefs.showAllLanguages : showAllLanguages) 
-            ? [] 
-            : (prefs.contentLanguages || contentLanguages)
+          contentLanguages: (
+            prefs.showAllLanguages !== undefined ? prefs.showAllLanguages : showAllLanguages
+          )
+            ? []
+            : prefs.contentLanguages || contentLanguages,
         };
-        
+
         if (langPrefIndex !== -1) {
           newPreferences[langPrefIndex] = languagesPref;
         } else {
           newPreferences.push(languagesPref);
         }
-        
+
         // Saving preferences to server
         await updatePreferences(newPreferences);
       } catch (error) {

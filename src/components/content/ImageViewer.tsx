@@ -71,9 +71,9 @@ export const ImageViewer = ({ images }: ImageViewerProps) => {
       {/* 画像プレビューモーダル */}
       {previewIndex >= 0 && (
         <ImagePreview
-          images={images.map(img => ({
+          images={images.map((img) => ({
             src: img.fullsize || img.thumb,
-            alt: img.alt
+            alt: img.alt,
           }))}
           currentIndex={previewIndex}
           onClose={() => setPreviewIndex(-1)}

@@ -35,17 +35,17 @@ export const ModernSettingsPage = () => {
 
   const handleSave = async () => {
     if (!isAuthenticated) return;
-    
+
     setIsSaving(true);
     setSuccessMessage(null);
-    
+
     try {
       await updateLangPrefs({
         postLanguage,
         contentLanguages,
-        showAllLanguages
+        showAllLanguages,
       });
-      
+
       setSuccessMessage('設定を保存しました');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
@@ -57,9 +57,9 @@ export const ModernSettingsPage = () => {
   };
 
   const toggleContentLanguage = (langCode: string) => {
-    setContentLanguages(prev => {
+    setContentLanguages((prev) => {
       if (prev.includes(langCode)) {
-        return prev.filter(code => code !== langCode);
+        return prev.filter((code) => code !== langCode);
       } else {
         return [...prev, langCode];
       }
@@ -101,8 +101,12 @@ export const ModernSettingsPage = () => {
 
       {/* 成功メッセージ */}
       {successMessage && (
-        <div className={`mb-6 p-4 glass ${successMessage.includes('失敗') ? 'bg-red-500/10 border-red-500/30' : 'bg-green-500/10 border-green-500/30'} border rounded-lg ambient-fade-in`}>
-          <p className={`${successMessage.includes('失敗') ? 'text-red-400' : 'text-green-400'} flex items-center`}>
+        <div
+          className={`mb-6 p-4 glass ${successMessage.includes('失敗') ? 'bg-red-500/10 border-red-500/30' : 'bg-green-500/10 border-green-500/30'} border rounded-lg ambient-fade-in`}
+        >
+          <p
+            className={`${successMessage.includes('失敗') ? 'text-red-400' : 'text-green-400'} flex items-center`}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 mr-2"
@@ -147,30 +151,28 @@ export const ModernSettingsPage = () => {
           </svg>
           <h2 className="text-xl font-semibold text-white">言語設定</h2>
         </div>
-        
+
         {/* 投稿言語 */}
         <div className="mb-8 p-4 glass rounded-lg hover-lift">
           <label className="block text-white/90 font-medium mb-3">投稿のデフォルト言語</label>
           <select
             value={postLanguage}
-            onChange={(e) => setPostLanguage(e.target.value)}
+            onChange={(e) => setPostLanguage((e.target as HTMLSelectElement).value)}
             className="glass-input ambient-hover"
           >
-            {LANGUAGE_OPTIONS.map(lang => (
+            {LANGUAGE_OPTIONS.map((lang) => (
               <option key={lang.code} value={lang.code} className="bg-gray-900">
                 {lang.name}
               </option>
             ))}
           </select>
-          <p className="text-sm text-white/60 mt-3">
-            新しい投稿を作成する際のデフォルト言語です
-          </p>
+          <p className="text-sm text-white/60 mt-3">新しい投稿を作成する際のデフォルト言語です</p>
         </div>
 
         {/* コンテンツ言語 */}
         <div className="p-4 glass rounded-lg hover-lift">
           <label className="block text-white/90 font-medium mb-3">表示するコンテンツの言語</label>
-          
+
           {/* すべての言語を表示する設定 */}
           <div className="mb-4">
             <label className="flex items-center space-x-3 cursor-pointer p-3 glass rounded-lg hover:bg-white/5 transition-all">
@@ -187,8 +189,11 @@ export const ModernSettingsPage = () => {
           {/* 個別言語選択（すべてが選択されていない場合のみ表示） */}
           {!showAllLanguages && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {LANGUAGE_OPTIONS.map(lang => (
-                <label key={lang.code} className="flex items-center space-x-3 cursor-pointer p-3 glass rounded-lg hover:bg-white/5 transition-all">
+              {LANGUAGE_OPTIONS.map((lang) => (
+                <label
+                  key={lang.code}
+                  className="flex items-center space-x-3 cursor-pointer p-3 glass rounded-lg hover:bg-white/5 transition-all"
+                >
                   <input
                     type="checkbox"
                     checked={contentLanguages.includes(lang.code)}

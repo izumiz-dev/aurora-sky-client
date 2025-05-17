@@ -15,12 +15,18 @@ interface ProfilePageProps {
 
 export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
   const { isAuthenticated, session } = useAuth();
-  const [authorFilter, setAuthorFilter] = useState<'posts_no_replies' | 'posts_with_replies' | 'posts_with_media'>('posts_no_replies');
-  
-  // プロフィールURLからハンドルを取得（@を除去）
-  const userHandle = handle?.startsWith('@') ? handle.slice(1) : (handle || session?.handle || '');
+  const [authorFilter, setAuthorFilter] = useState<
+    'posts_no_replies' | 'posts_with_replies' | 'posts_with_media'
+  >('posts_no_replies');
 
-  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
+  // プロフィールURLからハンドルを取得（@を除去）
+  const userHandle = handle?.startsWith('@') ? handle.slice(1) : handle || session?.handle || '';
+
+  const {
+    data: profile,
+    isLoading: profileLoading,
+    error: profileError,
+  } = useQuery({
     queryKey: cacheKeys.profile(userHandle),
     queryFn: () => getProfile(userHandle),
     enabled: isAuthenticated && !!userHandle,
@@ -36,7 +42,7 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
     isLoading: feedLoading,
   } = useInfiniteQuery({
     queryKey: cacheKeys.authorFeed(userHandle, authorFilter),
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam }: { pageParam?: string }) => {
       const response = await getAuthorFeed({
         actor: userHandle,
         cursor: pageParam,
@@ -50,7 +56,7 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
     ...cacheConfig.feed,
   });
 
-  const posts = feedData?.pages?.flatMap(page => page.feed) || [];
+  const posts = feedData?.pages?.flatMap((page: any) => page.feed) || [];
 
   useInfiniteScroll({
     onLoadMore: () => {
@@ -98,14 +104,10 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
         {/* バナー画像 */}
         {userProfile.banner && (
           <div className="h-48 overflow-hidden">
-            <img 
-              src={userProfile.banner} 
-              alt="Banner" 
-              className="w-full h-full object-cover"
-            />
+            <img src={userProfile.banner} alt="Banner" className="w-full h-full object-cover" />
           </div>
         )}
-        
+
         <div className="p-6">
           <div className="flex gap-4 mb-4">
             {/* アバター */}
@@ -117,20 +119,18 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
                 />
               </div>
             </div>
-            
+
             {/* ユーザー情報 */}
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-white">
                 {userProfile.displayName || userProfile.handle}
               </h1>
               <p className="text-white/60">@{userProfile.handle}</p>
-              
+
               {userProfile.description && (
-                <p className="mt-3 text-white/80 whitespace-pre-wrap">
-                  {userProfile.description}
-                </p>
+                <p className="mt-3 text-white/80 whitespace-pre-wrap">{userProfile.description}</p>
               )}
-              
+
               {/* 統計情報 */}
               <div className="flex gap-6 mt-4">
                 {userProfile.followersCount !== undefined && (
@@ -204,13 +204,13 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
               console.log('返信投稿データ:', {
                 post: item.post,
                 reply: item.reply,
-                recordReply: item.post.record.reply
+                recordReply: item.post.record.reply,
               });
             }
             const post = {
               ...item.post,
               reason: item.reason,
-              reply: item.reply
+              reply: item.reply,
             } as Post;
             return <PostItem key={post.uri} post={post} />;
           })

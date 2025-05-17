@@ -151,7 +151,7 @@ export const ImagePreview = ({ images, currentIndex, onClose, onNavigate }: Imag
             className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           />
-          
+
           {/* Alt テキスト */}
           {images[currentIndex].alt && (
             <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg glass backdrop-blur-lg text-white text-sm max-w-md text-center shadow-lg">
@@ -173,12 +173,7 @@ export const ImagePreview = ({ images, currentIndex, onClose, onNavigate }: Imag
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         )}

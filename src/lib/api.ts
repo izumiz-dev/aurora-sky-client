@@ -41,32 +41,36 @@ export const repost = async (uri: string, cid: string) => {
 
 export const uploadImage = async (file: File) => {
   const agent = await getAgent();
-  
+
   // ファイルサイズの確認（1MB以下）
   if (file.size > 1000000) {
     throw new Error('画像ファイルは1MB以下にしてください');
   }
-  
+
   // ファイルタイプの確認
   if (!file.type.startsWith('image/')) {
     throw new Error('画像ファイルを選択してください');
   }
-  
+
   // ArrayBufferに変換
   const arrayBuffer = await file.arrayBuffer();
   const uint8Array = new Uint8Array(arrayBuffer);
-  
+
   // 画像をアップロード
   const response = await agent.uploadBlob(uint8Array, {
     encoding: file.type,
   });
-  
+
   return response.data.blob;
 };
 
-export const createPostWithImages = async (text: string, images: { alt: string; blob: any }[], langs?: string[]) => {
+export const createPostWithImages = async (
+  text: string,
+  images: { alt: string; blob: any }[],
+  langs?: string[]
+) => {
   const agent = await getAgent();
-  
+
   const embed = {
     $type: 'app.bsky.embed.images',
     images: images.map(({ alt, blob }) => ({
@@ -74,7 +78,7 @@ export const createPostWithImages = async (text: string, images: { alt: string; 
       image: blob,
     })),
   };
-  
+
   return agent.post({
     text,
     embed,
@@ -90,7 +94,8 @@ export const getPreferences = async () => {
 
 export const updatePreferences = async (preferences: any[]) => {
   const agent = await getAgent();
-  return agent.setPreferences(preferences);
+  // The BskyAgent doesn't have setPreferences, we need to use the app API directly
+  return agent.app.bsky.actor.putPreferences({ preferences });
 };
 
 export const getProfile = async (actor: string) => {
@@ -102,7 +107,11 @@ export const getAuthorFeed = async (params: {
   actor: string;
   limit?: number;
   cursor?: string;
-  filter?: 'posts_with_replies' | 'posts_no_replies' | 'posts_with_media' | 'posts_and_author_threads';
+  filter?:
+    | 'posts_with_replies'
+    | 'posts_no_replies'
+    | 'posts_with_media'
+    | 'posts_and_author_threads';
 }) => {
   const agent = await getAgent();
   return agent.getAuthorFeed({

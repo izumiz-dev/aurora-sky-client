@@ -140,11 +140,11 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
   const handleCloseSnackbar = useCallback(() => {
     setShowSnackbar(false);
   }, []);
-  
+
   // Refresh the timeline (used after posting)
   const refreshTimeline = useCallback(async () => {
     if (!session) return;
-    
+
     try {
       const response = await fetchTimeline(session);
       setPosts(response.feed || []);

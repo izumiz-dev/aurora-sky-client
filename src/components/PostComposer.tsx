@@ -26,7 +26,6 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
   const [previewIndex, setPreviewIndex] = useState<number>(-1);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
   const handlePost = async () => {
     if (!text.trim() && images.length === 0) return;
 
@@ -49,7 +48,7 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
         // テキストのみ投稿
         await createPost(text, [preferences.postLanguage]);
       }
-      
+
       setText('');
       setImages([]);
       if (onPostSuccess) {
@@ -92,7 +91,7 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
 
           // プレビュー用のURLを作成
           const preview = URL.createObjectURL(file);
-          
+
           return {
             file,
             preview,
@@ -103,7 +102,9 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
 
       setImages([...images, ...newImages]);
     } catch (err) {
-      setError(err.message || '画像のアップロードに失敗しました');
+      setError(
+        (err instanceof Error ? err.message : String(err)) || '画像のアップロードに失敗しました'
+      );
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -139,23 +140,23 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
           />
         </div>
         <div className="flex-1">
-          <textarea 
-            className="glass-input resize-none" 
-            rows={3} 
+          <textarea
+            className="glass-input resize-none"
+            rows={3}
             placeholder="今どうしてる？"
             value={text}
             onInput={(e) => setText((e.target as HTMLTextAreaElement).value)}
             onKeyDown={handleKeyDown}
             disabled={isPosting}
           />
-          
+
           {/* 画像プレビュー */}
           {images.length > 0 && (
             <div className="mt-3 grid grid-cols-2 gap-2">
               {images.map((img, index) => (
                 <div key={index} className="relative group">
-                  <img 
-                    src={img.preview} 
+                  <img
+                    src={img.preview}
                     alt={img.alt || `添付画像 ${index + 1}`}
                     className="w-full h-32 object-cover rounded-lg cursor-pointer hover:brightness-110 transition-all"
                     onClick={() => setPreviewIndex(index)}
@@ -164,8 +165,19 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
                     onClick={() => removeImage(index)}
                     className="absolute top-2 right-2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                   <input
@@ -180,10 +192,8 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
             </div>
           )}
 
-          {error && (
-            <div className="mt-2 text-red-400 text-sm">{error}</div>
-          )}
-          
+          {error && <div className="mt-2 text-red-400 text-sm">{error}</div>}
+
           <div className="flex items-center justify-between mt-3">
             <div className="flex gap-2">
               <input
@@ -195,8 +205,8 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
                 className="hidden"
                 disabled={isPosting || isUploading || images.length >= 4}
               />
-              <button 
-                className="glass-button glass-button-ghost icon-btn" 
+              <button
+                className="glass-button glass-button-ghost icon-btn"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isPosting || isUploading || images.length >= 4}
               >
@@ -214,16 +224,14 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                {images.length > 0 && (
-                  <span className="text-xs ml-1">{images.length}/4</span>
-                )}
+                {images.length > 0 && <span className="text-xs ml-1">{images.length}/4</span>}
               </button>
             </div>
             <div className="flex items-center gap-2">
               <span className={`text-sm ${text.length > 300 ? 'text-red-400' : 'text-white/50'}`}>
                 {text.length}/300
               </span>
-              <button 
+              <button
                 className="glass-button btn-primary"
                 onClick={handlePost}
                 disabled={isPosting || (!text.trim() && images.length === 0) || text.length > 300}
@@ -260,11 +268,11 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
           </div>
         </div>
       </div>
-      
+
       {/* 画像プレビューモーダル */}
       {previewIndex >= 0 && (
         <ImagePreview
-          images={images.map(img => ({ src: img.preview, alt: img.alt }))}
+          images={images.map((img) => ({ src: img.preview, alt: img.alt }))}
           currentIndex={previewIndex}
           onClose={() => setPreviewIndex(-1)}
           onNavigate={setPreviewIndex}

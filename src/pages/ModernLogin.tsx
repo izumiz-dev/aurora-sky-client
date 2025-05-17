@@ -63,9 +63,7 @@ export const ModernLoginPage = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
-                ハンドル
-              </label>
+              <label className="block text-sm font-medium text-white/80 mb-2">ハンドル</label>
               <input
                 type="text"
                 value={identifier}
@@ -143,7 +141,6 @@ export const ModernLoginPage = () => {
               )}
             </button>
           </form>
-
         </div>
       </div>
     </div>

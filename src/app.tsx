@@ -37,47 +37,47 @@ export function App() {
       <AuthProvider>
         <LanguagePreferencesProvider>
           <Router>
-          <Route path="/login" component={ModernLoginPage} />
-          <Route
-            path="/test-embeds"
-            component={() => (
-              <ModernLayout>
-                <TestEmbedsPage />
-              </ModernLayout>
-            )}
-          />
-          <Route
-            path="/"
-            component={() => (
-              <ModernLayout>
-                <ModernHomePage />
-              </ModernLayout>
-            )}
-          />
-          <Route
-            path="/settings"
-            component={() => (
-              <ModernLayout>
-                <ModernSettingsPage />
-              </ModernLayout>
-            )}
-          />
-          <Route
-            path="/profile/:handle"
-            component={({handle}: {handle: string}) => (
-              <ModernLayout>
-                <ModernProfilePage handle={handle} />
-              </ModernLayout>
-            )}
-          />
-          <Route
-            path="/:rest*"
-            component={() => (
-              <ModernLayout>
-                <NotFoundPage />
-              </ModernLayout>
-            )}
-          />
+            <Route path="/login" component={ModernLoginPage} />
+            <Route
+              path="/test-embeds"
+              component={() => (
+                <ModernLayout>
+                  <TestEmbedsPage />
+                </ModernLayout>
+              )}
+            />
+            <Route
+              path="/"
+              component={() => (
+                <ModernLayout>
+                  <ModernHomePage />
+                </ModernLayout>
+              )}
+            />
+            <Route
+              path="/settings"
+              component={() => (
+                <ModernLayout>
+                  <ModernSettingsPage />
+                </ModernLayout>
+              )}
+            />
+            <Route
+              path="/profile/:handle"
+              component={(props: { handle?: string }) => (
+                <ModernLayout>
+                  <ModernProfilePage handle={props.handle} />
+                </ModernLayout>
+              )}
+            />
+            <Route
+              path="/:rest*"
+              component={() => (
+                <ModernLayout>
+                  <NotFoundPage />
+                </ModernLayout>
+              )}
+            />
           </Router>
           <Toaster
             position="bottom-right"

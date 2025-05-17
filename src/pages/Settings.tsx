@@ -27,24 +27,25 @@ export const SettingsPage = () => {
   useEffect(() => {
     const loadPreferences = async () => {
       if (!isAuthenticated) return;
-      
+
       try {
         const prefs = await getPreferences();
-        
+
         // コンテンツ言語設定を取得
-        const langPrefs = prefs.preferences.find(
+        const prefs_any = prefs as any;
+        const langPrefs = prefs_any.preferences.find(
           (p: any) => p.$type === 'app.bsky.actor.defs#contentLabelPref' && p.contentLanguages
         );
-        
+
         if (langPrefs?.contentLanguages) {
           setContentLanguages(langPrefs.contentLanguages);
         }
-        
+
         // 投稿言語設定を取得
-        const postLangPref = prefs.preferences.find(
+        const postLangPref = prefs_any.preferences.find(
           (p: any) => p.$type === 'app.bsky.actor.defs#postLanguage'
         );
-        
+
         if (postLangPref?.postLanguage) {
           setPostLanguage(postLangPref.postLanguage);
         }
@@ -60,10 +61,10 @@ export const SettingsPage = () => {
 
   const handleSave = async () => {
     if (!isAuthenticated) return;
-    
+
     setIsSaving(true);
     setSuccessMessage(null);
-    
+
     try {
       const preferences = [
         {
@@ -75,7 +76,7 @@ export const SettingsPage = () => {
           postLanguage,
         },
       ];
-      
+
       await updatePreferences(preferences);
       setSuccessMessage('設定を保存しました');
       setTimeout(() => setSuccessMessage(null), 3000);
@@ -87,9 +88,9 @@ export const SettingsPage = () => {
   };
 
   const toggleContentLanguage = (langCode: string) => {
-    setContentLanguages(prev => {
+    setContentLanguages((prev) => {
       if (prev.includes(langCode)) {
-        return prev.filter(code => code !== langCode);
+        return prev.filter((code) => code !== langCode);
       } else {
         return [...prev, langCode];
       }
@@ -131,31 +132,29 @@ export const SettingsPage = () => {
       {/* 言語設定セクション */}
       <div className="glass-card p-6 mb-6">
         <h2 className="text-xl font-semibold text-white mb-4">言語設定</h2>
-        
+
         {/* 投稿言語 */}
         <div className="mb-6">
           <label className="block text-white/80 mb-2">投稿のデフォルト言語</label>
           <select
             value={postLanguage}
-            onChange={(e) => setPostLanguage(e.target.value)}
+            onChange={(e) => setPostLanguage((e.target as HTMLSelectElement).value)}
             className="glass-input"
           >
-            {LANGUAGE_OPTIONS.map(lang => (
+            {LANGUAGE_OPTIONS.map((lang) => (
               <option key={lang.code} value={lang.code}>
                 {lang.name}
               </option>
             ))}
           </select>
-          <p className="text-sm text-white/60 mt-2">
-            新しい投稿を作成する際のデフォルト言語です
-          </p>
+          <p className="text-sm text-white/60 mt-2">新しい投稿を作成する際のデフォルト言語です</p>
         </div>
 
         {/* コンテンツ言語 */}
         <div>
           <label className="block text-white/80 mb-2">表示するコンテンツの言語</label>
           <div className="space-y-2">
-            {LANGUAGE_OPTIONS.map(lang => (
+            {LANGUAGE_OPTIONS.map((lang) => (
               <label key={lang.code} className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -175,11 +174,7 @@ export const SettingsPage = () => {
 
       {/* 保存ボタン */}
       <div className="flex justify-end">
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="glass-button btn-primary"
-        >
+        <button onClick={handleSave} disabled={isSaving} className="glass-button btn-primary">
           {isSaving ? (
             <span className="flex items-center">
               <svg

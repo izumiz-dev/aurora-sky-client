@@ -13,7 +13,14 @@ export const AppIcon = ({ size = 'md', withGradientBg = true, className = '' }: 
   };
 
   // スマホアプリのアイコンのような角丸を適用（サイズに応じて調整）
-  const roundedClass = size === 'lg' ? 'rounded-[36px]' : size === 'md' ? 'rounded-[18px]' : size === 'favicon' ? 'rounded-[16px]' : 'rounded-[14px]';
+  const roundedClass =
+    size === 'lg'
+      ? 'rounded-[36px]'
+      : size === 'md'
+        ? 'rounded-[18px]'
+        : size === 'favicon'
+          ? 'rounded-[16px]'
+          : 'rounded-[14px]';
   const containerClasses = withGradientBg
     ? `${sizeClasses[size].container} ${roundedClass} bg-gradient-to-br from-green-400 via-cyan-500 via-blue-500 to-purple-600 inline-flex items-center justify-center shadow-lg ${className}`
     : `${sizeClasses[size].container} ${roundedClass} inline-flex items-center justify-center ${className}`;
@@ -41,21 +48,29 @@ export const AppIcon = ({ size = 'md', withGradientBg = true, className = '' }: 
           </linearGradient>
           {/* 輝くエフェクト */}
           <filter id="glow">
-            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+            <feGaussianBlur stdDeviation="1" result="coloredBlur" />
             <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
         </defs>
-        
+
         {/* 背景の角丸四角形 */}
         <rect x="1" y="1" width="22" height="22" rx="5" ry="5" fill="url(#nightSky)" />
-        
+
         {/* オーロラの層 */}
-        <path d="M2 8C2 8 6 6 12 7C18 8 22 6 22 6L22 16C22 16 18 18 12 17C6 16 2 18 2 18L2 8Z" fill="url(#aurora)" opacity="0.8" />
-        <path d="M3 10C3 10 7 9 12 10C17 11 21 9 21 9L21 14C21 14 17 15 12 14C7 13 3 15 3 15L3 10Z" fill="url(#aurora)" opacity="0.6" />
-        
+        <path
+          d="M2 8C2 8 6 6 12 7C18 8 22 6 22 6L22 16C22 16 18 18 12 17C6 16 2 18 2 18L2 8Z"
+          fill="url(#aurora)"
+          opacity="0.8"
+        />
+        <path
+          d="M3 10C3 10 7 9 12 10C17 11 21 9 21 9L21 14C21 14 17 15 12 14C7 13 3 15 3 15L3 10Z"
+          fill="url(#aurora)"
+          opacity="0.6"
+        />
+
         {/* 星 */}
         <circle cx="6" cy="5" r="0.5" fill="white" opacity="0.8" filter="url(#glow)" />
         <circle cx="18" cy="4" r="0.5" fill="white" opacity="0.7" filter="url(#glow)" />
@@ -63,7 +78,7 @@ export const AppIcon = ({ size = 'md', withGradientBg = true, className = '' }: 
         <circle cx="9" cy="4" r="0.3" fill="white" opacity="0.6" />
         <circle cx="20" cy="7" r="0.3" fill="white" opacity="0.7" />
         <circle cx="4" cy="7" r="0.3" fill="white" opacity="0.8" />
-        
+
         {/* 蝶のシルエット（白く光らせる） */}
         <g transform="translate(12, 12) scale(0.65) translate(-12, -12)">
           <path
