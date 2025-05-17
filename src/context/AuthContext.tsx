@@ -2,6 +2,7 @@ import { createContext } from 'preact';
 import { useState, useEffect, useCallback, useContext } from 'preact/hooks';
 import { BskyAgent } from '@atproto/api';
 import type { SessionData } from '../types/session';
+import { SessionManager } from '../lib/sessionManager';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -23,36 +24,34 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
   useEffect(() => {
     let mounted = true;
     const loadSession = async () => {
-      const storedSession = localStorage.getItem('bsky-session');
+      const storedSession = await SessionManager.getSession();
       if (storedSession && mounted) {
         try {
-          const parsedSession = JSON.parse(storedSession);
-          // console.log('Restored session:', parsedSession);
-
           // アバターが無い場合は取得を試みる
-          if (!parsedSession.avatar && parsedSession.did) {
+          if (!storedSession.avatar && storedSession.did) {
             try {
               const agent = new BskyAgent({ service: 'https://bsky.social' });
-              await agent.resumeSession(parsedSession);
-              const profile = await agent.getProfile({ actor: parsedSession.did });
+              await agent.resumeSession(storedSession);
+              const profile = await agent.getProfile({ actor: storedSession.did });
 
               const sessionWithAvatar = {
-                ...parsedSession,
+                ...storedSession,
                 avatar: profile.data.avatar,
+                active: storedSession.active ?? true,
               };
 
               setSession(sessionWithAvatar);
-              localStorage.setItem('bsky-session', JSON.stringify(sessionWithAvatar));
+              await SessionManager.saveSession(sessionWithAvatar);
             } catch (error) {
               console.error('Failed to fetch profile:', error);
-              setSession(parsedSession);
+              setSession(storedSession);
             }
           } else {
-            setSession(parsedSession);
+            setSession(storedSession);
           }
         } catch (e) {
-          console.error('Failed to parse stored session', e);
-          localStorage.removeItem('bsky-session');
+          console.error('Failed to load session', e);
+          await SessionManager.clearSession();
         }
       }
       if (mounted) {
@@ -88,15 +87,17 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
           const sessionWithAvatar = {
             ...data,
             avatar: profile.data.avatar,
+            active: data.active ?? true,
           };
 
           setSession(sessionWithAvatar);
-          localStorage.setItem('bsky-session', JSON.stringify(sessionWithAvatar));
+          await SessionManager.saveSession(sessionWithAvatar);
         } catch (profileError) {
           // プロフィール取得に失敗してもログインは続行
           console.error('Profile fetch failed:', profileError);
-          setSession(data);
-          localStorage.setItem('bsky-session', JSON.stringify(data));
+          const sessionData = { ...data, active: data.active ?? true };
+          setSession(sessionData);
+          await SessionManager.saveSession(sessionData);
         }
       } else {
         throw new Error('ログインが成功しましたが、セッションデータが取得できませんでした');
@@ -110,9 +111,9 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
     }
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     setSession(null);
-    localStorage.removeItem('bsky-session');
+    await SessionManager.clearSession();
   }, []);
 
   const value = {

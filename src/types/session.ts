@@ -6,5 +6,5 @@ export interface SessionData {
   accessJwt: string;
   refreshJwt: string;
   avatar?: string;
-  active?: boolean;
+  active: boolean;
 }

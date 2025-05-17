@@ -1,14 +1,19 @@
 import { BskyAgent, RichText } from '@atproto/api';
 import { parseApiError } from './api-error-handler';
+import { SessionManager } from './sessionManager';
 
 export const agent = new BskyAgent({
   service: 'https://bsky.social',
 });
 
 export const getAgent = async () => {
-  const session = JSON.parse(localStorage.getItem('bsky-session') || 'null');
+  const session = await SessionManager.getSession();
   if (session) {
-    await agent.resumeSession(session);
+    const sessionWithDefaults = {
+      ...session,
+      active: session.active ?? true,
+    };
+    await agent.resumeSession(sessionWithDefaults);
   }
   return agent;
 };
