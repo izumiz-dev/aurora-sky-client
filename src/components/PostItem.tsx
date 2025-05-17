@@ -134,6 +134,10 @@ export const PostItem = ({ post, isNew = false }: PostItemProps) => {
             <img
               src={post.author.avatar || 'https://via.placeholder.com/48'}
               alt={post.author.displayName || post.author.handle}
+              onError={(e) => {
+                e.stopPropagation();
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48';
+              }}
             />
           </a>
           <div className="flex-1 min-w-0">

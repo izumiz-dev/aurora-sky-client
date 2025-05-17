@@ -39,9 +39,14 @@ self.addEventListener('activate', (event) => {
 // フェッチイベントの処理
 self.addEventListener('fetch', (event) => {
   const { request } = event;
+  const url = new URL(request.url);
   
-  // APIリクエストはキャッシュしない
-  if (request.url.includes('/api/') || request.url.includes('bsky.social')) {
+  // APIリクエストと外部画像はキャッシュしない
+  if (request.url.includes('/api/') || 
+      request.url.includes('bsky.social') || 
+      request.url.includes('bsky.network') ||
+      // 外部のアバター画像URLをキャッシュから除外
+      (request.destination === 'image' && !url.origin.includes(self.location.origin))) {
     return;
   }
   

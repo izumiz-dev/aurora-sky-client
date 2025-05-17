@@ -20,11 +20,11 @@ export const UserMenu = () => {
       >
         <div className="avatar avatar-sm">
           <img
-            src={session?.avatar || '/default-avatar.png'}
+            src={session?.avatar || 'https://via.placeholder.com/32'}
             alt={session?.handle || 'User'}
             onError={(e) => {
-              console.error('Avatar load error in header:', e);
-              (e.target as HTMLImageElement).src = '/default-avatar.png';
+              e.stopPropagation();
+              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/32';
             }}
           />
         </div>
