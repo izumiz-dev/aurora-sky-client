@@ -1,5 +1,6 @@
 import { useState, useRef } from 'preact/hooks';
 import { useAuth } from '../context/AuthContext';
+import { useLanguagePreferences } from '../context/LanguagePreferences';
 import { createPost, createPostWithImages, uploadImage } from '../lib/api';
 import { ImagePreview } from './content/ImagePreview';
 
@@ -16,6 +17,7 @@ interface UploadedImage {
 
 export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
   const { session } = useAuth();
+  const { preferences } = useLanguagePreferences();
   const [text, setText] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +25,7 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [previewIndex, setPreviewIndex] = useState<number>(-1);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const handlePost = async () => {
     if (!text.trim() && images.length === 0) return;
@@ -41,10 +44,10 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
             return { alt: img.alt, blob: img.blob };
           })
         );
-        await createPostWithImages(text, uploadedImages);
+        await createPostWithImages(text, uploadedImages, [preferences.postLanguage]);
       } else {
         // テキストのみ投稿
-        await createPost(text);
+        await createPost(text, [preferences.postLanguage]);
       }
       
       setText('');

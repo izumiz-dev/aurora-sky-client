@@ -10,7 +10,8 @@
       "Bash(npm run tsc:*)",
       "Bash(npm run:*)",
       "WebFetch(domain:atproto.blue)",
-      "WebFetch(domain:docs.bsky.app)"
+      "WebFetch(domain:docs.bsky.app)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

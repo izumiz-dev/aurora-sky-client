@@ -20,10 +20,11 @@ export const fetchTimeline = async (params: { limit?: number; cursor?: string } 
   });
 };
 
-export const createPost = async (text: string) => {
+export const createPost = async (text: string, langs?: string[]) => {
   const agent = await getAgent();
   return agent.post({
     text,
+    langs,
     createdAt: new Date().toISOString(),
   });
 };
@@ -63,7 +64,7 @@ export const uploadImage = async (file: File) => {
   return response.data.blob;
 };
 
-export const createPostWithImages = async (text: string, images: { alt: string; blob: any }[]) => {
+export const createPostWithImages = async (text: string, images: { alt: string; blob: any }[], langs?: string[]) => {
   const agent = await getAgent();
   
   const embed = {
@@ -77,6 +78,17 @@ export const createPostWithImages = async (text: string, images: { alt: string; 
   return agent.post({
     text,
     embed,
+    langs,
     createdAt: new Date().toISOString(),
   });
+};
+
+export const getPreferences = async () => {
+  const agent = await getAgent();
+  return agent.getPreferences();
+};
+
+export const updatePreferences = async (preferences: any[]) => {
+  const agent = await getAgent();
+  return agent.setPreferences(preferences);
 };

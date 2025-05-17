@@ -43,7 +43,12 @@ export const UserMenu = () => {
               プロフィール
             </a>
             <a
-              href="#"
+              href="/settings"
+              onClick={(e) => {
+                e.preventDefault();
+                route('/settings');
+                setIsMenuOpen(false);
+              }}
               className="block px-4 py-2 text-sm text-gray-100 hover:bg-white/10 transition-colors"
             >
               設定

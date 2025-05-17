@@ -8,11 +8,13 @@ import { ModernLayout } from './layouts/ModernLayout';
 // モダンページ
 import { ModernHomePage } from './pages/ModernHome';
 import { ModernLoginPage } from './pages/ModernLogin';
+import { ModernSettingsPage } from './pages/ModernSettings';
 import { NotFoundPage } from './pages/NotFound';
 import { TestEmbedsPage } from './pages/TestEmbeds';
 
 // 認証
 import { AuthProvider } from './context/AuthContext';
+import { LanguagePreferencesProvider } from './context/LanguagePreferences';
 
 // スタイル
 import './modern.css';
@@ -32,7 +34,8 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router>
+        <LanguagePreferencesProvider>
+          <Router>
           <Route path="/login" component={ModernLoginPage} />
           <Route
             path="/test-embeds"
@@ -51,6 +54,14 @@ export function App() {
             )}
           />
           <Route
+            path="/settings"
+            component={() => (
+              <ModernLayout>
+                <ModernSettingsPage />
+              </ModernLayout>
+            )}
+          />
+          <Route
             path="/:rest*"
             component={() => (
               <ModernLayout>
@@ -58,33 +69,34 @@ export function App() {
               </ModernLayout>
             )}
           />
-        </Router>
-        <Toaster
-          position="bottom-right"
-          toastOptions={{
-            className: 'glass',
-            style: {
-              background: 'var(--glass-bg)',
-              backdropFilter: 'blur(var(--glass-blur))',
-              WebkitBackdropFilter: 'blur(var(--glass-blur))',
-              border: '1px solid var(--glass-border)',
-              color: 'var(--text-primary)',
-              boxShadow: 'var(--glass-shadow)',
-            },
-            success: {
-              iconTheme: {
-                primary: '#10b981',
-                secondary: '#ffffff',
+          </Router>
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              className: 'glass',
+              style: {
+                background: 'var(--glass-bg)',
+                backdropFilter: 'blur(var(--glass-blur))',
+                WebkitBackdropFilter: 'blur(var(--glass-blur))',
+                border: '1px solid var(--glass-border)',
+                color: 'var(--text-primary)',
+                boxShadow: 'var(--glass-shadow)',
               },
-            },
-            error: {
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#ffffff',
+              success: {
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#ffffff',
+                },
               },
-            },
-          }}
-        />
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#ffffff',
+                },
+              },
+            }}
+          />
+        </LanguagePreferencesProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
