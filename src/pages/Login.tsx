@@ -64,18 +64,6 @@ export const LoginPage = () => {
             </div>
           </div>
           <h2 className="text-2xl font-semibold text-white mb-2">Blueskyにログイン</h2>
-          <p className="text-white/70 text-sm">
-            アカウントをお持ちでない場合は
-            <a
-              href="https://bsky.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 underline transition-colors"
-            >
-              公式アプリ
-            </a>
-            で作成してください
-          </p>
         </div>
 
         {error && (
@@ -94,7 +82,7 @@ export const LoginPage = () => {
                 autoComplete="username"
                 required
                 className="form-input"
-                placeholder="メールアドレスまたはユーザー名"
+                placeholder="ハンドル (@username.bsky.social)"
                 value={identifier}
                 onInput={(e) => setIdentifier((e.target as HTMLInputElement).value)}
                 disabled={isLoading}
@@ -108,11 +96,21 @@ export const LoginPage = () => {
                 autoComplete="current-password"
                 required
                 className="form-input"
-                placeholder="パスワード"
+                placeholder="App パスワード"
                 value={password}
                 onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
                 disabled={isLoading}
               />
+              <div className="text-right mt-2">
+                <a
+                  href="https://bsky.app/settings/app-passwords"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  App パスワードの取得 →
+                </a>
+              </div>
             </div>
           </div>
 
