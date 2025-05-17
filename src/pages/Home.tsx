@@ -109,7 +109,7 @@ export const HomePage = () => {
     return (
       <div className="text-center py-16">
         <div className="glass-card-simple max-w-md mx-auto p-8">
-          <h2 className="text-2xl font-semibold text-white mb-3">Blueskyにログイン</h2>
+          <h2 className="text-2xl font-semibold text-white mb-3">AuroraSkyにログイン</h2>
           <p className="text-white/70 mb-6">タイムラインを表示するにはログインしてください</p>
           <a href="/login" className="btn-primary inline-block">
             ログインページへ

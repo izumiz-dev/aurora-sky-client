@@ -30,7 +30,7 @@ export const PostItem = ({ post, isNew = false }: PostItemProps) => {
     switch (actionId) {
       case 'reply':
         // TODO: リプライ機能の実装
-        console.log('Reply to:', post.uri);
+        // TODO: Implement reply functionality
         break;
       case 'repost':
         // すぐにアニメーションを開始
@@ -74,7 +74,7 @@ export const PostItem = ({ post, isNew = false }: PostItemProps) => {
         // アニメーション後にリセット（5秒に延長）
         setTimeout(() => setAnimateAction(null), 5000);
         break;
-      case 'copy-link':
+      case 'copy-link': {
         // bsky.appの投稿URLを生成してコピー
         const postUrl = `https://bsky.app/profile/${post.author.handle}/post/${post.uri.split('/').pop()}`;
         try {
@@ -85,6 +85,7 @@ export const PostItem = ({ post, isNew = false }: PostItemProps) => {
           setSnackbar({ message: 'リンクのコピーに失敗しました' });
         }
         break;
+      }
     }
     closeContextMenu();
   };

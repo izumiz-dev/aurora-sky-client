@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture & Key Technologies
 
-This is a Bluesky client built with Preact and Vite:
+This is AuroraSky, a beautiful Bluesky client built with Preact and Vite:
 
 - **Framework**: Preact with React compatibility layer
 - **Build Tool**: Vite

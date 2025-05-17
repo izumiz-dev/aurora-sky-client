@@ -12,7 +12,8 @@
       "WebFetch(domain:atproto.blue)",
       "WebFetch(domain:docs.bsky.app)",
       "Bash(grep:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

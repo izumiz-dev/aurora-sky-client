@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'preact/hooks';
-import { ChatBubbleOvalLeftIcon, ArrowPathRoundedSquareIcon, HeartIcon, LinkIcon, EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
+import { ChatBubbleOvalLeftIcon, ArrowPathRoundedSquareIcon, HeartIcon, LinkIcon } from '@heroicons/react/24/outline';
 
 interface Position {
   x: number;
