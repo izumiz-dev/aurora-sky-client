@@ -10,19 +10,18 @@ interface ModernLayoutProps {
   path?: string;
 }
 
-export const ModernLayout: FunctionalComponent<ModernLayoutProps> = ({ children }) => {
+type RouteComponentProps = {
+  path?: string;
+};
+
+export const ModernLayout: FunctionalComponent<ModernLayoutProps & RouteComponentProps> = ({ children, path }) => {
   const { isAuthenticated } = useAuth();
+  const isLoginPage = path === '/login';
 
   return (
-    <div className="min-h-screen animated-bg">
-      <BackgroundParticles />
-      <div className="animated-gradient"></div>
-      <header className="aurora-gradient-bg sticky top-0 z-50 border-b border-white/10 shadow-lg"
-        style={{
-          backdropFilter: 'saturate(180%) blur(20px)',
-          WebkitBackdropFilter: 'saturate(180%) blur(20px)',
-          color: 'white'
-        }}>
+    <>
+      <header className="aurora-gradient-bg fixed top-0 left-0 right-0 w-full z-50 border-b border-white/10 shadow-lg"
+        style={{ position: 'fixed !important' }}>
         <div className="max-w-screen-xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
@@ -36,7 +35,7 @@ export const ModernLayout: FunctionalComponent<ModernLayoutProps> = ({ children 
             </div>
 
             <div className="flex items-center gap-4">
-              {!isAuthenticated && (
+              {!isAuthenticated && !isLoginPage && (
                 <Link href="/login" className="glass-button btn-primary">
                   ログイン
                 </Link>
@@ -46,10 +45,14 @@ export const ModernLayout: FunctionalComponent<ModernLayoutProps> = ({ children 
         </div>
       </header>
 
-      <main>{children}</main>
+      <div className="min-h-screen animated-bg">
+        <BackgroundParticles />
+        <div className="animated-gradient"></div>
+        <main className="pt-16">{children}</main>
+      </div>
 
       {/* 浮かぶ設定ボタン */}
-      {isAuthenticated && <FloatingSettings />}
-    </div>
+      {isAuthenticated && !isLoginPage && <FloatingSettings />}
+    </>
   );
 };

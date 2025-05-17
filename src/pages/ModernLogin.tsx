@@ -36,23 +36,21 @@ export const ModernLoginPage = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center animated-bg">
-        <div className="animated-gradient"></div>
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center fade-enter">
         <div className="glass-spinner"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center animated-bg px-4">
-      <div className="animated-gradient"></div>
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 fade-enter">
       <div className="max-w-md w-full relative">
         {/* 開発中の注意書き */}
         <DevelopmentNotice />
         
         {/* ロゴセクション */}
         <div className="text-center mb-8">
-          <AppIcon size="lg" withGradientBg={false} className="mb-4" />
+          <AppIcon size="lg" withGradientBg={false} className="mb-2" />
           <h1 className="text-3xl font-bold text-white mb-2">AuroraSkyへようこそ</h1>
           <p className="text-white/70">こころがやすまるクライアント</p>
         </div>

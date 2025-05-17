@@ -27,21 +27,136 @@
   background: rgba(255, 255, 255, 0.4);
 }
 
-/* アニメーション */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
+
+/* Aurora gradient text - 自然なオーロラの配色 */
+.aurora-gradient-text {
+  background: linear-gradient(135deg,
+      #1e3a8a 0%,
+      /* 深い夜空の青 */
+      #3b82f6 15%,
+      /* 鮮やかな青 */
+      #67e8f9 30%,
+      /* 水色 */
+      #34d399 45%,
+      /* エメラルドグリーン */
+      #86efac 60%,
+      /* ライトグリーン */
+      #fbbf24 75%,
+      /* 琥珀色 */
+      #f472b6 90%,
+      /* ソフトピンク */
+      #c084fc 100%
+      /* 薄紫 */
+    );
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: aurora-breathe 15s ease-in-out infinite;
+  font-weight: 600;
+  position: relative;
+  letter-spacing: 0.05em;
+}
+
+/* ソフトなグロー効果 */
+.aurora-gradient-text::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  background: linear-gradient(135deg,
+      #1e3a8a 0%,
+      #3b82f6 15%,
+      #67e8f9 30%,
+      #34d399 45%,
+      #86efac 60%,
+      #fbbf24 75%,
+      #f472b6 90%,
+      #c084fc 100%);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: blur(15px) opacity(0.5);
+  animation: aurora-breathe 15s ease-in-out infinite;
+}
+
+@keyframes aurora-breathe {
+
+  0%,
+  100% {
+    background-position: 0% 0%;
     transform: translateY(0);
+  }
+
+  25% {
+    background-position: 50% 50%;
+    transform: translateY(-1px);
+  }
+
+  50% {
+    background-position: 100% 100%;
+    transform: translateY(0);
+  }
+
+  75% {
+    background-position: 50% 50%;
+    transform: translateY(1px);
   }
 }
 
-/* ユーティリティクラス */
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out forwards;
+/* Aurora gradient background - ヘッダー背景用 */
+.aurora-gradient-bg {
+  background: linear-gradient(135deg,
+      #1e3a8a 0%,
+      /* 深い夜空の青 */
+      #3b82f6 15%,
+      /* 鮮やかな青 */
+      #67e8f9 30%,
+      /* 水色 */
+      #34d399 45%,
+      /* エメラルドグリーン */
+      #86efac 60%,
+      /* ライトグリーン */
+      #fbbf24 75%,
+      /* 琥珀色 */
+      #f472b6 90%,
+      /* ソフトピンク */
+      #c084fc 100%
+      /* 薄紫 */
+    );
+  background-size: 200% 200%;
+  animation: aurora-breathe 15s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ヘッダーに輝きを追加 */
+.aurora-gradient-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 45%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.1) 55%,
+      transparent 100%);
+  animation: aurora-shimmer 8s ease-in-out infinite;
+}
+
+@keyframes aurora-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* グラスモーフィズム効果 */
@@ -54,22 +169,6 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* ローディングスピナー */
-.loading-spinner {
-  display: inline-block;
-  width: 2rem;
-  height: 2rem;
-  border: 0.25rem solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
 
 /* レスポンシブなテキスト */
 .text-ellipsis {
@@ -158,49 +257,8 @@ p {
 }
 
 /* セクションの余白調整 */
-section + section {
+section+section {
   margin-top: 2rem;
 }
 
-/* レスポンシブなコンテナ */
-.container {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
 
-@media (min-width: 640px) {
-  .container {
-    max-width: 640px;
-  }
-}
-
-@media (min-width: 768px) {
-  .container {
-    max-width: 768px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .container {
-    max-width: 1024px;
-  }
-}
-
-@media (min-width: 1280px) {
-  .container {
-    max-width: 1280px;
-  }
-}
-
-@media (min-width: 1536px) {
-  .container {
-    max-width: 1536px;
-  }
-}
-
-.read-the-docs {
-  color: #888;
-}

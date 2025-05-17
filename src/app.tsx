@@ -19,6 +19,8 @@ import { LanguagePreferencesProvider } from './context/LanguagePreferences';
 // スタイル
 import './modern.css';
 import './glass.css';
+import './styles/transitions.css';
+import './styles/aurora-loader-clear.css';
 
 // React Query クライアントの初期化
 const queryClient = new QueryClient({
@@ -38,35 +40,42 @@ export function App() {
       <AuthProvider>
         <LanguagePreferencesProvider>
           <Router>
-            <Route path="/login" component={ModernLoginPage} />
+            <Route
+              path="/login"
+              component={(props: { path?: string }) => (
+                <ModernLayout path={props.path}>
+                  <ModernLoginPage />
+                </ModernLayout>
+              )}
+            />
             <Route
               path="/"
-              component={() => (
-                <ModernLayout>
+              component={(props: { path?: string }) => (
+                <ModernLayout path={props.path}>
                   <ModernHomePage />
                 </ModernLayout>
               )}
             />
             <Route
               path="/settings"
-              component={() => (
-                <ModernLayout>
+              component={(props: { path?: string }) => (
+                <ModernLayout path={props.path}>
                   <ModernSettingsPage />
                 </ModernLayout>
               )}
             />
             <Route
               path="/profile/:handle"
-              component={(props: { handle?: string }) => (
-                <ModernLayout>
+              component={(props: { handle?: string; path?: string }) => (
+                <ModernLayout path={props.path}>
                   <ModernProfilePage handle={props.handle} />
                 </ModernLayout>
               )}
             />
             <Route
               path="/:rest*"
-              component={() => (
-                <ModernLayout>
+              component={(props: { path?: string }) => (
+                <ModernLayout path={props.path}>
                   <NotFoundPage />
                 </ModernLayout>
               )}

@@ -10,6 +10,7 @@ import type { Post } from '../types/post';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { useSelfThreads } from '../hooks/useSelfThreads';
 import { cacheConfig, cacheKeys } from '../lib/cacheConfig';
+import { AuroraLoader } from '../components/AuroraLoader';
 
 interface ProfilePageProps {
   handle?: string;
@@ -95,7 +96,7 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
   if (profileLoading || feedLoading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="glass-spinner"></div>
+        <AuroraLoader />
       </div>
     );
   }
@@ -111,7 +112,7 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
   const userProfile = profile?.data as UserProfile;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 pt-6">
+    <div className="max-w-2xl mx-auto px-4 pt-6 fade-enter">
       {/* プロフィールヘッダー */}
       <div className="glass-card mb-6 overflow-hidden">
         {/* バナー画像 */}

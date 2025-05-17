@@ -1,6 +1,7 @@
 import { render } from 'preact';
 import './index.css';
 import './styles/mobile.css';
+import './styles/header-fix.css';
 import { App } from './app.tsx';
 import { initSentry } from './lib/sentry.optional';
 import { registerServiceWorker } from './lib/sw-register';

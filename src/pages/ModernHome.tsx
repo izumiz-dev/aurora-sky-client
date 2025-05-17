@@ -29,9 +29,9 @@ export const ModernHomePage = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4">
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 fade-enter">
         <div className="glass-card p-8 max-w-md w-full text-center">
-          <AppIcon size="lg" withGradientBg={false} className="mx-auto mb-4" />
+          <AppIcon size="lg" withGradientBg={false} className="mx-auto mb-2" />
           <h2 className="text-2xl font-bold text-white mb-2">AuroraSkyへようこそ</h2>
           <p className="text-white/70 mb-6">タイムラインを表示するにはログインしてください</p>
           <a href="/login" className="glass-button btn-primary">
@@ -43,7 +43,7 @@ export const ModernHomePage = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 pt-6">
+    <div className="max-w-2xl mx-auto px-4 pt-6 fade-enter">
       <DevelopmentNotice />
       <PostComposer onPostSuccess={refreshTimeline} />
 

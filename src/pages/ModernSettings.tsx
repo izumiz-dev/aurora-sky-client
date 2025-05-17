@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguagePreferences } from '../context/LanguagePreferences';
 import { AppIcon } from '../components/AppIcon';
 import { route } from 'preact-router';
+import { AuroraLoader } from '../components/AuroraLoader';
 
 // 言語コードと表示名のマッピング
 const LANGUAGE_OPTIONS = [
@@ -95,14 +96,14 @@ export const ModernSettingsPage = () => {
     return (
       <div className="max-w-3xl mx-auto px-4 pt-6">
         <div className="flex justify-center py-12">
-          <div className="glass-spinner"></div>
+          <AuroraLoader />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 pt-6">
+    <div className="max-w-3xl mx-auto px-4 pt-6 fade-enter">
       <h1 className="text-3xl font-bold text-white mb-8 shimmer-text">設定</h1>
 
       {/* 成功メッセージ */}

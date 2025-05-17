@@ -1,0 +1,40 @@
+/* ページ遷移のアニメーション */
+.page-enter {
+  animation: pageEnter 0.3s ease-out;
+}
+
+.page-exit {
+  animation: pageExit 0.3s ease-in;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* より滑らかなフェード効果 */
+.fade-enter {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
