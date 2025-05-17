@@ -3,6 +3,7 @@ import { Link } from 'preact-router';
 import { useAuth } from '../context/AuthContext';
 import { UserMenu } from '../components/UserMenu';
 import { AppIcon } from '../components/AppIcon';
+import { BackgroundParticles } from '../components/BackgroundParticles';
 
 interface ModernLayoutProps {
   children?: preact.ComponentChildren;
@@ -14,6 +15,7 @@ export const ModernLayout: FunctionalComponent<ModernLayoutProps> = ({ children 
 
   return (
     <div className="min-h-screen animated-bg">
+      <BackgroundParticles />
       <div className="animated-gradient"></div>
       <header className="glass-header">
         <div className="max-w-screen-xl mx-auto px-4">
