@@ -18,6 +18,7 @@ export const ModernHomePage = () => {
     newPostIds,
     showSnackbar,
     handleCloseSnackbar,
+    refreshTimeline,
   } = useTimeline(session, isAuthenticated);
 
   if (!isAuthenticated) {
@@ -52,7 +53,7 @@ export const ModernHomePage = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-6">
-      <PostComposer />
+      <PostComposer onPostSuccess={refreshTimeline} />
 
       {newPostsCount > 0 && (
         <div className="mb-4 ambient-fade-in">

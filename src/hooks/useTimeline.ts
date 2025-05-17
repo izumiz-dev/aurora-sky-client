@@ -140,6 +140,19 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
   const handleCloseSnackbar = useCallback(() => {
     setShowSnackbar(false);
   }, []);
+  
+  // Refresh the timeline (used after posting)
+  const refreshTimeline = useCallback(async () => {
+    if (!session) return;
+    
+    try {
+      const response = await fetchTimeline(session);
+      setPosts(response.feed || []);
+      setCursor(response.cursor || null);
+    } catch (error) {
+      console.error('Failed to refresh timeline:', error);
+    }
+  }, [session]);
 
   useInfiniteScroll({
     onLoadMore: handleLoadMore,
@@ -159,5 +172,6 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
     newPostIds,
     showSnackbar,
     handleCloseSnackbar,
+    refreshTimeline,
   };
 };
