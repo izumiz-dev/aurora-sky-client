@@ -89,15 +89,40 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
     }
   }, [session, posts]);
 
-  // Set up interval to check for new posts
+  // Set up interval to check for new posts with page visibility
   useEffect(() => {
     if (isAuthenticated && session && posts.length > 0) {
-      intervalIdRef.current = setInterval(checkForNewPosts, 60000); // Check every minute
+      // Function to handle visibility change
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          // Page is hidden, clear the interval
+          if (intervalIdRef.current) {
+            clearInterval(intervalIdRef.current);
+            intervalIdRef.current = null;
+          }
+        } else {
+          // Page is visible, restart the interval
+          if (!intervalIdRef.current) {
+            intervalIdRef.current = setInterval(checkForNewPosts, 60000);
+            // Also check immediately when page becomes visible
+            checkForNewPosts();
+          }
+        }
+      };
+
+      // Add visibility change listener
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+
+      // Start interval only if page is visible
+      if (!document.hidden) {
+        intervalIdRef.current = setInterval(checkForNewPosts, 60000); // Check every minute
+      }
 
       return () => {
         if (intervalIdRef.current) {
           clearInterval(intervalIdRef.current);
         }
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
       };
     }
   }, [isAuthenticated, session, checkForNewPosts, posts.length]);

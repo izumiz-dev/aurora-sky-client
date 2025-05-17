@@ -25,6 +25,8 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      refetchOnReconnect: false, // 再接続時の自動更新を無効
+      refetchInterval: false, // バックグラウンドでの定期更新を無効
       retry: 1,
     },
   },
