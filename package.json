@@ -1,0 +1,58 @@
+{
+  "name": "bsky-client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext ts,tsx",
+    "lint:fix": "eslint src --ext ts,tsx --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@atproto/api": "^0.15.7",
+    "@headlessui/react": "^2.2.3",
+    "@heroicons/react": "^2.2.0",
+    "@preact/signals": "^2.0.4",
+    "@tanstack/react-query": "^5.76.1",
+    "@tanstack/react-query-devtools": "^5.76.1",
+    "preact": "^10.26.5",
+    "preact-router": "^4.1.2",
+    "react-hot-toast": "^2.5.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "@preact/preset-vite": "^2.10.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/postcss": "^4.1.7",
+    "@types/node": "^22.15.18",
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.5",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.4.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "postcss": "^8.5.3",
+    "postcss-import": "^16.1.0",
+    "postcss-nested": "^7.0.2",
+    "postcss-nesting": "^13.0.1",
+    "prettier": "^3.5.3",
+    "tailwindcss": "^4.1.7",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "vite-plugin-eslint": "^1.8.1"
+  },
+  "volta": {
+    "node": "22.15.1",
+    "npm": "11.4.0"
+  }
+}
