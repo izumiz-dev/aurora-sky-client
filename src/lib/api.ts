@@ -1,6 +1,7 @@
 import { BskyAgent, RichText } from '@atproto/api';
 import { parseApiError } from './api-error-handler';
 import { SessionManager } from './sessionManager';
+import { removeJpegExif } from '../utils/imageMetadataRemover';
 
 export const agent = new BskyAgent({
   service: 'https://bsky.social',
@@ -74,18 +75,28 @@ export const repost = async (uri: string, cid: string) => {
 export const uploadImage = async (file: File) => {
   const agent = await getAgent();
 
-  // ファイルサイズの確認（1MB以下）
-  if (file.size > 1000000) {
-    throw new Error('画像ファイルは1MB以下にしてください');
-  }
-
   // ファイルタイプの確認
   if (!file.type.startsWith('image/')) {
     throw new Error('画像ファイルを選択してください');
   }
 
+  // メタデータを削除
+  let processedBlob: Blob;
+  try {
+    processedBlob = await removeJpegExif(file);
+    console.log(`メタデータ削除: ${file.name} (元: ${file.size} bytes, 処理後: ${processedBlob.size} bytes)`);
+  } catch (error) {
+    console.error('メタデータ削除に失敗しました。元のファイルを使用します:', error);
+    processedBlob = file;
+  }
+
+  // ファイルサイズの確認（1MB以下）
+  if (processedBlob.size > 1000000) {
+    throw new Error('画像ファイルは1MB以下にしてください');
+  }
+
   // ArrayBufferに変換
-  const arrayBuffer = await file.arrayBuffer();
+  const arrayBuffer = await processedBlob.arrayBuffer();
   const uint8Array = new Uint8Array(arrayBuffer);
 
   // 画像をアップロード
