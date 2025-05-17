@@ -22,7 +22,11 @@
       "Bash(git add:*)",
       "Bash(git reset:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(rg:*)",
+      "Bash(mkdir:*)",
+      "Bash(node:*)",
+      "Bash(git restore:*)"
     ],
     "deny": []
   }

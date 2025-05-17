@@ -37,10 +37,10 @@ export default defineConfig({
       'Content-Security-Policy': [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // 開発環境用に緩和
-        "style-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "img-src 'self' data: https: blob:",
-        "connect-src 'self' https://bsky.social wss://bsky.social",
-        "font-src 'self'",
+        "connect-src 'self' https://*.bsky.social https://*.bsky.network wss://*.bsky.social wss://*.bsky.network",
+        "font-src 'self' https://fonts.gstatic.com",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
@@ -50,7 +50,6 @@ export default defineConfig({
       ].join('; '),
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
-      'X-XSS-Protection': '1; mode=block',
       'Referrer-Policy': 'no-referrer-when-downgrade',
     },
   },
