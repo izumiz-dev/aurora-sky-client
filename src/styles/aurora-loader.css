@@ -20,7 +20,7 @@
   z-index: 9999;
 }
 
-/* Aurora curtain effect */
+/* Aurora curtain effect - with 15° tilt for dramatic effect */
 .aurora-curtain {
   position: absolute;
   width: 100%;
@@ -28,13 +28,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  transform: rotate(15deg);
 }
 
 .curtain-layer {
   position: absolute;
-  width: 120%;
-  height: 100%;
-  left: -10%;
+  width: 140%;  /* Increased to account for rotation */
+  height: 120%;
+  left: -20%;
+  top: -10%;
   opacity: 0.8;
   mix-blend-mode: screen;
   filter: blur(8px);
@@ -126,19 +128,23 @@
   animation: glow-pulse 8s ease-in-out infinite;
 }
 
-/* Vertical wave effect */
+/* Vertical wave effect - tilted to match aurora angle */
 .aurora-vertical-wave {
   position: absolute;
-  width: 100%;
+  width: 120%;
   height: 200%;
   top: -100%;
+  left: -10%;
   background: linear-gradient(
-    to bottom,
+    165deg,  /* Angled gradient for magnetic field lines */
     transparent 0%,
-    rgba(150, 200, 255, 0.03) 50%,
+    rgba(150, 200, 255, 0.05) 25%,
+    rgba(100, 255, 200, 0.03) 50%,
+    rgba(200, 150, 255, 0.05) 75%,
     transparent 100%
   );
-  animation: vertical-drift 12s linear infinite;
+  animation: vertical-drift 15s linear infinite;
+  transform: rotate(15deg);
 }
 
 /* Shimmer effect */
@@ -151,30 +157,30 @@
   animation: shimmer 15s linear infinite;
 }
 
-/* Wave animations */
+/* Wave animations with vertical drift matching aurora patterns */
 @keyframes wave-motion-1 {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
+  0%, 100% { transform: translateX(-100%) translateY(-5%); }
+  50% { transform: translateX(100%) translateY(5%); }
 }
 
 @keyframes wave-motion-2 {
-  0%, 100% { transform: translateX(100%); }
-  50% { transform: translateX(-100%); }
+  0%, 100% { transform: translateX(100%) translateY(3%); }
+  50% { transform: translateX(-100%) translateY(-3%); }
 }
 
 @keyframes wave-motion-3 {
-  0%, 100% { transform: translateX(-100%) translateY(10px); }
-  50% { transform: translateX(100%) translateY(-10px); }
+  0%, 100% { transform: translateX(-100%) translateY(-8%); }
+  50% { transform: translateX(100%) translateY(8%); }
 }
 
 @keyframes wave-motion-4 {
-  0%, 100% { transform: translateX(100%) translateY(-10px); }
-  50% { transform: translateX(-100%) translateY(10px); }
+  0%, 100% { transform: translateX(100%) translateY(6%); }
+  50% { transform: translateX(-100%) translateY(-6%); }
 }
 
 @keyframes wave-motion-5 {
-  0%, 100% { transform: translateX(-100%) translateY(5px); }
-  50% { transform: translateX(100%) translateY(-5px); }
+  0%, 100% { transform: translateX(-100%) translateY(-10%); }
+  50% { transform: translateX(100%) translateY(10%); }
 }
 
 /* Auxiliary animations */
