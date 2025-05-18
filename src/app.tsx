@@ -11,6 +11,7 @@ import { ModernLoginPage } from './pages/ModernLogin';
 import { ModernSettingsPage } from './pages/ModernSettings';
 import { ModernProfilePage } from './pages/ModernProfile';
 import { NotFoundPage } from './pages/NotFound';
+import { AuroraLoaderShowcase } from './components/AuroraLoaderShowcase';
 
 // 認証
 import { AuthProvider } from './context/AuthContext';
@@ -20,7 +21,7 @@ import { LanguagePreferencesProvider } from './context/LanguagePreferences';
 import './modern.css';
 import './glass.css';
 import './styles/transitions.css';
-import './styles/aurora-loader-clear.css';
+import './styles/aurora-loader.css';
 
 // React Query クライアントの初期化
 const queryClient = new QueryClient({
@@ -71,6 +72,10 @@ export function App() {
                   <ModernProfilePage handle={props.handle} />
                 </ModernLayout>
               )}
+            />
+            <Route
+              path="/showcase"
+              component={AuroraLoaderShowcase}
             />
             <Route
               path="/:rest*"

@@ -20,24 +20,26 @@ export const AuroraLoader = ({ minDuration = 500, onMinDurationReached }: Aurora
   }, [minDuration, onMinDurationReached]);
 
   return (
-    <div className="aurora-loader-container" data-min-duration-met={hasMetMinDuration}>
-      {/* 背景の光の脈動 */}
-      <div className="aurora-glow"></div>
-      
-      {/* 縦の流れ */}
-      <div className="aurora-vertical-wave"></div>
-      
-      {/* メインのオーロラカーテン */}
-      <div className="aurora-curtain">
-        <div className="curtain-layer layer-1"></div>
-        <div className="curtain-layer layer-2"></div>
-        <div className="curtain-layer layer-3"></div>
-        <div className="curtain-layer layer-4"></div>
-        <div className="curtain-layer layer-5"></div>
+    <div className="aurora-loader-wrapper">
+      <div className="aurora-loader-container" data-min-duration-met={hasMetMinDuration}>
+        {/* 背景の光の脈動 */}
+        <div className="aurora-glow"></div>
+        
+        {/* 縦の流れ */}
+        <div className="aurora-vertical-wave"></div>
+        
+        {/* メインのオーロラカーテン */}
+        <div className="aurora-curtain">
+          <div className="curtain-layer layer-1"></div>
+          <div className="curtain-layer layer-2"></div>
+          <div className="curtain-layer layer-3"></div>
+          <div className="curtain-layer layer-4"></div>
+          <div className="curtain-layer layer-5"></div>
+        </div>
+        
+        {/* きらめき効果 */}
+        <div className="aurora-shimmer"></div>
       </div>
-      
-      {/* きらめき効果 */}
-      <div className="aurora-shimmer"></div>
     </div>
   );
 };
