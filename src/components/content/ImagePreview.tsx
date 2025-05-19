@@ -11,6 +11,7 @@ interface ImagePreviewProps {
 export const ImagePreview = ({ images, currentIndex, onClose, onNavigate }: ImagePreviewProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     // ポータルコンテナを作成
@@ -22,10 +23,18 @@ export const ImagePreview = ({ images, currentIndex, onClose, onNavigate }: Imag
     // スクロールを無効化
     document.body.style.overflow = 'hidden';
 
+    // モバイル判定
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     return () => {
       // クリーンアップ
       document.body.removeChild(root);
       document.body.style.overflow = '';
+      window.removeEventListener('resize', checkMobile);
     };
   }, []);
 
@@ -117,7 +126,7 @@ export const ImagePreview = ({ images, currentIndex, onClose, onNavigate }: Imag
         )}
 
         {/* 前へボタン */}
-        {currentIndex > 0 && (
+        {currentIndex > 0 && !isMobile && (
           <button
             onClick={navigatePrevious}
             className="absolute left-6 p-3 rounded-full glass-button glass-button-ghost hover:bg-white/10 transition-colors backdrop-blur-lg shadow-lg"
@@ -161,7 +170,7 @@ export const ImagePreview = ({ images, currentIndex, onClose, onNavigate }: Imag
         </div>
 
         {/* 次へボタン */}
-        {currentIndex < images.length - 1 && (
+        {currentIndex < images.length - 1 && !isMobile && (
           <button
             onClick={navigateNext}
             className="absolute right-6 p-3 rounded-full glass-button glass-button-ghost hover:bg-white/10 transition-colors backdrop-blur-lg shadow-lg"
