@@ -1,23 +1,131 @@
 import { BskyAgent, RichText } from '@atproto/api';
+import type { AtpSessionEvent, AtpSessionData } from '@atproto/api';
 import { parseApiError } from './api-error-handler';
 import { SessionManager } from './sessionManager';
 import { removeJpegExif } from '../utils/imageMetadataRemover';
+import type { SessionData } from '../types/session';
+
+// セッションの変更を処理するハンドラー
+const handleSessionChange = async (evt: AtpSessionEvent, sess?: AtpSessionData) => {
+  if (evt === 'create' || evt === 'update') {
+    if (sess) {
+      // セッションが作成または更新された場合、保存する
+      await SessionManager.saveSession({
+        ...sess,
+        active: sess.active ?? true,
+      });
+    }
+  } else if (evt === 'expired') {
+    // セッションが期限切れになった場合、クリアする
+    await SessionManager.clearSession();
+  }
+};
 
 export const agent = new BskyAgent({
   service: 'https://bsky.social',
+  persistSession: handleSessionChange,
 });
 
+// トークンリフレッシュのミューテックス
+const refreshMutex = new Map<string, Promise<any>>();
+
 export const getAgent = async () => {
-  const session = await SessionManager.getSession();
+  let session = await SessionManager.getSession();
   if (session) {
-    const sessionWithDefaults = {
-      ...session,
-      active: session.active ?? true,
-    };
-    await agent.resumeSession(sessionWithDefaults);
+    try {
+      // トークンの有効期限をチェックして必要なら更新
+      const needsRefresh = checkTokenNeedsRefresh(session.accessJwt);
+      
+      if (needsRefresh) {
+        const did = session.did;
+        
+        // 既にリフレッシュ中の場合は待機
+        if (refreshMutex.has(did)) {
+          await refreshMutex.get(did);
+          session = await SessionManager.getSession(); // 更新されたセッションを取得
+        } else {
+          // トークンをリフレッシュ
+          const refreshPromise = refreshToken(session);
+          refreshMutex.set(did, refreshPromise);
+          
+          try {
+            session = await refreshPromise;
+          } finally {
+            refreshMutex.delete(did);
+          }
+        }
+      }
+      
+      const sessionWithDefaults = {
+        ...session!,
+        active: session!.active ?? true,
+      };
+      if (sessionWithDefaults.refreshJwt) {
+        await agent.resumeSession(sessionWithDefaults);
+      } else {
+        throw new Error('No refresh token available');
+      }
+    } catch (error) {
+      console.error('Failed to resume session:', error);
+      // セッションの復元に失敗した場合、クリアする
+      await SessionManager.clearSession();
+    }
   }
   return agent;
 };
+
+// JWTトークンの有効期限をチェック
+function checkTokenNeedsRefresh(token: string): boolean {
+  try {
+    // JWTのペイロードをデコード（簡易版）
+    const parts = token.split('.');
+    if (parts.length !== 3) return true;
+    
+    const payload = JSON.parse(atob(parts[1]));
+    const exp = payload.exp;
+    
+    if (!exp) return true;
+    
+    // 有効期限の5分前にリフレッシュ
+    const expiresAt = exp * 1000;
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+    
+    return (expiresAt - now) < fiveMinutes;
+  } catch (error) {
+    console.error('Failed to parse JWT:', error);
+    return true; // エラーの場合は安全のため更新
+  }
+}
+
+// トークンをリフレッシュ
+async function refreshToken(session: SessionData): Promise<SessionData> {
+  try {
+    // リフレッシュトークンを使用して新しいアクセストークンを取得
+    const tempAgent = new BskyAgent({ service: 'https://bsky.social' });
+    
+    // refreshSessionを呼び出し
+    await tempAgent.resumeSession(session);
+    const response = await tempAgent.com.atproto.server.refreshSession();
+    
+    if (response.success) {
+      const newSession: SessionData = {
+        ...session,
+        accessJwt: response.data.accessJwt,
+        refreshJwt: response.data.refreshJwt,
+      };
+      
+      // 新しいセッションを保存
+      await SessionManager.saveSession(newSession);
+      return newSession;
+    }
+    
+    throw new Error('Token refresh failed');
+  } catch (error) {
+    console.error('Failed to refresh token:', error);
+    throw error;
+  }
+}
 
 // APIコールをエラーハンドリング付きでラップ
 const wrapApiCall = async <T>(apiCall: () => Promise<T>): Promise<T> => {

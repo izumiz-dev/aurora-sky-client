@@ -11,16 +11,39 @@ export class SessionCrypto {
    * 暗号化キーを取得または生成
    */
   private static async getOrCreateKey(): Promise<CryptoKey> {
-    const keyString = import.meta.env.VITE_SESSION_KEY || 'default-dev-key-change-in-production';
+    const keyString = import.meta.env.VITE_SESSION_KEY;
+    
+    // 本番環境でキーが設定されていない場合はエラー
+    if (import.meta.env.PROD && !keyString) {
+      throw new Error('Session encryption key not configured for production');
+    }
+    
+    // 開発環境でのデフォルトキー（警告を表示）
+    if (!keyString) {
+      console.warn('Using default development key. DO NOT use in production!');
+    }
+    
     const encoder = new TextEncoder();
-    const keyData = encoder.encode(keyString);
+    const keyData = encoder.encode(keyString || 'default-dev-key-for-development-only');
     
-    // ハッシュ化してキーマテリアルを生成
-    const hashBuffer = await crypto.subtle.digest('SHA-256', keyData);
-    
-    return crypto.subtle.importKey(
+    // PBKDF2を使用してより安全なキー導出を行う
+    const salt = encoder.encode('aurora-sky-session-salt'); // 固定ソルト（理想的には動的生成）
+    const keyMaterial = await crypto.subtle.importKey(
       'raw',
-      hashBuffer,
+      keyData,
+      'PBKDF2',
+      false,
+      ['deriveBits', 'deriveKey']
+    );
+    
+    return crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: 100000,
+        hash: 'SHA-256'
+      },
+      keyMaterial,
       { name: this.ALGORITHM, length: this.KEY_SIZE },
       false,
       ['encrypt', 'decrypt']

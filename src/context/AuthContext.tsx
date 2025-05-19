@@ -112,9 +112,13 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
   }, []);
 
   const logout = useCallback(async () => {
+    if (session) {
+      await SessionManager.logoutSession(session);
+    } else {
+      await SessionManager.clearSession();
+    }
     setSession(null);
-    await SessionManager.clearSession();
-  }, []);
+  }, [session]);
 
   const value = {
     isAuthenticated: !!session,

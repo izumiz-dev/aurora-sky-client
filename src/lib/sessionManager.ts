@@ -7,7 +7,7 @@ import type { SessionData } from '../types/session';
 export class SessionManager {
   private static readonly SESSION_KEY = 'bsky-session-encrypted';
   private static readonly SESSION_EXPIRY_KEY = 'bsky-session-expiry';
-  private static readonly SESSION_DURATION = 24 * 60 * 60 * 1000; // 24時間
+  private static readonly SESSION_DURATION = 90 * 24 * 60 * 60 * 1000; // 90日間（リフレッシュトークンの有効期限）
 
   /**
    * セッションを暗号化して保存
@@ -80,6 +80,30 @@ export class SessionManager {
     if (this.shouldPersist()) {
       localStorage.removeItem(this.SESSION_KEY);
       localStorage.removeItem(this.SESSION_EXPIRY_KEY);
+    }
+  }
+
+  /**
+   * セッションをサーバー側でも無効化してからクリア
+   */
+  static async logoutSession(session: SessionData): Promise<void> {
+    try {
+      // サーバー側でセッションを無効化
+      const { BskyAgent } = await import('@atproto/api');
+      const agent = new BskyAgent({ service: 'https://bsky.social' });
+      
+      // セッションを復元してからログアウト
+      await agent.resumeSession(session);
+      
+      // サーバー側でセッションを削除（API v2では利用可能）
+      // 現在のAPIでは明示的なログアウトエンドポイントがないため、
+      // クライアント側でのクリアのみ行う
+      
+    } catch (error) {
+      console.error('Failed to invalidate session on server:', error);
+    } finally {
+      // クライアント側のセッションをクリア
+      this.clearSession();
     }
   }
 

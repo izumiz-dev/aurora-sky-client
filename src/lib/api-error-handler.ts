@@ -54,6 +54,14 @@ export function parseApiError(error: any): ApiError {
     };
   }
 
+  // トークン期限切れエラー
+  if (error?.message?.includes('expired') || error?.message?.includes('token')) {
+    return {
+      statusCode: 401,
+      message: 'セッションの有効期限が切れました。再度ログインしてください。'
+    };
+  }
+
   // サーバーエラー
   if (error?.status >= 500 || error?.statusCode >= 500) {
     return {
