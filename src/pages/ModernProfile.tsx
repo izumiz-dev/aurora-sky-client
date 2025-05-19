@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 import { route } from 'preact-router';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { PostItem } from '../components/PostItem';
+import { TimelineThread } from '../components/thread/TimelineThread';
 import { SelfThreadItem } from '../components/SelfThreadItem';
 import { useAuth } from '../context/AuthContext';
 import { getProfile, getAuthorFeed } from '../lib/api';
@@ -9,6 +9,7 @@ import type { UserProfile } from '../types/profile';
 import type { Post } from '../types/post';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { useSelfThreads } from '../hooks/useSelfThreads';
+import { useDeduplicatedTimeline } from '../hooks/useDeduplicatedTimeline';
 import { cacheConfig, cacheKeys } from '../lib/cacheConfig';
 import { AuroraLoader } from '../components/AuroraLoader';
 
@@ -64,13 +65,33 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
     cursor?: string;
   }
   const feedItems = feedData?.pages?.flatMap((page: FeedPage) => page.feed) || [];
-  const posts = feedItems.map((item) => ({
-    ...item.post,
-    reason: item.reason,
-    reply: item.reply,
-  } as Post));
+  const posts = feedItems.map((item) => {
+    // feedItemはpostとreplyの両方を含む可能性がある
+    const post = item.post || item;
+    
+    // デバッグ情報（開発環境のみ）
+    if (import.meta.env.DEV && post.record?.reply) {
+      console.log('ModernProfile: Reply post detected', {
+        postUri: post.uri,
+        hasReply: !!post.reply,
+        hasRecordReply: !!post.record?.reply,
+        isOwnPost: post.author.did === session?.did,
+        authorFilter,
+        rawItem: item,
+      });
+    }
+    
+    // 自分自身への返信の場合でも、標準のreply情報を保持
+    return {
+      ...post,
+      reason: item.reason,
+      reply: item.reply || post.reply,
+    } as Post;
+  });
   
-  const threadGroups = useSelfThreads(posts);
+  // Apply deduplication logic
+  const deduplicatedPosts = useDeduplicatedTimeline(posts);
+  const threadGroups = useSelfThreads(deduplicatedPosts);
 
   useInfiniteScroll({
     onLoadMore: () => {
@@ -219,7 +240,7 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
                 posts={group.posts}
               />
             ) : (
-              <PostItem 
+              <TimelineThread 
                 key={group.posts[0].uri} 
                 post={group.posts[0]} 
               />

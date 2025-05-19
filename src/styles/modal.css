@@ -1,0 +1,140 @@
+/* Modal backdrop styles */
+.thread-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  animation: modal-fade-in 0.2s ease-out;
+  z-index: 1000; /* Ensure it's above the settings button */
+}
+
+/* Minimal header styles */
+.thread-modal-header {
+  background-color: transparent;
+  flex-shrink: 0;
+}
+
+.thread-modal-content {
+  animation: modal-slide-up 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  /* Prevent rubber-band scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  /* Glass morphism for dark theme */
+  background: rgba(20, 20, 20, 0.7) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.75),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mobile slide animation */
+@media (max-width: 768px) {
+  @keyframes modal-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Modal glow effect */
+.thread-modal-content::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(147, 51, 234, 0.2));
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  animation: modalGlow 0.6s ease-out forwards;
+  filter: blur(10px);
+}
+
+@keyframes modalGlow {
+  0% {
+    opacity: 0;
+    filter: blur(20px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Enhanced blur for better readability */
+@supports (backdrop-filter: blur(12px)) {
+  .thread-modal-backdrop {
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+  }
+}
+
+/* Desktop modal styles */
+@media (min-width: 768px) {
+  .thread-modal-content {
+    margin: 2rem auto;
+    max-height: calc(100vh - 8rem - 64px); /* Screen height - margins - header */
+  }
+}
+
+/* Mobile specific modal styles */
+@media (max-width: 768px) {
+  .thread-modal-content {
+    position: fixed;
+    top: 64px; /* Just below the header */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px 20px 0 0; /* Only top corners rounded */
+    margin: 0;
+    max-width: 100vw;
+    width: 100%;
+    height: calc(100vh - 64px); /* Full height minus header */
+    max-height: calc(100vh - 64px);
+  }
+}
+
+/* Fix image height issues within modals */
+.thread-modal-content img {
+  max-height: 60vh;
+  object-fit: contain;
+}
+
+/* For multiple images, ensure they don't exceed reasonable heights */
+.thread-modal-content .grid img {
+  max-height: 40vh;
+  object-fit: cover;
+}

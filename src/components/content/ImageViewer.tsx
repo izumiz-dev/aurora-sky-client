@@ -13,9 +13,10 @@ interface Image {
 
 interface ImageViewerProps {
   images: Image[];
+  inModal?: boolean;
 }
 
-export const ImageViewer = ({ images }: ImageViewerProps) => {
+export const ImageViewer = ({ images, inModal = false }: ImageViewerProps) => {
   const [previewIndex, setPreviewIndex] = useState<number>(-1);
 
   if (!images || images.length === 0) return null;
@@ -48,12 +49,12 @@ export const ImageViewer = ({ images }: ImageViewerProps) => {
               key={index}
               className={`relative overflow-hidden rounded-lg glass-card ambient-fade-in hover-lift ${
                 imageCount === 3 && index === 0 ? 'row-span-2' : ''
-              }`}
+              } ${inModal ? 'max-h-[300px]' : ''}`}
             >
               <img
                 src={imageUrl}
                 alt={image.alt || '画像'}
-                className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                className={`w-full ${inModal ? 'max-h-[300px]' : 'h-full'} object-cover cursor-pointer hover:scale-105 transition-transform duration-300`}
                 loading="lazy"
                 onClick={() => handleImageClick(index)}
               />

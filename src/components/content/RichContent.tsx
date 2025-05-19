@@ -27,9 +27,10 @@ interface RichContentProps {
       did?: string;
     }>;
   }>;
+  inModal?: boolean;
 }
 
-export const RichContent = ({ text, embed, facets }: RichContentProps) => {
+export const RichContent = ({ text, embed, facets, inModal = false }: RichContentProps) => {
   // If we have facets, use the facet renderer instead of parsing
   const hasRichText = facets && facets.length > 0;
   const segments = hasRichText ? [] : parseContent(text);
@@ -104,7 +105,7 @@ export const RichContent = ({ text, embed, facets }: RichContentProps) => {
 
       {/* Handle images */}
       {imageData && Array.isArray(imageData) && imageData.length > 0 && (
-        <ImageViewer images={imageData as any} />
+        <ImageViewer images={imageData as any} inModal={inModal} />
       )}
     </div>
   );

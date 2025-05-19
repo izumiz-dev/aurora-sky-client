@@ -5,28 +5,21 @@ import { RichContent } from './content/RichContent';
 import { ContextMenu, postMenuItems } from './ContextMenu';
 import { Snackbar } from './Snackbar';
 import { CachedAvatar } from './CachedAvatar';
-import { useQuery } from '@tanstack/react-query';
-import { getPostThread } from '../lib/api';
+import { ThreadView } from './ThreadView';
 
 interface PostItemProps {
   post: Post;
   isNew?: boolean;
-  showReplies?: boolean;
+  hideReplyTo?: boolean;
+  inModal?: boolean;
 }
 
-export const PostItem = ({ post, isNew = false, showReplies = true }: PostItemProps) => {
+export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = false }: PostItemProps) => {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [snackbar, setSnackbar] = useState<{ message: string } | null>(null);
   const [liked, setLiked] = useState(post.viewer?.like ?? false);
   const [reposted, setReposted] = useState(post.viewer?.repost ?? false);
   const [animateAction, setAnimateAction] = useState<'like' | 'repost' | null>(null);
-  const [showThreadView, setShowThreadView] = useState(false);
-  
-  const { data: threadData, isLoading: threadLoading } = useQuery({
-    queryKey: ['thread', post.uri],
-    queryFn: () => getPostThread({ uri: post.uri }),
-    enabled: showThreadView && !!post.replyCount,
-  });
 
   const handleContextMenu = (e: MouseEvent) => {
     e.preventDefault();
@@ -37,11 +30,16 @@ export const PostItem = ({ post, isNew = false, showReplies = true }: PostItemPr
     setContextMenu(null);
   };
 
+  // スレッド表示モーダルを開く
+  const [showThreadModal, setShowThreadModal] = useState(false);
+
   const handleMenuAction = async (actionId: string) => {
     switch (actionId) {
       case 'reply':
-        // TODO: リプライ機能の実装
-        // TODO: Implement reply functionality
+        // モーダル内では新しいモーダルを開かない
+        if (!inModal) {
+          setShowThreadModal(true);
+        }
         break;
       case 'repost':
         // すぐにアニメーションを開始
@@ -108,11 +106,16 @@ export const PostItem = ({ post, isNew = false, showReplies = true }: PostItemPr
           liked ? 'liked-post' : ''
         } ${reposted ? 'reposted-post' : ''} ${
           animateAction === 'like' ? 'like-animation' : ''
-        } ${animateAction === 'repost' ? 'repost-animation' : ''}`}
+        } ${animateAction === 'repost' ? 'repost-animation' : ''} ${!inModal ? 'cursor-pointer hover:bg-white/5' : ''} transition-colors`}
         onContextMenu={handleContextMenu}
+        onClick={() => {
+          if (!inModal) {
+            setShowThreadModal(true);
+          }
+        }}
       >
         {/* 返信先の表示 */}
-        {(post.reply?.parent || post.record?.reply) && (
+        {!hideReplyTo && (post.reply?.parent || post.record?.reply) && (
           <div className="flex items-center gap-2 mb-3 text-white/60 text-sm">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -124,15 +127,20 @@ export const PostItem = ({ post, isNew = false, showReplies = true }: PostItemPr
             </svg>
             <span>
               返信先:
-              {post.reply?.parent ? (
+              {post.reply?.parent?.author ? (
                 <a
                   href={`/profile/@${post.reply.parent.author.handle}`}
                   className="font-medium hover:underline ml-1"
                 >
                   {post.reply.parent.author.displayName || post.reply.parent.author.handle}
                 </a>
+              ) : post.record?.reply ? (
+                <span className="font-medium ml-1 text-white/50">
+                  {/* record.replyは参照のみ持つため、詳細情報を表示できない */}
+                  投稿への返信
+                </span>
               ) : (
-                <span className="font-medium ml-1">返信投稿（詳細情報なし）</span>
+                <span className="font-medium ml-1">返信投稿</span>
               )}
             </span>
           </div>
@@ -168,52 +176,10 @@ export const PostItem = ({ post, isNew = false, showReplies = true }: PostItemPr
               </div>
             </div>
             <div className="text-white">
-              <RichContent text={post.record.text} embed={post.embed} facets={post.record.facets} />
+              <RichContent text={post.record.text} embed={post.embed} facets={post.record.facets} inModal={inModal} />
             </div>
-            {/* スレッド表示ボタン（返信がある場合のみ） */}
-            {showReplies && !!post.replyCount && post.replyCount > 0 && (
-              <div className="mt-4">
-                <button
-                  onClick={() => setShowThreadView(!showThreadView)}
-                  className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
-                >
-                  <svg
-                    className={`w-4 h-4 transform transition-transform ${
-                      showThreadView ? 'rotate-180' : ''
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                  {showThreadView ? 'スレッドを閉じる' : `${post.replyCount}件の返信を表示`}
-                </button>
-              </div>
-            )}
           </div>
         </div>
-        {/* スレッド表示 */}
-        {showThreadView && threadData?.data && (
-          <div className="mt-4 pl-12 space-y-4">
-            {threadLoading ? (
-              <div className="text-white/60 text-sm">読み込み中...</div>
-            ) : threadData.data.thread && 'replies' in threadData.data.thread && threadData.data.thread.replies ? (
-              threadData.data.thread.replies.map((reply: any) => (
-                <div key={reply.post.uri} className="border-l-2 border-white/10 pl-4">
-                  <PostItem post={reply.post} showReplies={false} />
-                </div>
-              ))
-            ) : (
-              <div className="text-white/60 text-sm">返信はありません</div>
-            )}
-          </div>
-        )}
       </div>
       {contextMenu && (
         <ContextMenu
@@ -224,6 +190,12 @@ export const PostItem = ({ post, isNew = false, showReplies = true }: PostItemPr
         />
       )}
       {snackbar && <Snackbar message={snackbar.message} onClose={() => setSnackbar(null)} />}
+      {showThreadModal && (
+        <ThreadView 
+          parentPost={post} 
+          onClose={() => setShowThreadModal(false)} 
+        />
+      )}
     </>
   );
 };

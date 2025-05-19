@@ -23,7 +23,7 @@ export const SelfThreadItem = ({ posts, isNew = false }: SelfThreadItemProps) =>
       )}
       
       {/* メイン投稿 */}
-      <PostItem post={mainPost} isNew={isNew} showReplies={false} />
+      <PostItem post={mainPost} isNew={isNew} />
       
       {/* スレッド展開ボタン */}
       {threadCount > 0 && (
@@ -70,7 +70,7 @@ export const SelfThreadItem = ({ posts, isNew = false }: SelfThreadItemProps) =>
               <div className="relative">
                 {/* 投稿への接続線 */}
                 <div className="absolute left-12 top-8 w-8 h-0.5 bg-white/20" />
-                <PostItem post={post} showReplies={false} />
+                <PostItem post={post} />
               </div>
             </div>
           ))}

@@ -1,16 +1,16 @@
 import { useAuth } from '../context/AuthContext';
 import { PostComposer } from '../components/PostComposer';
-import { TimelineThread } from '../components/thread/TimelineThread';
-import { SelfThreadItem } from '../components/SelfThreadItem';
+import { UnifiedThreadView } from '../components/UnifiedThreadView';
+import { OptimizedSelfThread } from '../components/OptimizedSelfThread';
 import { Snackbar } from '../components/Snackbar';
 import { useTimeline } from '../hooks/useTimeline';
 import { useSelfThreads } from '../hooks/useSelfThreads';
-import { useDeduplicatedTimeline } from '../hooks/useDeduplicatedTimeline';
+import { useThreadPreloader } from '../hooks/useThreadPreloader';
 import { AppIcon } from '../components/AppIcon';
 import { DevelopmentNotice } from '../components/DevelopmentNotice';
 import { AuroraLoader } from '../components/AuroraLoader';
 
-export const ModernHomePage = () => {
+export const ModernHomeOptimized = () => {
   const { isAuthenticated, session } = useAuth();
   const {
     posts,
@@ -27,9 +27,14 @@ export const ModernHomePage = () => {
     refreshTimeline,
   } = useTimeline(session, isAuthenticated);
   
-  // Apply deduplication logic
-  const deduplicatedPosts = useDeduplicatedTimeline(posts);
-  const threadGroups = useSelfThreads(deduplicatedPosts);
+  const threadGroups = useSelfThreads(posts);
+  
+  // スレッドのプリロード
+  useThreadPreloader({
+    posts: posts.slice(0, 10), // 最初の10投稿のみプリロード
+    enabled: !isLoading,
+    priority: 'low'
+  });
 
   if (!isAuthenticated) {
     return (
@@ -55,9 +60,9 @@ export const ModernHomePage = () => {
         <div className="mb-4 ambient-fade-in">
           <button
             onClick={loadNewPosts}
-            className="aurora-gradient-bg w-full py-3 text-center hover:scale-[1.02] transition-transform ambient-glow rounded-lg border border-white/20 shadow-lg"
+            className="glass-button w-full py-3 text-center hover:scale-[1.02] transition-transform ambient-glow"
           >
-            <span className="text-white font-medium">{newPostsCount}件の新しい投稿を表示</span>
+            <span className="shimmer-text">{newPostsCount}件の新しい投稿を表示</span>
           </button>
         </div>
       )}
@@ -70,6 +75,12 @@ export const ModernHomePage = () => {
         ) : error ? (
           <div className="glass-card p-6 text-center">
             <p className="text-red-400 mb-4">タイムラインの読み込みに失敗しました</p>
+            <button 
+              onClick={refreshTimeline}
+              className="glass-button"
+            >
+              再読み込み
+            </button>
           </div>
         ) : posts.length === 0 ? (
           <div className="glass-card p-12 text-center">
@@ -77,35 +88,47 @@ export const ModernHomePage = () => {
             <p className="text-white/70">フォローしているユーザーの投稿がここに表示されます</p>
           </div>
         ) : (
-          threadGroups.map((group) => (
-            group.type === 'thread' ? (
-              <SelfThreadItem 
-                key={group.id} 
-                posts={group.posts} 
-                isNew={group.posts.some(p => newPostIds.has(p.uri))}
-              />
-            ) : (
-              <TimelineThread 
-                key={group.posts[0].uri} 
-                post={group.posts[0]} 
-                isNew={newPostIds.has(group.posts[0].uri)} 
-              />
-            )
-          ))
+          threadGroups.map((group) => {
+            if (group.type === 'thread') {
+              return (
+                <OptimizedSelfThread 
+                  key={group.id} 
+                  posts={group.posts} 
+                  isNew={group.posts.some(p => newPostIds.has(p.uri))}
+                />
+              );
+            } else {
+              const post = group.posts[0];
+              return (
+                <UnifiedThreadView 
+                  key={post.uri} 
+                  post={post} 
+                  isNew={newPostIds.has(post.uri)}
+                  mode="inline"
+                />
+              );
+            }
+          })
         )}
       </div>
 
       {isLoadingMore && (
         <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <AuroraLoader />
         </div>
       )}
 
       {!hasMore && posts.length > 0 && (
-        <div className="text-center py-8 text-white/60">これ以上の投稿はありません</div>
+        <div className="text-center py-8 text-white/60">
+          これ以上の投稿はありません
+        </div>
       )}
 
-      {loadError && <div className="text-center py-4 text-red-400">{loadError}</div>}
+      {loadError && (
+        <div className="text-center py-4 text-red-400">
+          {loadError}
+        </div>
+      )}
 
       {showSnackbar && (
         <Snackbar

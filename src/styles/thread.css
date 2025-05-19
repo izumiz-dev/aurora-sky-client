@@ -1,0 +1,46 @@
+/* Thread display styles */
+.thread-connector {
+  position: relative;
+}
+
+.thread-connector::before {
+  content: '';
+  position: absolute;
+  left: 32px;
+  top: -16px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 100%);
+  --tw-gradient-from: rgba(255, 255, 255, 0.3);
+  --tw-gradient-to: rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth transitions for thread expansion */
+.thread-expand-enter {
+  animation: thread-expand 0.3s ease-out;
+}
+
+@keyframes thread-expand {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animate the connector line */
+@keyframes connector-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-connector {
+  animation: connector-fade 0.3s ease-out;
+}

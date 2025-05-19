@@ -28,7 +28,10 @@
       "Bash(node:*)",
       "Bash(git restore:*)",
       "Bash(/home/seolhyun/.volta/tools/image/packages/@anthropic-ai/claude-code/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg \"text-(2xl|3xl|4xl|5xl|6xl)\" --type ts --type tsx -n)",
-      "Bash(/home/seolhyun/.volta/tools/image/packages/@anthropic-ai/claude-code/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg \"text-(2xl|3xl|4xl|5xl|6xl)\" -n)"
+      "Bash(/home/seolhyun/.volta/tools/image/packages/@anthropic-ai/claude-code/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg \"text-(2xl|3xl|4xl|5xl|6xl)\" -n)",
+      "Bash(cp:*)",
+      "Bash(touch:*)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   }
