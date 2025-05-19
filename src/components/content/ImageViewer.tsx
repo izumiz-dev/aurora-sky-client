@@ -50,13 +50,17 @@ export const ImageViewer = ({ images, inModal = false }: ImageViewerProps) => {
               className={`relative overflow-hidden rounded-lg glass-card ambient-fade-in hover-lift ${
                 imageCount === 3 && index === 0 ? 'row-span-2' : ''
               } ${inModal ? 'max-h-[300px]' : ''}`}
+              onClick={(e) => e.stopPropagation()}
             >
               <img
                 src={imageUrl}
                 alt={image.alt || '画像'}
                 className={`w-full ${inModal ? 'max-h-[300px]' : 'h-full'} object-cover cursor-pointer hover:scale-105 transition-transform duration-300`}
                 loading="lazy"
-                onClick={() => handleImageClick(index)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleImageClick(index);
+                }}
               />
               {/* 画像が複数ある場合は番号を表示 */}
               {imageCount > 1 && (
