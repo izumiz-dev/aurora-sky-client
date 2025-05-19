@@ -253,6 +253,29 @@ button:focus {
   outline: none;
 }
 
+/* モーダルオーバーレイ */
+.modal-overlay {
+  animation: fadeIn 0.2s ease-out;
+  z-index: 50;
+}
+
+.modal-content {
+  animation: slideUp 0.3s ease-out;
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 /* Media preferences for reduced motion */
 @media (prefers-reduced-motion: reduce) {
   * {

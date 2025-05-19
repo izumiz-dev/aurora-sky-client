@@ -3,9 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguagePreferences } from '../context/LanguagePreferences';
 import { createPost, createPostWithImages, uploadImage } from '../lib/api';
 import { ImagePreview } from './content/ImagePreview';
+import type { Post } from '../types/post';
 
 interface PostComposerProps {
   onPostSuccess?: () => void;
+  replyTo?: Post;
 }
 
 interface UploadedImage {
@@ -15,7 +17,7 @@ interface UploadedImage {
   alt: string;
 }
 
-export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
+export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
   const { session } = useAuth();
   const { preferences } = useLanguagePreferences();
   const [text, setText] = useState('');
@@ -33,6 +35,21 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
     setError(null);
 
     try {
+      const postData = {
+        text,
+        langs: [preferences.postLanguage],
+        reply: replyTo ? {
+          root: {
+            uri: replyTo.record.reply?.root?.uri || replyTo.uri,
+            cid: replyTo.record.reply?.root?.cid || replyTo.cid,
+          },
+          parent: {
+            uri: replyTo.uri,
+            cid: replyTo.cid,
+          },
+        } : undefined,
+      };
+
       if (images.length > 0) {
         // 画像付き投稿
         const uploadedImages = await Promise.all(
@@ -43,10 +60,10 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
             return { alt: img.alt, blob: img.blob };
           })
         );
-        await createPostWithImages(text, uploadedImages, [preferences.postLanguage]);
+        await createPostWithImages(text, uploadedImages, [preferences.postLanguage], postData.reply);
       } else {
         // テキストのみ投稿
-        await createPost(text, [preferences.postLanguage]);
+        await createPost(text, [preferences.postLanguage], postData.reply);
       }
 
       setText('');
@@ -127,7 +144,14 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
   };
 
   return (
-    <div className="glass-card p-4 mb-6">
+    <div className={replyTo ? '' : 'glass-card p-4 mb-6'}>
+      {replyTo && (
+        <div className="mb-2">
+          <span className="text-sm text-white/60">
+            <span className="text-white/40">返信先:</span> @{replyTo.author.handle}
+          </span>
+        </div>
+      )}
       <div className="flex gap-3">
         <div className="avatar avatar-md flex-shrink-0">
           <img
@@ -143,7 +167,7 @@ export const PostComposer = ({ onPostSuccess }: PostComposerProps) => {
           <textarea
             className="glass-input resize-none"
             rows={3}
-            placeholder="今どうしてる？"
+            placeholder={replyTo ? "返信を入力..." : "今どうしてる？"}
             value={text}
             onInput={(e) => setText((e.target as HTMLTextAreaElement).value)}
             onKeyDown={handleKeyDown}

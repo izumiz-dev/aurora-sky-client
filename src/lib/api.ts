@@ -152,7 +152,7 @@ export const fetchTimeline = async (params: { limit?: number; cursor?: string } 
   });
 };
 
-export const createPost = async (text: string, langs?: string[]) => {
+export const createPost = async (text: string, langs?: string[], reply?: { root: { uri: string; cid: string }; parent: { uri: string; cid: string } }) => {
   const agent = await getAgent();
   
   // RichTextを使って自動的にリンクとメンションを検出
@@ -166,6 +166,7 @@ export const createPost = async (text: string, langs?: string[]) => {
     text: richText.text,
     facets: richText.facets,
     langs,
+    reply,
     createdAt: new Date().toISOString(),
   });
 };
@@ -218,7 +219,8 @@ export const uploadImage = async (file: File) => {
 export const createPostWithImages = async (
   text: string,
   images: { alt: string; blob: unknown }[],
-  langs?: string[]
+  langs?: string[],
+  reply?: { root: { uri: string; cid: string }; parent: { uri: string; cid: string } }
 ) => {
   const agent = await getAgent();
 
@@ -242,6 +244,7 @@ export const createPostWithImages = async (
     facets: richText.facets,
     embed,
     langs,
+    reply,
     createdAt: new Date().toISOString(),
   });
 };

@@ -6,6 +6,7 @@ import { ContextMenu, postMenuItems } from './ContextMenu';
 import { Snackbar } from './Snackbar';
 import { CachedAvatar } from './CachedAvatar';
 import { ThreadView } from './ThreadView';
+import { PostComposerModal } from './PostComposerModal';
 
 interface PostItemProps {
   post: Post;
@@ -32,14 +33,14 @@ export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = f
 
   // スレッド表示モーダルを開く
   const [showThreadModal, setShowThreadModal] = useState(false);
+  // リプライモーダルを開く
+  const [showReplyModal, setShowReplyModal] = useState(false);
 
   const handleMenuAction = async (actionId: string) => {
     switch (actionId) {
       case 'reply':
-        // モーダル内では新しいモーダルを開かない
-        if (!inModal) {
-          setShowThreadModal(true);
-        }
+        // リプライモーダルを開く
+        setShowReplyModal(true);
         break;
       case 'repost':
         // すぐにアニメーションを開始
@@ -194,6 +195,16 @@ export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = f
         <ThreadView 
           parentPost={post} 
           onClose={() => setShowThreadModal(false)} 
+        />
+      )}
+      {showReplyModal && (
+        <PostComposerModal
+          isOpen={showReplyModal}
+          onClose={() => setShowReplyModal(false)}
+          replyTo={post}
+          onPostSuccess={() => {
+            // リプライ成功後の処理（必要に応じて追加）
+          }}
         />
       )}
     </>
