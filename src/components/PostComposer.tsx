@@ -1,8 +1,9 @@
-import { useState, useRef } from 'preact/hooks';
+import { useState, useRef, useEffect } from 'preact/hooks';
 import { useAuth } from '../context/AuthContext';
 import { useLanguagePreferences } from '../context/LanguagePreferences';
 import { createPost, createPostWithImages, uploadImage } from '../lib/api';
 import { ImagePreview } from './content/ImagePreview';
+import { resizeImageToUnder1MB, getImageFromPasteEvent } from '../utils/imageResizer';
 import type { Post } from '../types/post';
 
 interface PostComposerProps {
@@ -27,6 +28,7 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [previewIndex, setPreviewIndex] = useState<number>(-1);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handlePost = async () => {
     if (!text.trim() && images.length === 0) return;
@@ -99,18 +101,26 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
     try {
       const newImages: UploadedImage[] = await Promise.all(
         filesToAdd.map(async (file) => {
-          if (file.size > 1000000) {
-            throw new Error(`${file.name}は1MB以下にしてください`);
-          }
           if (!file.type.startsWith('image/')) {
             throw new Error(`${file.name}は画像ファイルではありません`);
           }
 
+          // 1MBを超える場合はリサイズ
+          let processedFile = file;
+          if (file.size > 1000000) {
+            try {
+              processedFile = await resizeImageToUnder1MB(file);
+              // リサイズ成功
+            } catch {
+              throw new Error(`${file.name}のリサイズに失敗しました`);
+            }
+          }
+
           // プレビュー用のURLを作成
-          const preview = URL.createObjectURL(file);
+          const preview = URL.createObjectURL(processedFile);
 
           return {
-            file,
+            file: processedFile,
             preview,
             alt: '',
           };
@@ -120,7 +130,7 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
       setImages([...images, ...newImages]);
     } catch (err) {
       setError(
-        (err instanceof Error ? err.message : String(err)) || '画像のアップロードに失敗しました'
+        ((err instanceof Error ? err.message : String(err)) || '画像のアップロードに失敗しました')
       );
     } finally {
       setIsUploading(false);
@@ -142,6 +152,60 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
     newImages[index].alt = alt;
     setImages(newImages);
   };
+
+  // クリップボードから画像を貼り付ける処理
+  const handlePaste = async (e: ClipboardEvent) => {
+    const imageFile = getImageFromPasteEvent(e);
+    if (!imageFile) return;
+
+    e.preventDefault();
+
+    // 画像数の制限チェック
+    if (images.length >= 4) {
+      setError('画像は最大4枚まで添付できます');
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+
+    try {
+      // 1MBを超える場合はリサイズ
+      let processedFile = imageFile;
+      if (imageFile.size > 1000000) {
+        processedFile = await resizeImageToUnder1MB(imageFile);
+        // リサイズ成功
+      }
+
+      // プレビュー用のURLを作成
+      const preview = URL.createObjectURL(processedFile);
+
+      const newImage: UploadedImage = {
+        file: processedFile,
+        preview,
+        alt: '',
+      };
+
+      setImages([...images, newImage]);
+    } catch {
+      setError('画像の処理に失敗しました');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // ペーストイベントのリスナーを設定
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const handlePasteEvent = (e: Event) => handlePaste(e as ClipboardEvent);
+    
+    textarea.addEventListener('paste', handlePasteEvent);
+    return () => {
+      textarea.removeEventListener('paste', handlePasteEvent);
+    };
+  }, [handlePaste]);
 
   return (
     <div className={replyTo ? '' : 'glass-card p-4 mb-6'}>
@@ -165,6 +229,7 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
         </div>
         <div className="flex-1">
           <textarea
+            ref={textareaRef}
             className="glass-input resize-none"
             rows={3}
             placeholder={replyTo ? "返信を入力..." : "今どうしてる？"}

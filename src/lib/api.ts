@@ -3,6 +3,7 @@ import type { AtpSessionEvent, AtpSessionData } from '@atproto/api';
 import { parseApiError } from './api-error-handler';
 import { SessionManager } from './sessionManager';
 import { removeJpegExif } from '../utils/imageMetadataRemover';
+import { resizeImageToUnder1MB } from '../utils/imageResizer';
 import type { SessionData } from '../types/session';
 
 // セッションの変更を処理するハンドラー
@@ -199,19 +200,26 @@ export const uploadImage = async (file: File) => {
     throw new Error('画像ファイルを選択してください');
   }
 
+  // 1MBを超える場合はリサイズ
+  let processedFile = file;
+  if (file.size > 1000000) {
+    try {
+      processedFile = await resizeImageToUnder1MB(file);
+      // リサイズ成功
+    } catch (resizeError) {
+      console.error('画像のリサイズに失敗しました:', resizeError);
+      throw new Error('画像のリサイズに失敗しました');
+    }
+  }
+
   // メタデータを削除
   let processedBlob: Blob;
   try {
-    processedBlob = await removeJpegExif(file);
-    console.log(`メタデータ削除: ${file.name} (元: ${file.size} bytes, 処理後: ${processedBlob.size} bytes)`);
+    processedBlob = await removeJpegExif(processedFile);
+    // メタデータ削除成功
   } catch (error) {
-    console.error('メタデータ削除に失敗しました。元のファイルを使用します:', error);
-    processedBlob = file;
-  }
-
-  // ファイルサイズの確認（1MB以下）
-  if (processedBlob.size > 1000000) {
-    throw new Error('画像ファイルは1MB以下にしてください');
+    console.error('メタデータ削除に失敗しました。リサイズされたファイルを使用します:', error);
+    processedBlob = processedFile;
   }
 
   // ArrayBufferに変換
