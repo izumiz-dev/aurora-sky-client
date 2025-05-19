@@ -161,11 +161,11 @@ export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = f
             <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mb-1">
               <a
                 href={`/profile/@${post.author.handle}`}
-                className={`font-semibold text-white ${isNew ? 'shimmer-text' : ''} hover:underline max-w-[150px] sm:max-w-none truncate`}
+                className={`font-semibold text-white text-sm sm:text-base ${isNew ? 'shimmer-text' : ''} hover:underline max-w-[150px] sm:max-w-none truncate`}
               >
                 {post.author.displayName || post.author.handle}
               </a>
-              <div className="flex items-baseline gap-1 text-sm text-white/60">
+              <div className="flex items-baseline gap-1 text-xs sm:text-sm text-white/60">
                 <a
                   href={`/profile/@${post.author.handle}`}
                   className="hover:underline max-w-[120px] sm:max-w-none truncate"
@@ -175,7 +175,7 @@ export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = f
                 <span>· {formatTimeAgo(new Date(post.record.createdAt))}</span>
               </div>
             </div>
-            <div className="text-white">
+            <div className="text-white text-sm sm:text-base">
               <RichContent text={post.record.text} embed={post.embed} facets={post.record.facets} inModal={inModal} />
             </div>
           </div>

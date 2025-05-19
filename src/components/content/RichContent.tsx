@@ -81,7 +81,7 @@ export const RichContent = ({ text, embed, facets, inModal = false }: RichConten
 
   return (
     <div>
-      <div className="whitespace-pre-wrap break-words">
+      <div className="whitespace-pre-wrap break-words text-sm sm:text-base">
         {hasRichText
           ? renderTextWithFacets(text, facets)
           : segments.map((segment, index) => (

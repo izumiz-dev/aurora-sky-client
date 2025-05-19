@@ -66,10 +66,10 @@ export const QuotedPost = ({ record }: QuotedPostProps) => {
           )}
           <div className="flex-1 min-w-0">
             <div className="flex items-baseline gap-1">
-              <span className="font-medium text-sm text-white truncate">
+              <span className="font-medium text-xs sm:text-sm text-white truncate">
                 {author.displayName || author.handle}
               </span>
-              <span className="text-xs text-white/60">@{author.handle}</span>
+              <span className="text-xs sm:text-xs text-white/60">@{author.handle}</span>
             </div>
             {createdAt && (
               <div className="text-xs text-white/50">{formatTimeAgo(new Date(createdAt))}</div>
@@ -78,7 +78,7 @@ export const QuotedPost = ({ record }: QuotedPostProps) => {
         </div>
       )}
 
-      {text && <p className="text-sm text-white/90 whitespace-pre-wrap break-words">{text}</p>}
+      {text && <p className="text-xs sm:text-sm text-white/90 whitespace-pre-wrap break-words">{text}</p>}
     </div>
   );
 };
