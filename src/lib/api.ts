@@ -26,6 +26,16 @@ export const agent = new BskyAgent({
   persistSession: handleSessionChange,
 });
 
+// User-Agentヘッダーを設定
+if (agent.xrpc) {
+  const originalCall = agent.xrpc.call.bind(agent.xrpc);
+  agent.xrpc.call = async function(nsid: string, params?: any, data?: any, opts?: any) {
+    const headers = opts?.headers || {};
+    headers['User-Agent'] = 'AuroraSky/1.0.0';
+    return originalCall(nsid, params, data, { ...opts, headers });
+  };
+}
+
 // トークンリフレッシュのミューテックス
 const refreshMutex = new Map<string, Promise<any>>();
 
