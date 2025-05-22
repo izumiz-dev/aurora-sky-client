@@ -1,6 +1,6 @@
 import { render } from 'preact';
 import './index.css';
-import './styles/mobile.css';
+// mobile.cssはapp.tsxで読み込むように移動
 import './styles/header-fix.css';
 import './styles/modal.css';
 import { App } from './app.tsx';

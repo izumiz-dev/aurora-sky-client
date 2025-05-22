@@ -52,6 +52,16 @@
     margin-top: 0.75rem;
   }
   
+  /* ログインフォーム専用の間隔調整 */
+  form.space-y-6 > * + * {
+    margin-top: 0.875rem;  /* 14px - 少し狭める */
+  }
+  
+  /* ラベルの下マージンも調整 */
+  label.mb-2 {
+    margin-bottom: 0.375rem;  /* 6px - 8pxから減らす */
+  }
+  
   /* アバターのサイズ調整 */
   .avatar-md {
     width: 40px;
@@ -87,7 +97,7 @@
   }
   
   /* Composer textarea用のスタイル調整 */
-  .glass-input {
+  textarea.glass-input {
     font-size: 0.875rem;  /* 14px - PostItemのテキストと同じサイズ */
     line-height: 1.5;
     padding: 0.625rem 0.875rem;
@@ -171,10 +181,20 @@
   }
   
   /* 小型モバイル用のComposer調整 */
-  .glass-input {
+  textarea.glass-input {
     font-size: 0.8125rem;  /* 13px - さらに小さく */
     line-height: 1.4;
     padding: 0.5rem 0.75rem;
+  }
+  
+  /* 小型モバイルではラベルの間隔もさらに狭める */
+  label.mb-2 {
+    margin-bottom: 0.25rem;  /* 4px */
+  }
+  
+  /* フォームの各要素間の間隔も狭める */
+  form.space-y-6 > * + * {
+    margin-top: 0.75rem;  /* 12px */
   }
 }
 

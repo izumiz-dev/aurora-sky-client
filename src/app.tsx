@@ -17,8 +17,9 @@ import { AuroraLoaderShowcase } from './components/AuroraLoaderShowcase';
 import { AuthProvider } from './context/AuthContext';
 import { LanguagePreferencesProvider } from './context/LanguagePreferences';
 
-// スタイル
+// スタイル - glass.cssを最後に読み込んで優先度を上げる
 import './modern.css';
+import './styles/mobile.css';  // mobile.cssをglass.cssの前に移動
 import './glass.css';
 import './styles/transitions.css';
 import './styles/aurora-loader.css';

@@ -210,6 +210,54 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  /* @tailwindcss/formsのスタイルをリセット */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
+  box-sizing: border-box;
+}
+
+/* モバイルでの入力欄の高さを確実に上書き */
+@media (max-width: 640px) {
+  input[type="text"].glass-input,
+  input[type="password"].glass-input,
+  input[type="email"].glass-input {
+    padding: 0.4375rem 0.75rem !important;  /* 上下7px、左右12px */
+    min-height: unset !important;
+    height: 2.125rem !important;  /* 34px - フォントサイズ14pxに適切な高さ */
+    line-height: 1.25 !important;
+    font-size: 0.875rem !important;  /* 14px */
+    /* @tailwindcss/formsのスタイルをリセット */
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: none !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* placeholderのフォントサイズも統一 */
+  input.glass-input::placeholder {
+    font-size: 0.875rem !important;
+  }
+}
+
+/* 小型モバイル用 */
+@media (max-width: 400px) {
+  input[type="text"].glass-input,
+  input[type="password"].glass-input,
+  input[type="email"].glass-input {
+    padding: 0.375rem 0.625rem !important;  /* 上下6px、左右10px */
+    min-height: unset !important;
+    height: 1.875rem !important;  /* 30px - フォントサイズ13pxに適切 */
+    line-height: 1.2 !important;
+    font-size: 0.8125rem !important;  /* 13px */
+  }
+  
+  /* placeholderのフォントサイズも統一 */
+  input.glass-input::placeholder {
+    font-size: 0.8125rem !important;
+  }
 }
 
 .glass-input::placeholder {
@@ -221,6 +269,23 @@ body {
   border-color: var(--accent-primary);
   background: rgba(255, 255, 255, 0.03);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* フォーカス時の高さが変わらないように */
+@media (max-width: 640px) {
+  input[type="text"].glass-input:focus,
+  input[type="password"].glass-input:focus,
+  input[type="email"].glass-input:focus {
+    height: 2.125rem !important;  /* 34px - フォーカス時も同じ高さ */
+  }
+}
+
+@media (max-width: 400px) {
+  input[type="text"].glass-input:focus,
+  input[type="password"].glass-input:focus,
+  input[type="email"].glass-input:focus {
+    height: 1.875rem !important;  /* 30px - フォーカス時も同じ高さ */
+  }
 }
 
 /* Engagement buttons */
