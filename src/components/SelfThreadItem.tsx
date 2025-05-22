@@ -5,9 +5,10 @@ import type { Post } from '../types/post';
 interface SelfThreadItemProps {
   posts: Post[];
   isNew?: boolean;
+  onReplySuccess?: () => void;
 }
 
-export const SelfThreadItem = ({ posts, isNew = false }: SelfThreadItemProps) => {
+export const SelfThreadItem = ({ posts, isNew = false, onReplySuccess }: SelfThreadItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
   if (posts.length === 0) return null;
@@ -23,7 +24,7 @@ export const SelfThreadItem = ({ posts, isNew = false }: SelfThreadItemProps) =>
       )}
       
       {/* メイン投稿 */}
-      <PostItem post={mainPost} isNew={isNew} />
+      <PostItem post={mainPost} isNew={isNew} onReplySuccess={onReplySuccess} />
       
       {/* スレッド展開ボタン */}
       {threadCount > 0 && (
@@ -70,7 +71,7 @@ export const SelfThreadItem = ({ posts, isNew = false }: SelfThreadItemProps) =>
               <div className="relative">
                 {/* 投稿への接続線 */}
                 <div className="absolute left-12 top-8 w-8 h-0.5 bg-white/20" />
-                <PostItem post={post} />
+                <PostItem post={post} onReplySuccess={onReplySuccess} />
               </div>
             </div>
           ))}

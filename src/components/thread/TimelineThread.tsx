@@ -8,9 +8,10 @@ import { PostItem } from '../PostItem';
 interface TimelineThreadProps {
   post: Post & { hideParentContext?: boolean };
   isNew?: boolean;
+  onReplySuccess?: () => void;
 }
 
-export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, isNew = false }) => {
+export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, isNew = false, onReplySuccess }) => {
   // 返信投稿の場合、親投稿を取得（ただしhideParentContextが設定されている場合はスキップ）
   // post.replyはAPI返答に含まれる親投稿情報、post.record.replyは投稿自体の返信情報
   const isReply = !!(post.reply?.parent || post.record?.reply);
@@ -42,12 +43,12 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
 
   // 単独投稿の場合、または親のコンテキストを隠す場合
   if (!isReply || post.hideParentContext) {
-    return <PostItem post={post} isNew={isNew} />;
+    return <PostItem post={post} isNew={isNew} onReplySuccess={onReplySuccess} />;
   }
   
   // ローディング中
   if (isLoading) {
-    return <PostItem post={post} isNew={isNew} />;
+    return <PostItem post={post} isNew={isNew} onReplySuccess={onReplySuccess} />;
   }
 
   // スレッドから最小限の親投稿を抽出
@@ -86,7 +87,7 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
   };
 
   if (!threadData?.data.thread) {
-    return <PostItem post={post} isNew={isNew} />;
+    return <PostItem post={post} isNew={isNew} onReplySuccess={onReplySuccess} />;
   }
 
   // デバッグ: 取得したスレッドデータの確認
@@ -115,7 +116,7 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
     // APIから完全なスレッドが取得できない場合でも、基本的な返信情報は表示
     return (
       <div className="relative space-y-0">
-        <PostItem post={post} isNew={isNew} />
+        <PostItem post={post} isNew={isNew} onReplySuccess={onReplySuccess} />
       </div>
     );
   }
@@ -169,6 +170,7 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
               post={displayPost} 
               isNew={isCurrent && isNew}
               hideReplyTo={index > 0}
+              onReplySuccess={onReplySuccess}
             />
             
             {/* 投稿間のスペース（最後の投稿以外） */}

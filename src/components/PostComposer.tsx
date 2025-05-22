@@ -5,6 +5,8 @@ import { createPost, createPostWithImages, uploadImage } from '../lib/api';
 import { ImagePreview } from './content/ImagePreview';
 import { resizeImageToUnder1MB, getImageFromPasteEvent } from '../utils/imageResizer';
 import type { Post } from '../types/post';
+import { useQueryClient } from '@tanstack/react-query';
+import { cacheKeys } from '../lib/cacheConfig';
 
 interface PostComposerProps {
   onPostSuccess?: () => void;
@@ -21,6 +23,7 @@ interface UploadedImage {
 export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
   const { session } = useAuth();
   const { preferences } = useLanguagePreferences();
+  const queryClient = useQueryClient();
   const [text, setText] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +73,10 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
 
       setText('');
       setImages([]);
+      
+      // タイムラインを更新
+      await queryClient.invalidateQueries({ queryKey: cacheKeys.timeline(session?.did) });
+      
       if (onPostSuccess) {
         onPostSuccess();
       }

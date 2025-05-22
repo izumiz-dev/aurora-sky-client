@@ -13,9 +13,10 @@ interface PostItemProps {
   isNew?: boolean;
   hideReplyTo?: boolean;
   inModal?: boolean;
+  onReplySuccess?: () => void;
 }
 
-export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = false }: PostItemProps) => {
+export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = false, onReplySuccess }: PostItemProps) => {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [snackbar, setSnackbar] = useState<{ message: string } | null>(null);
   const [liked, setLiked] = useState(post.viewer?.like ?? false);
@@ -203,7 +204,9 @@ export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = f
           onClose={() => setShowReplyModal(false)}
           replyTo={post}
           onPostSuccess={() => {
-            // リプライ成功後の処理（必要に応じて追加）
+            if (onReplySuccess) {
+              onReplySuccess();
+            }
           }}
         />
       )}

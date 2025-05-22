@@ -83,12 +83,14 @@ export const ModernHomePage = () => {
                 key={group.id} 
                 posts={group.posts} 
                 isNew={group.posts.some(p => newPostIds.has(p.uri))}
+                onReplySuccess={refreshTimeline}
               />
             ) : (
               <TimelineThread 
                 key={group.posts[0].uri} 
                 post={group.posts[0]} 
                 isNew={newPostIds.has(group.posts[0].uri)} 
+                onReplySuccess={refreshTimeline}
               />
             )
           ))
