@@ -7,7 +7,7 @@ import type { SessionData } from '../types/session';
 export class SessionManager {
   private static readonly SESSION_KEY = 'bsky-session-encrypted';
   private static readonly SESSION_EXPIRY_KEY = 'bsky-session-expiry';
-  private static readonly SESSION_DURATION = 90 * 24 * 60 * 60 * 1000; // 90日間（リフレッシュトークンの有効期限）
+  private static readonly SESSION_DURATION = 14 * 24 * 60 * 60 * 1000; // 14日間（安全のため短めに設定）
 
   /**
    * セッションを暗号化して保存
@@ -20,15 +20,13 @@ export class SessionManager {
       // 有効期限を設定
       const expiry = Date.now() + this.SESSION_DURATION;
       
-      // sessionStorageを使用（タブを閉じると自動的に削除される）
+      // localStorageを優先的に使用（ブラウザを閉じても保持される）
+      localStorage.setItem(this.SESSION_KEY, encrypted);
+      localStorage.setItem(this.SESSION_EXPIRY_KEY, expiry.toString());
+      
+      // sessionStorageにも保存（現在のタブでの高速アクセス用）
       sessionStorage.setItem(this.SESSION_KEY, encrypted);
       sessionStorage.setItem(this.SESSION_EXPIRY_KEY, expiry.toString());
-      
-      // 長期保存が必要な場合はlocalStorageも使用（暗号化済み）
-      if (this.shouldPersist()) {
-        localStorage.setItem(this.SESSION_KEY, encrypted);
-        localStorage.setItem(this.SESSION_EXPIRY_KEY, expiry.toString());
-      }
     } catch (error) {
       console.error('Failed to save session:', error);
       throw new Error('セッションの保存に失敗しました');
@@ -40,14 +38,20 @@ export class SessionManager {
    */
   static async getSession(): Promise<SessionData | null> {
     try {
-      // まずsessionStorageから取得を試みる
+      // まずsessionStorageから取得を試みる（高速アクセス）
       let encrypted = sessionStorage.getItem(this.SESSION_KEY);
       let expiry = sessionStorage.getItem(this.SESSION_EXPIRY_KEY);
       
       // sessionStorageにない場合はlocalStorageから取得
-      if (!encrypted && this.shouldPersist()) {
+      if (!encrypted) {
         encrypted = localStorage.getItem(this.SESSION_KEY);
         expiry = localStorage.getItem(this.SESSION_EXPIRY_KEY);
+        
+        // localStorageから取得できた場合、sessionStorageにもコピー
+        if (encrypted && expiry) {
+          sessionStorage.setItem(this.SESSION_KEY, encrypted);
+          sessionStorage.setItem(this.SESSION_EXPIRY_KEY, expiry);
+        }
       }
       
       if (!encrypted || !expiry) {
@@ -76,11 +80,8 @@ export class SessionManager {
   static clearSession(): void {
     sessionStorage.removeItem(this.SESSION_KEY);
     sessionStorage.removeItem(this.SESSION_EXPIRY_KEY);
-    
-    if (this.shouldPersist()) {
-      localStorage.removeItem(this.SESSION_KEY);
-      localStorage.removeItem(this.SESSION_EXPIRY_KEY);
-    }
+    localStorage.removeItem(this.SESSION_KEY);
+    localStorage.removeItem(this.SESSION_EXPIRY_KEY);
   }
 
   /**
@@ -118,21 +119,11 @@ export class SessionManager {
   }
 
   /**
-   * 永続化設定をチェック
-   */
-  private static shouldPersist(): boolean {
-    // ユーザーの設定に基づいて永続化を決定
-    return localStorage.getItem('persistSession') === 'true';
-  }
-
-  /**
    * 永続化設定を保存
+   * @deprecated セッションは常に永続化されるようになりました
    */
-  static setPersist(persist: boolean): void {
-    if (persist) {
-      localStorage.setItem('persistSession', 'true');
-    } else {
-      localStorage.removeItem('persistSession');
-    }
+  static setPersist(_persist: boolean): void {
+    // この機能は廃止されました。セッションは常に永続化されます。
+    console.warn('setPersist is deprecated. Sessions are now always persisted.');
   }
 }

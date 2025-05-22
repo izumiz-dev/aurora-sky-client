@@ -74,6 +74,8 @@ export const getAgent = async () => {
       if (sessionWithDefaults.refreshJwt) {
         await agent.resumeSession(sessionWithDefaults);
       } else {
+        // リフレッシュトークンがない場合はセッションをクリアしてログイン画面へ
+        await SessionManager.clearSession();
         throw new Error('No refresh token available');
       }
     } catch (error) {
@@ -132,8 +134,18 @@ async function refreshToken(session: SessionData): Promise<SessionData> {
     }
     
     throw new Error('Token refresh failed');
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to refresh token:', error);
+    
+    // リフレッシュトークンが無効な場合はセッションをクリア
+    if (error?.status === 400 || 
+        error?.status === 401 || 
+        error?.message?.includes('Invalid refresh token') ||
+        error?.message?.includes('Token expired')) {
+      await SessionManager.clearSession();
+      window.location.href = '/login';
+    }
+    
     throw error;
   }
 }
@@ -142,8 +154,20 @@ async function refreshToken(session: SessionData): Promise<SessionData> {
 const wrapApiCall = async <T>(apiCall: () => Promise<T>): Promise<T> => {
   try {
     return await apiCall();
-  } catch (error) {
+  } catch (error: any) {
     const parsedError = parseApiError(error);
+    
+    // 401エラー（認証エラー）の場合はセッションをクリアしてログイン画面へ
+    if (parsedError.statusCode === 401 || 
+        error?.status === 401 || 
+        error?.message?.toLowerCase().includes('unauthorized') ||
+        error?.message?.toLowerCase().includes('invalid token')) {
+      await SessionManager.clearSession();
+      // ログインページへリダイレクト
+      window.location.href = '/login';
+      throw new Error('セッションの有効期限が切れました。再度ログインしてください。');
+    }
+    
     // エラーに追加情報を含めて再スロー
     const enrichedError = Object.assign(new Error(parsedError.message), {
       ...parsedError,
