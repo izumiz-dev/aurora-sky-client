@@ -88,13 +88,39 @@ export const RichContent = ({ text, embed, facets, inModal = false }: RichConten
               <ContentRenderer
                 key={index}
                 segment={segment}
-                skipUrlPreview={!!externalData && segment.content === (externalData as any).uri}
+                skipUrlPreview={!!externalData && segment.content === (externalData as {uri: string}).uri}
               />
             ))}
       </div>
 
       {/* Handle quoted posts */}
-      {quotedRecord && <QuotedPost record={quotedRecord as any} />}
+      {quotedRecord && 
+        typeof quotedRecord === 'object' && 
+        'uri' in quotedRecord && 
+        'cid' in quotedRecord && (
+          <QuotedPost record={quotedRecord as {
+            $type?: string;
+            uri: string;
+            cid: string;
+            author?: {
+              did: string;
+              handle: string;
+              displayName?: string;
+              avatar?: string;
+            };
+            value?: {
+              $type?: string;
+              text?: string;
+              createdAt?: string;
+              [key: string]: unknown;
+            };
+            record?: {
+              text?: string;
+              createdAt?: string;
+              [key: string]: unknown;
+            };
+          }} />
+        )}
 
       {/* Handle external embeds (link cards) */}
       {externalData && (
@@ -105,7 +131,7 @@ export const RichContent = ({ text, embed, facets, inModal = false }: RichConten
 
       {/* Handle images */}
       {imageData && Array.isArray(imageData) && imageData.length > 0 && (
-        <ImageViewer images={imageData as any} inModal={inModal} />
+        <ImageViewer images={imageData as Array<{fullsize: string; thumb: string; alt: string}>} inModal={inModal} />
       )}
     </div>
   );

@@ -1,7 +1,9 @@
 // Service Workerの登録
 export const registerServiceWorker = async () => {
   if (!('serviceWorker' in navigator)) {
-    console.log('Service Worker not supported');
+    if (import.meta.env.DEV) {
+      console.warn('Service Worker not supported');
+    }
     return;
   }
 
@@ -10,7 +12,9 @@ export const registerServiceWorker = async () => {
       scope: '/'
     });
 
-    console.log('Service Worker registered successfully:', registration);
+    if (import.meta.env.DEV) {
+      console.warn('Service Worker registered successfully:', registration);
+    }
 
     // 更新があった場合の処理
     registration.addEventListener('updatefound', () => {
@@ -19,7 +23,9 @@ export const registerServiceWorker = async () => {
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             // 新しいバージョンが利用可能
-            console.log('New version available! Refresh to update.');
+            if (import.meta.env.DEV) {
+              console.warn('New version available! Refresh to update.');
+            }
             
             // ユーザーに更新を促す（必要に応じて）
             if (confirm('新しいバージョンが利用可能です。更新しますか？')) {

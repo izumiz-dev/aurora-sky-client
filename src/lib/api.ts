@@ -30,7 +30,12 @@ export const agent = new BskyAgent({
 // User-Agentヘッダーを設定
 if (agent.xrpc) {
   const originalCall = agent.xrpc.call.bind(agent.xrpc);
-  agent.xrpc.call = async function(nsid: string, params?: any, data?: any, opts?: any) {
+  agent.xrpc.call = async function(
+    nsid: string,
+    params?: Record<string, unknown>,
+    data?: unknown,
+    opts?: { headers?: Record<string, string> }
+  ) {
     const headers = opts?.headers || {};
     headers['User-Agent'] = 'AuroraSky/1.0.0';
     return originalCall(nsid, params, data, { ...opts, headers });
@@ -38,7 +43,7 @@ if (agent.xrpc) {
 }
 
 // トークンリフレッシュのミューテックス
-const refreshMutex = new Map<string, Promise<any>>();
+const refreshMutex = new Map<string, Promise<SessionData>>();
 
 export const getAgent = async () => {
   let session = await SessionManager.getSession();
@@ -134,14 +139,18 @@ async function refreshToken(session: SessionData): Promise<SessionData> {
     }
     
     throw new Error('Token refresh failed');
-  } catch (error: any) {
+  } catch (error) {
     console.error('Failed to refresh token:', error);
     
     // リフレッシュトークンが無効な場合はセッションをクリア
-    if (error?.status === 400 || 
-        error?.status === 401 || 
-        error?.message?.includes('Invalid refresh token') ||
-        error?.message?.includes('Token expired')) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const errorStatus = (error as any)?.status;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const errorMessage = (error as any)?.message;
+    if (errorStatus === 400 || 
+        errorStatus === 401 || 
+        errorMessage?.includes('Invalid refresh token') ||
+        errorMessage?.includes('Token expired')) {
       await SessionManager.clearSession();
       window.location.href = '/login';
     }
@@ -154,14 +163,18 @@ async function refreshToken(session: SessionData): Promise<SessionData> {
 const wrapApiCall = async <T>(apiCall: () => Promise<T>): Promise<T> => {
   try {
     return await apiCall();
-  } catch (error: any) {
+  } catch (error) {
     const parsedError = parseApiError(error);
     
     // 401エラー（認証エラー）の場合はセッションをクリアしてログイン画面へ
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const errorStatus = (error as any)?.status;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const errorMessage = (error as any)?.message;
     if (parsedError.statusCode === 401 || 
-        error?.status === 401 || 
-        error?.message?.toLowerCase().includes('unauthorized') ||
-        error?.message?.toLowerCase().includes('invalid token')) {
+        errorStatus === 401 || 
+        errorMessage?.toLowerCase().includes('unauthorized') ||
+        errorMessage?.toLowerCase().includes('invalid token')) {
       await SessionManager.clearSession();
       // ログインページへリダイレクト
       window.location.href = '/login';
@@ -299,7 +312,8 @@ export const getPreferences = async () => {
 export const updatePreferences = async (preferences: unknown[]) => {
   const agent = await getAgent();
   // The BskyAgent doesn't have setPreferences, we need to use the app API directly
-  return agent.app.bsky.actor.putPreferences({ preferences: preferences as any });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (agent as any).app.bsky.actor.putPreferences({ preferences });
 };
 
 export const getProfile = async (actor: string) => {

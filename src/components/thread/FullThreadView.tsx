@@ -22,7 +22,7 @@ export const FullThreadView: FunctionComponent<FullThreadViewProps> = ({ post })
   });
 
   // スレッド全体をフラット化する関数
-  const flattenFullThread = (thread: any): Post[] => {
+  const flattenFullThread = (thread: ThreadViewPost): Post[] => {
     const posts: Post[] = [];
     
     // 親を再帰的に収集
@@ -80,6 +80,20 @@ export const FullThreadView: FunctionComponent<FullThreadViewProps> = ({ post })
   }
 
   if (!threadData?.data.thread) {
+    return (
+      <div className="text-center py-8 text-white/60">
+        スレッドが見つかりませんでした
+      </div>
+    );
+  }
+
+  // Type guard to check if the thread is a valid ThreadViewPost
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isThreadViewPost = (thread: any): thread is ThreadViewPost => {
+    return thread && 'post' in thread && thread.post;
+  };
+
+  if (!isThreadViewPost(threadData.data.thread)) {
     return (
       <div className="text-center py-8 text-white/60">
         スレッドが見つかりませんでした

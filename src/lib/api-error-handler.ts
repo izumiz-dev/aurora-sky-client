@@ -18,11 +18,13 @@ export class RateLimitError extends Error {
 }
 
 // APIエラーを解析してユーザーフレンドリーなメッセージに変換
-export function parseApiError(error: any): ApiError {
+export function parseApiError(error: unknown): ApiError {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const err = error as any; // 最小限のany使用
   // ATProtoのエラー形式をチェック
-  if (error?.status === 429 || error?.statusCode === 429) {
-    const retryAfter = error?.headers?.['retry-after'] || 
-                      error?.headers?.['x-ratelimit-reset'] || 
+  if (err?.status === 429 || err?.statusCode === 429) {
+    const retryAfter = err?.headers?.['retry-after'] || 
+                      err?.headers?.['x-ratelimit-reset'] || 
                       60;
     return {
       statusCode: 429,
@@ -33,21 +35,21 @@ export function parseApiError(error: any): ApiError {
   }
 
   // リクエストタイムアウト
-  if (error?.code === 'ETIMEDOUT' || error?.name === 'TimeoutError') {
+  if (err?.code === 'ETIMEDOUT' || err?.name === 'TimeoutError') {
     return {
       message: '接続がタイムアウトしました。ネットワーク接続を確認してください。'
     };
   }
 
   // ネットワークエラー
-  if (error?.code === 'ECONNREFUSED' || error?.code === 'ENOTFOUND') {
+  if (err?.code === 'ECONNREFUSED' || err?.code === 'ENOTFOUND') {
     return {
       message: 'サーバーに接続できません。しばらく待ってから再度お試しください。'
     };
   }
 
   // 認証エラー
-  if (error?.status === 401 || error?.statusCode === 401) {
+  if (err?.status === 401 || err?.statusCode === 401) {
     return {
       statusCode: 401,
       message: '認証に失敗しました。ログインし直してください。'
@@ -55,7 +57,7 @@ export function parseApiError(error: any): ApiError {
   }
 
   // トークン期限切れエラー
-  if (error?.message?.includes('expired') || error?.message?.includes('token')) {
+  if (err?.message?.includes('expired') || err?.message?.includes('token')) {
     return {
       statusCode: 401,
       message: 'セッションの有効期限が切れました。再度ログインしてください。'
@@ -63,16 +65,16 @@ export function parseApiError(error: any): ApiError {
   }
 
   // サーバーエラー
-  if (error?.status >= 500 || error?.statusCode >= 500) {
+  if (err?.status >= 500 || err?.statusCode >= 500) {
     return {
-      statusCode: error.status || error.statusCode,
+      statusCode: err.status || err.statusCode,
       message: 'サーバーでエラーが発生しました。しばらく待ってから再度お試しください。'
     };
   }
 
   // その他のエラー
   return {
-    message: error?.message || 'エラーが発生しました。'
+    message: err?.message || 'エラーが発生しました。'
   };
 }
 
@@ -119,7 +121,7 @@ export async function retryWithBackoff<T>(
   maxRetries: number = 3,
   initialDelay: number = 1000
 ): Promise<T> {
-  let lastError: any;
+  let lastError: unknown;
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {

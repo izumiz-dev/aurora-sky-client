@@ -61,31 +61,33 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
   });
 
   interface FeedPage {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     feed: any[];
     cursor?: string;
   }
   const feedItems = feedData?.pages?.flatMap((page: FeedPage) => page.feed) || [];
-  const posts = feedItems.map((item) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const posts = feedItems.map((item: any) => {
     // feedItemはpostとreplyの両方を含む可能性がある
     const post = item.post || item;
     
     // デバッグ情報（開発環境のみ）
-    if (import.meta.env.DEV && post.record?.reply) {
-      console.log('ModernProfile: Reply post detected', {
-        postUri: post.uri,
-        hasReply: !!post.reply,
-        hasRecordReply: !!post.record?.reply,
-        isOwnPost: post.author.did === session?.did,
-        authorFilter,
-        rawItem: item,
-      });
-    }
+    // if (import.meta.env.DEV && post.record?.reply) {
+    //   console.log('ModernProfile: Reply post detected', {
+    //     postUri: post.uri,
+    //     hasReply: !!post.reply,
+    //     hasRecordReply: !!post.record?.reply,
+    //     isOwnPost: post.author.did === session?.did,
+    //     authorFilter,
+    //     rawItem: item,
+    //   });
+    // }
     
     // 自分自身への返信の場合でも、標準のreply情報を保持
     return {
       ...post,
-      reason: item.reason,
-      reply: item.reply || post.reply,
+      reason: item.reason || undefined,
+      reply: item.reply || post.reply || undefined,
     } as Post;
   });
   

@@ -15,7 +15,10 @@ export function initSentry(): void {
   }
   
   // Sentryがインストールされていない場合は何もしない
-  console.info('Sentry integration is not configured. To enable, install @sentry/browser');
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.info('Sentry integration is not configured. To enable, install @sentry/browser');
+  }
 }
 
 /**
@@ -42,7 +45,8 @@ export function captureMessage(message: string, level: 'info' | 'warning' | 'err
   
   // 開発環境ではコンソールに出力
   if (import.meta.env.DEV) {
-    console.log(`Sentry captureMessage [${level}]:`, message);
+    // eslint-disable-next-line no-console
+    console.info(`Sentry captureMessage [${level}]:`, message);
   }
 }
 
@@ -52,7 +56,8 @@ export function captureMessage(message: string, level: 'info' | 'warning' | 'err
 export function setUser(user: { id: string; username?: string }): void {
   // 将来的な実装用
   if (import.meta.env.DEV) {
-    console.log('Sentry setUser:', user);
+    // eslint-disable-next-line no-console
+    console.info('Sentry setUser:', user);
   }
 }
 
@@ -62,6 +67,7 @@ export function setUser(user: { id: string; username?: string }): void {
 export function clearUser(): void {
   // 将来的な実装用
   if (import.meta.env.DEV) {
-    console.log('Sentry clearUser');
+    // eslint-disable-next-line no-console
+    console.info('Sentry clearUser');
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'preact/hooks';
+import { useState, useRef, useEffect, useCallback } from 'preact/hooks';
 import { useAuth } from '../context/AuthContext';
 import { useLanguagePreferences } from '../context/LanguagePreferences';
 import { createPost, createPostWithImages, uploadImage } from '../lib/api';
@@ -161,7 +161,7 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
   };
 
   // クリップボードから画像を貼り付ける処理
-  const handlePaste = async (e: ClipboardEvent) => {
+  const handlePaste = useCallback(async (e: ClipboardEvent) => {
     const imageFile = getImageFromPasteEvent(e);
     if (!imageFile) return;
 
@@ -199,7 +199,7 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
     } finally {
       setIsUploading(false);
     }
-  };
+  }, [images]);
 
   // ペーストイベントのリスナーを設定
   useEffect(() => {

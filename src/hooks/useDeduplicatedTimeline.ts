@@ -11,13 +11,13 @@ export const useDeduplicatedTimeline = (posts: Post[]): DeduplicatedPost[] => {
     const postUris = new Set(posts.map(post => post.uri));
     
     // デバッグ情報（開発環境のみ）
-    if (import.meta.env.DEV) {
-      console.log('useDeduplicatedTimeline: Processing posts', {
-        totalPosts: posts.length,
-        uniqueUris: postUris.size,
-        duplicates: posts.length - postUris.size
-      });
-    }
+    // if (import.meta.env.DEV) {
+    //   console.log('useDeduplicatedTimeline: Processing posts', {
+    //     totalPosts: posts.length,
+    //     uniqueUris: postUris.size,
+    //     duplicates: posts.length - postUris.size
+    //   });
+    // }
     
     // 返信でその親が既に表示されている投稿をマーク
     const processedPosts = posts.map(post => {
@@ -29,13 +29,13 @@ export const useDeduplicatedTimeline = (posts: Post[]): DeduplicatedPost[] => {
         
         // 親が既にタイムラインに存在する場合はコンテキスト非表示フラグを設定
         if (parentUri && postUris.has(parentUri)) {
-          if (import.meta.env.DEV) {
-            console.log('useDeduplicatedTimeline: Hiding parent context', {
-              postUri: post.uri,
-              parentUri,
-              parentInTimeline: true
-            });
-          }
+          // if (import.meta.env.DEV) {
+          //   console.log('useDeduplicatedTimeline: Hiding parent context', {
+          //     postUri: post.uri,
+          //     parentUri,
+          //     parentInTimeline: true
+          //   });
+          // }
           
           return {
             ...post,

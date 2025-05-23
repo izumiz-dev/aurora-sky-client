@@ -89,9 +89,10 @@ class AvatarCacheManager {
       }
 
       return await response.blob();
-    } catch (error: any) {
+    } catch (error) {
       // Check if this is a CSP violation
-      if (error.name === 'SecurityError' || error.message?.includes('CSP') || error.message?.includes('blocked')) {
+      const err = error as Error;
+      if (err.name === 'SecurityError' || err.message?.includes('CSP') || err.message?.includes('blocked')) {
         console.error(`CSP violation for URL: ${url}, trying alternative method`, error);
         
         // Alternative method: use img element and canvas
@@ -314,8 +315,8 @@ class AvatarCacheManager {
       const blob = await this.fetchImageAsBlob(url);
       await this.saveToCache(url, blob, _handle);
       return this.memoryCache.get(url) || url;
-    } catch (error: any) {
-      if (error.message === 'CSP_VIOLATION') {
+    } catch (error) {
+      if ((error as Error).message === 'CSP_VIOLATION') {
         console.warn(`CSP violation for avatar ${url}, using original URL`);
         // For CSP violations, return the original URL directly
         return url;

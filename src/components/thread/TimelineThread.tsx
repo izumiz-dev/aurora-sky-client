@@ -2,7 +2,7 @@ import { type FunctionComponent } from 'preact';
 import { useQuery } from '@tanstack/react-query';
 import { getPostThread } from '../../lib/api';
 import type { Post } from '../../types/post';
-// import type { ThreadViewPost } from '../../types/thread';
+import type { ThreadViewPost } from '../../types/thread';
 import { PostItem } from '../PostItem';
 
 interface TimelineThreadProps {
@@ -18,6 +18,7 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
   const shouldFetchParent = isReply && !post.hideParentContext;
   
   // デバッグ情報（開発環境のみ）
+  /*
   if (import.meta.env.DEV && isReply) {
     console.log('TimelineThread: Reply detected', {
       postUri: post.uri,
@@ -29,6 +30,7 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
       recordReply: post.record?.reply,
     });
   }
+  */
   
   const { data: threadData, isLoading } = useQuery({
     queryKey: ['thread', post.uri],
@@ -52,11 +54,11 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
   }
 
   // スレッドから最小限の親投稿を抽出
-  const getMinimalThread = (thread: any): Post[] => {
+  const getMinimalThread = (thread: ThreadViewPost): Post[] => {
     const posts: Post[] = [];
     
     // 親投稿を再帰的に収集（最も遠い親から）
-    const collectParents = (node: any) => {
+    const collectParents = (node: ThreadViewPost) => {
       if (node.parent && 'post' in node.parent) {
         collectParents(node.parent);
         posts.push(node.parent.post);
@@ -69,6 +71,7 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
     posts.push(thread.post);
     
     // デバッグ情報（開発環境のみ）
+    /*
     if (import.meta.env.DEV) {
       console.log('getMinimalThread: Thread collected', {
         threadRootUri: thread.post.uri,
@@ -82,6 +85,7 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
         hasMoreParents: thread.parent?.parent ? 'yes' : 'no',
       });
     }
+    */
     
     return posts;
   };
@@ -91,35 +95,29 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
   }
 
   // デバッグ: 取得したスレッドデータの確認
+  /*
   if (import.meta.env.DEV) {
     console.log('TimelineThread: Thread data received', {
       postUri: post.uri,
       threadStructure: {
         hasParent: !!('parent' in threadData.data.thread && threadData.data.thread.parent && 'post' in threadData.data.thread.parent),
-        parentCount: 'post' in threadData.data.thread ? countParents(threadData.data.thread as any) : 0,
+        parentCount: 'post' in threadData.data.thread ? countParents(threadData.data.thread) : 0,
         hasReplies: !!('replies' in threadData.data.thread && threadData.data.thread.replies?.length),
         replyCount: ('replies' in threadData.data.thread ? (threadData.data.thread.replies?.length || 0) : 0) as number,
       },
     });
   }
+  */
 
-  const threadPosts = getMinimalThread(threadData.data.thread);
-  
-  // 親の数を数える補助関数
-  function countParents(thread: any): number {
-    if (!thread.parent || !('post' in thread.parent)) return 0;
-    return 1 + countParents(thread.parent);
-  }
-  
-  // スレッドデータが取得できない場合でも、record.replyがある場合は処理を続ける
-  if (!threadData?.data.thread && post.record?.reply) {
-    // APIから完全なスレッドが取得できない場合でも、基本的な返信情報は表示
-    return (
-      <div className="relative space-y-0">
-        <PostItem post={post} isNew={isNew} onReplySuccess={onReplySuccess} />
-      </div>
-    );
-  }
+  // Type guard to check if the thread is a valid ThreadViewPost
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isThreadViewPost = (thread: any): thread is ThreadViewPost => {
+    return thread && 'post' in thread && thread.post;
+  };
+
+  const threadPosts = threadData?.data?.thread && isThreadViewPost(threadData.data.thread)
+    ? getMinimalThread(threadData.data.thread) 
+    : [];
 
   // スレッド表示する投稿を収集
   const displayPosts: Post[] = [];
@@ -132,19 +130,6 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({ post, i
   
   // 現在の投稿を追加（元のpostを使用）
   displayPosts.push(post);
-  
-  // デバッグ情報
-  if (import.meta.env.DEV && displayPosts.length > 2) {
-    console.log('TimelineThread: Displaying long thread', {
-      totalPosts: displayPosts.length,
-      posts: displayPosts.map((p, i) => ({
-        index: i,
-        uri: p.uri,
-        text: p.record.text.slice(0, 50),
-        isParent: i < displayPosts.length - 1,
-      })),
-    });
-  }
   
   return (
     <div className="relative space-y-0">

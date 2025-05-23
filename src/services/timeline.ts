@@ -75,23 +75,20 @@ export const fetchTimeline = async (
   return processTimeline(response, session, followingDids);
 };
 
+// FeedItemの型定義
+type FeedItem = AppBskyFeedDefs.FeedViewPost;
+
 // タイムラインを処理する関数
 const processTimeline = (
-  response: any, 
+  response: {
+    data: {
+      feed: AppBskyFeedDefs.FeedViewPost[];
+      cursor?: string;
+    };
+  }, 
   _session: SessionData,
   followingDids?: Set<string>
 ): { feed: Post[]; cursor?: string } => {
-
-  interface FeedItem {
-    post: AppBskyFeedDefs.PostView;
-    reply?: {
-      parent: {
-        author: {
-          did: string;
-        };
-      };
-    };
-  }
 
   interface PostRecord {
     text?: string;
@@ -121,7 +118,7 @@ const processTimeline = (
     }
     
     // 返信の場合、返信先を確認
-    if (item.reply && item.reply.parent && item.reply.parent.author) {
+    if (item.reply && item.reply.parent && 'author' in item.reply.parent && item.reply.parent.author) {
       const parentAuthorDid = item.reply.parent.author.did;
       
       // 返信先がフォローしているユーザー（または自分）の場合は表示
