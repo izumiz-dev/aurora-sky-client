@@ -76,15 +76,16 @@
     height: 40px;
   }
   
-  /* ガラスカードの軽量化 */
+  /* ガラスカードの軽量化 - ブラー効果を適度に軽減しつつ世界観を維持 */
   .glass-card {
-    backdrop-filter: blur(var(--mobile-blur-amount));
-    -webkit-backdrop-filter: blur(var(--mobile-blur-amount));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* 背景色は元の透明感を維持 */
   }
   
   .glass-card-simple {
-    backdrop-filter: blur(calc(var(--mobile-blur-amount) * 0.6));
-    -webkit-backdrop-filter: blur(calc(var(--mobile-blur-amount) * 0.6));
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
   
   /* ボタンのサイズ調整 */
@@ -312,5 +313,98 @@
   .glass-card.p-4.mb-6 {
     margin-bottom: 0.75rem !important;
     padding: 0.75rem !important;
+  }
+  
+  /* モバイルでのパフォーマンス最適化 */
+  
+  /* 背景パーティクルをモバイルで無効化 */
+  .animated-bg::before {
+    display: none !important;
+  }
+  
+  /* ホバー効果を無効化してパフォーマンス向上 */
+  .hover\\:bg-white\\/5:hover,
+  .hover\\:bg-white\\/10:hover,
+  .hover\\:bg-white\\/20:hover {
+    background-color: transparent !important;
+  }
+  
+  /* アニメーション最適化 */
+  .transition-all {
+    transition: opacity 0.2s ease !important;
+  }
+  
+  .transition-colors {
+    transition: color 0.15s ease !important;
+  }
+  
+  /* モバイルコンポーザーのブラー軽減 */
+  .bg-black\\/90.backdrop-blur-sm {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    /* 背景色は既に適切に設定されているので変更なし */
+  }
+  
+  /* transform3dを使用してハードウェアアクセラレーション */
+  .mobile-composer-enter,
+  .mobile-composer-exit {
+    transform: translate3d(0, 0, 0);
+    will-change: transform, opacity;
+  }
+  
+  /* グラデーションアニメーションを軽量化 */
+  .animated-gradient {
+    animation-duration: 20s !important; /* 8sから20sに変更してCPU負荷軽減 */
+  }
+  
+  /* モバイルでポストの文字選択を無効化 */
+  .glass-card {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  /* ポスト内のテキストも選択無効化 */
+  .glass-card .whitespace-pre-wrap,
+  .glass-card .text-white,
+  .glass-card .text-sm,
+  .glass-card .text-base,
+  .glass-card span,
+  .glass-card p,
+  .glass-card div {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+  }
+  
+  /* RichContentコンポーネント内のテキストも無効化 */
+  .glass-card [class*="rich-content"],
+  .glass-card [class*="text-"],
+  .glass-card a:not(input):not(textarea) {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none !important;
+  }
+  
+  /* ただし、入力フィールドとコンポーザーは選択可能にする */
+  .glass-card input,
+  .glass-card textarea,
+  .glass-card [contenteditable="true"],
+  /* PostComposerは除外 */
+  .glass-card.p-4.mb-6 input,
+  .glass-card.p-4.mb-6 textarea,
+  .glass-card.p-4.mb-6 span,
+  .glass-card.p-4.mb-6 div {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+    -webkit-touch-callout: default !important;
   }
 }

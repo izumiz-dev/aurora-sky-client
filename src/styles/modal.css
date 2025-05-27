@@ -138,3 +138,38 @@
   max-height: 40vh;
   object-fit: cover;
 }
+
+/* モバイルでのThreadModal最適化 */
+@media (max-width: 640px) {
+  /* モバイルでbackdropのブラー効果を軽減 */
+  .thread-modal-backdrop {
+    backdrop-filter: blur(8px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* モバイルでmodalコンテンツのブラー効果を軽減 */
+  .thread-modal-content {
+    backdrop-filter: blur(12px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+    /* 背景色は元の設定を維持してガラスモーフィズムの美しさを保つ */
+  }
+  
+  /* モバイルでグロー効果を無効化 */
+  .thread-modal-content::after {
+    display: none !important;
+  }
+  
+  /* モバイルでのアニメーション軽量化 */
+  .thread-modal-content {
+    animation-duration: 0.2s !important;
+  }
+  
+  /* Enhanced blur設定を上書き */
+  @supports (backdrop-filter: blur(8px)) {
+    .thread-modal-backdrop {
+      backdrop-filter: blur(8px) saturate(140%) !important;
+      -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+    }
+  }
+}

@@ -274,7 +274,7 @@ export const MobilePostComposer = ({ isOpen, onClose, replyTo, onPostSuccess }: 
   return (
     <div className={`fixed inset-0 z-[10000] bg-black/95 ${isOpen ? 'mobile-composer-enter' : 'mobile-composer-exit'}`}>
       {/* ヘッダー */}
-      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-xl border-b border-white/10" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <div className="sticky top-0 z-10 bg-black/90 backdrop-blur-sm border-b border-white/10" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="flex items-center justify-between px-4 py-3">
           <button
             onClick={onClose}
@@ -537,7 +537,7 @@ export const MobilePostComposer = ({ isOpen, onClose, replyTo, onPostSuccess }: 
       </div>
 
       {/* 下部ツールバー */}
-      <div className="sticky bottom-0 bg-black/80 backdrop-blur-xl border-t border-white/10 px-4 py-3">
+      <div className="sticky bottom-0 bg-black/90 backdrop-blur-sm border-t border-white/10 px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex gap-3">
             <input
