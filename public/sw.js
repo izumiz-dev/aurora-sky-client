@@ -45,6 +45,8 @@ self.addEventListener('fetch', (event) => {
   if (request.url.includes('/api/') || 
       request.url.includes('bsky.social') || 
       request.url.includes('bsky.network') ||
+      request.url.includes('googleapis.com') ||
+      request.url.includes('gstatic.com') ||
       // 外部のアバター画像URLをキャッシュから除外
       (request.destination === 'image' && !url.origin.includes(self.location.origin))) {
     return;
