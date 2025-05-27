@@ -10,6 +10,7 @@ export const ModernLoginPage = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(true); // デフォルトでチェック
 
   const { isAuthenticated, loading: authLoading, login } = useAuth();
 
@@ -25,7 +26,7 @@ export const ModernLoginPage = () => {
     setIsLoading(true);
 
     try {
-      await login(identifier, password);
+      await login(identifier, password, rememberMe);
       route('/');
     } catch (err) {
       setError('ログインに失敗しました。IDまたはパスワードを確認してください。');
@@ -95,6 +96,8 @@ export const ModernLoginPage = () => {
               <label className="flex items-center">
                 <input
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe((e.target as HTMLInputElement).checked)}
                   className="w-4 h-4 text-blue-600 border-white/30 rounded focus:ring-blue-500 bg-white/10"
                 />
                 <span className="ml-2 text-sm text-white/60">ログイン状態を保持</span>

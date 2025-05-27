@@ -7,7 +7,7 @@ import { SessionManager } from '../lib/sessionManager';
 type AuthContextType = {
   isAuthenticated: boolean;
   session: SessionData | null;
-  login: (identifier: string, password: string) => Promise<void>;
+  login: (identifier: string, password: string, rememberMe?: boolean) => Promise<void>;
   logout: () => void;
   loading: boolean;
   error: string | null;
@@ -24,7 +24,9 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
   useEffect(() => {
     let mounted = true;
     const loadSession = async () => {
+      console.log('[AuthContext] Loading session...');
       const storedSession = await SessionManager.getSession();
+      console.log('[AuthContext] Stored session:', storedSession ? 'Found' : 'Not found');
       if (storedSession && mounted) {
         try {
           // アバターが無い場合は取得を試みる
@@ -41,7 +43,7 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
               };
 
               setSession(sessionWithAvatar);
-              await SessionManager.saveSession(sessionWithAvatar);
+              await SessionManager.saveSession(sessionWithAvatar, true);
             } catch (error) {
               console.error('Failed to fetch profile:', error);
               setSession(storedSession);
@@ -66,7 +68,7 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
     };
   }, []); // 空の依存配列で1回のみ実行
 
-  const login = useCallback(async (identifier: string, password: string) => {
+  const login = useCallback(async (identifier: string, password: string, rememberMe: boolean = true) => {
     try {
       setLoading(true);
       setError(null);
@@ -91,13 +93,15 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
           };
 
           setSession(sessionWithAvatar);
-          await SessionManager.saveSession(sessionWithAvatar);
+          await SessionManager.saveSession(sessionWithAvatar, rememberMe);
+          console.log('[AuthContext] Login successful, session saved');
         } catch (profileError) {
           // プロフィール取得に失敗してもログインは続行
           console.error('Profile fetch failed:', profileError);
           const sessionData = { ...data, active: data.active ?? true };
           setSession(sessionData);
-          await SessionManager.saveSession(sessionData);
+          await SessionManager.saveSession(sessionData, rememberMe);
+          console.log('[AuthContext] Login successful (without avatar), session saved');
         }
       } else {
         throw new Error('ログインが成功しましたが、セッションデータが取得できませんでした');

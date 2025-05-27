@@ -11,16 +11,26 @@ export class SessionCrypto {
    * 暗号化キーを取得または生成
    */
   private static async getOrCreateKey(): Promise<CryptoKey> {
-    const keyString = import.meta.env.VITE_SESSION_KEY;
-    
-    // 本番環境でキーが設定されていない場合はエラー
-    if (import.meta.env.PROD && !keyString) {
-      throw new Error('Session encryption key not configured for production');
+    // Web Crypto APIの可用性をチェック
+    if (!crypto || !crypto.subtle) {
+      throw new Error('Web Crypto API is not available. HTTPS is required for session encryption.');
     }
     
-    // 開発環境でのデフォルトキー（警告を表示）
+    const keyString = import.meta.env.VITE_SESSION_KEY;
+    
+    // デバッグ用：環境変数の状態を確認
+    console.log('[Crypto] Environment:', import.meta.env.PROD ? 'production' : 'development');
+    console.log('[Crypto] Key configured:', !!keyString);
+    
+    // 本番環境でキーが設定されていない場合、デフォルトキーを使用（セキュリティ警告付き）
     if (!keyString) {
-      console.warn('Using default development key. DO NOT use in production!');
+      if (import.meta.env.PROD) {
+        console.error('[Crypto] WARNING: Session encryption key not configured for production!');
+        console.error('[Crypto] Using fallback key. This is NOT secure for production use.');
+        console.error('[Crypto] Please set VITE_SESSION_KEY in your deployment environment variables.');
+      } else {
+        console.warn('[Crypto] Using default development key.');
+      }
     }
     
     const encoder = new TextEncoder();
@@ -55,6 +65,7 @@ export class SessionCrypto {
    */
   static async encrypt(data: string): Promise<string> {
     try {
+      console.log('[Crypto] Starting encryption...');
       const key = await this.getOrCreateKey();
       const encoder = new TextEncoder();
       const encodedData = encoder.encode(data);
@@ -75,9 +86,16 @@ export class SessionCrypto {
       combined.set(new Uint8Array(encryptedData), iv.length);
       
       // Base64エンコードして返す
-      return btoa(String.fromCharCode(...combined));
+      const result = btoa(String.fromCharCode(...combined));
+      console.log('[Crypto] Encryption successful');
+      return result;
     } catch (error) {
-      console.error('Encryption failed:', error);
+      console.error('[Crypto] Encryption failed:', error);
+      if (error instanceof Error) {
+        console.error('[Crypto] Error details:', error.message);
+        console.error('[Crypto] Error stack:', error.stack);
+        throw new Error(`Failed to encrypt data: ${error.message}`);
+      }
       throw new Error('Failed to encrypt data');
     }
   }
@@ -108,6 +126,9 @@ export class SessionCrypto {
       return decoder.decode(decryptedData);
     } catch (error) {
       console.error('Decryption failed:', error);
+      if (error instanceof Error) {
+        throw new Error(`Failed to decrypt data: ${error.message}`);
+      }
       throw new Error('Failed to decrypt data');
     }
   }

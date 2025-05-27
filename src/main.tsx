@@ -6,6 +6,7 @@ import './styles/modal.css';
 import { App } from './app.tsx';
 import { initSentry } from './lib/sentry.optional';
 import { registerServiceWorker } from './lib/sw-register';
+import './lib/debug-storage'; // デバッグツール
 
 // Sentryの初期化（本番環境でDSNが設定されている場合のみ）
 initSentry();
