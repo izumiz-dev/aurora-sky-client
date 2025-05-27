@@ -248,41 +248,60 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
 
           {/* 画像プレビュー */}
           {images.length > 0 && (
-            <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="mt-3 space-y-3">
               {images.map((img, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={img.preview}
-                    alt={img.alt || `添付画像 ${index + 1}`}
-                    className="w-full h-32 object-cover rounded-lg cursor-pointer hover:brightness-110 transition-all"
-                    onClick={() => setPreviewIndex(index)}
-                  />
-                  <button
-                    onClick={() => removeImage(index)}
-                    className="absolute top-2 right-2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
+                <div key={index} className="glass-card p-3">
+                  <div className="flex gap-3">
+                    <div className="relative flex-shrink-0">
+                      <img
+                        src={img.preview}
+                        alt={img.alt || `添付画像 ${index + 1}`}
+                        className="w-24 h-24 object-cover rounded-lg cursor-pointer hover:brightness-110 transition-all"
+                        onClick={() => setPreviewIndex(index)}
                       />
-                    </svg>
-                  </button>
-                  <input
-                    type="text"
-                    placeholder="代替テキスト"
-                    value={img.alt}
-                    onInput={(e) => updateImageAlt(index, (e.target as HTMLInputElement).value)}
-                    className="absolute bottom-2 left-2 right-2 px-2 py-1 text-xs bg-black/50 text-white rounded placeholder-white/70 opacity-0 group-hover:opacity-100 transition-opacity"
-                  />
+                      <button
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 p-1 bg-red-500/80 hover:bg-red-500 rounded-full text-white transition-colors"
+                        aria-label={`画像${index + 1}を削除`}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-sm text-white/80 block mb-1">
+                        画像{index + 1}の代替テキスト
+                        {!img.alt && (
+                          <span className="text-yellow-400 text-xs ml-2">
+                            (推奨)
+                          </span>
+                        )}
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="画像の内容を説明してください"
+                        value={img.alt}
+                        onInput={(e) => updateImageAlt(index, (e.target as HTMLInputElement).value)}
+                        className="glass-input text-sm w-full"
+                        maxLength={1000}
+                      />
+                      <div className="text-xs text-white/40 mt-1">
+                        {img.alt.length}/1000文字
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -324,6 +343,25 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
               </button>
             </div>
             <div className="flex items-center gap-2">
+              {images.length > 0 && images.some(img => !img.alt) && (
+                <span className="text-yellow-400 text-xs flex items-center gap-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                  ALTテキスト未入力
+                </span>
+              )}
               <span className={`text-sm ${text.length > 300 ? 'text-red-400' : 'text-white/50'}`}>
                 {text.length}/300
               </span>
