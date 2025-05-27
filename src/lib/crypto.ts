@@ -19,8 +19,8 @@ export class SessionCrypto {
     const keyString = import.meta.env.VITE_SESSION_KEY;
     
     // デバッグ用：環境変数の状態を確認
-    console.log('[Crypto] Environment:', import.meta.env.PROD ? 'production' : 'development');
-    console.log('[Crypto] Key configured:', !!keyString);
+    // console.log('[Crypto] Environment:', import.meta.env.PROD ? 'production' : 'development');
+    // console.log('[Crypto] Key configured:', !!keyString);
     
     // 本番環境でキーが設定されていない場合、デフォルトキーを使用（セキュリティ警告付き）
     if (!keyString) {
@@ -65,7 +65,7 @@ export class SessionCrypto {
    */
   static async encrypt(data: string): Promise<string> {
     try {
-      console.log('[Crypto] Starting encryption...');
+      // console.log('[Crypto] Starting encryption...');
       const key = await this.getOrCreateKey();
       const encoder = new TextEncoder();
       const encodedData = encoder.encode(data);
@@ -87,7 +87,7 @@ export class SessionCrypto {
       
       // Base64エンコードして返す
       const result = btoa(String.fromCharCode(...combined));
-      console.log('[Crypto] Encryption successful');
+      // console.log('[Crypto] Encryption successful');
       return result;
     } catch (error) {
       console.error('[Crypto] Encryption failed:', error);

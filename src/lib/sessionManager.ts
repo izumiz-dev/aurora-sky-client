@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { SessionCrypto } from './crypto';
 import { FallbackSessionStorage } from './sessionStorage';
 import type { SessionData } from '../types/session';

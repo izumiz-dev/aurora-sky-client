@@ -2,6 +2,7 @@
  * デバッグ用のストレージチェック関数
  * ブラウザコンソールで実行: window.debugStorage()
  */
+/* eslint-disable no-console */
 export function debugStorage() {
   console.log('=== Storage Debug Info ===');
   
@@ -61,5 +62,6 @@ export function debugStorage() {
 
 // デバッグ関数をグローバルに公開
 if (typeof window !== 'undefined') {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).debugStorage = debugStorage;
 }
