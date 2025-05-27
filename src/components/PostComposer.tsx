@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { cacheKeys } from '../lib/cacheConfig';
 import { isAltTextGenerationEnabled } from '../lib/aiSettings';
 import { generateAltText } from '../lib/gemini';
+import { MobilePostComposer } from './MobilePostComposer';
 
 interface PostComposerProps {
   onPostSuccess?: () => void;
@@ -34,9 +35,22 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
   const [previewIndex, setPreviewIndex] = useState<number>(-1);
   const [isGeneratingAlt, setIsGeneratingAlt] = useState(false);
   const [generatingIndex, setGeneratingIndex] = useState<number>(-1);
+  const [showMobileComposer, setShowMobileComposer] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const showAiButton = isAltTextGenerationEnabled();
+  
+  // モバイルデバイスの検出
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 640 || ('ontouchstart' in window));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handlePost = async () => {
     if (!text.trim() && images.length === 0) return;
@@ -244,16 +258,33 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
     };
   }, [handlePaste]);
 
+  // モバイルでテキストエリアをタップした時の処理
+  const handleMobileFocus = useCallback(() => {
+    if (isMobile) {
+      setShowMobileComposer(true);
+    }
+  }, [isMobile]);
+
+  // モバイルコンポーザーからの投稿成功時の処理
+  const handleMobilePostSuccess = () => {
+    setText('');
+    setImages([]);
+    if (onPostSuccess) {
+      onPostSuccess();
+    }
+  };
+
   return (
-    <div className={replyTo ? '' : 'glass-card p-4 mb-6'}>
-      {replyTo && (
-        <div className="mb-2">
-          <span className="text-sm text-white/60">
-            <span className="text-white/40">返信先:</span> @{replyTo.author.handle}
-          </span>
-        </div>
-      )}
-      <div className="flex gap-3">
+    <>
+      <div className={replyTo ? '' : 'glass-card p-4 mb-6'}>
+        {replyTo && (
+          <div className="mb-2">
+            <span className="text-sm text-white/60">
+              <span className="text-white/40">返信先:</span> @{replyTo.author.handle}
+            </span>
+          </div>
+        )}
+        <div className="flex gap-3">
         <div className="avatar avatar-md flex-shrink-0">
           <img
             src={session?.avatar || '/default-avatar.png'}
@@ -273,7 +304,9 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
             value={text}
             onInput={(e) => setText((e.target as HTMLTextAreaElement).value)}
             onKeyDown={handleKeyDown}
+            onFocus={handleMobileFocus}
             disabled={isPosting}
+            readOnly={isMobile}
           />
 
           {/* 画像プレビュー */}
@@ -498,5 +531,16 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
         />
       )}
     </div>
+    
+    {/* モバイル用フルスクリーンコンポーザー */}
+    {isMobile && (
+      <MobilePostComposer
+        isOpen={showMobileComposer}
+        onClose={() => setShowMobileComposer(false)}
+        replyTo={replyTo}
+        onPostSuccess={handleMobilePostSuccess}
+      />
+    )}
+  </>
   );
 };

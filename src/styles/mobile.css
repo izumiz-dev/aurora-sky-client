@@ -25,23 +25,31 @@
   
   /* パディングとマージンの調整 */
   .p-8 {
-    padding: 1.25rem;
-  }
-  
-  .p-6 {
     padding: 1rem;
   }
   
-  .mb-8 {
-    margin-bottom: 1.5rem;
+  .p-6 {
+    padding: 0.75rem;
   }
   
-  .mb-6 {
+  .p-4 {
+    padding: 0.5rem;
+  }
+  
+  .pt-6 {
+    padding-top: 0.75rem;
+  }
+  
+  .mb-8 {
     margin-bottom: 1rem;
   }
   
+  .mb-6 {
+    margin-bottom: 0.5rem;
+  }
+  
   .mb-4 {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
   }
   
   .space-y-6 > * + * {
@@ -214,5 +222,95 @@
   
   button {
     min-height: 44px;
+  }
+}
+
+/* モバイルコンポーザーのアニメーション */
+.mobile-composer-enter {
+  animation: slideUpFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.mobile-composer-exit {
+  animation: slideDownFadeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideUpFadeIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDownFadeOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* モバイルコンポーザー内のスタイル調整 */
+@media (max-width: 640px) {
+  .mobile-composer-content {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* モバイルでテキストエリアをタップ可能な見た目に */
+  textarea[readonly] {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* モバイルコンポーザーのボタンサイズ調整 */
+  .mobile-composer-header button {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* モバイルコンポーザーの最高z-index確保 */
+  .mobile-composer-overlay {
+    z-index: 10000 !important;
+  }
+  
+  /* セーフエリア対応 */
+  .mobile-composer-header {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .mobile-composer-footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* モバイル用ヘッダー調整 */
+  header .flex {
+    height: 3rem !important; /* 48px */
+  }
+  
+  /* アイコンサイズもモバイルで小さく */
+  header .w-11 {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+  
+  /* メインコンテンツのパディング調整 */
+  main {
+    padding-top: 3rem !important; /* 48px ヘッダー高さに合わせる */
+  }
+  
+  /* PostComposerのマージン調整 */
+  .glass-card.p-4.mb-6 {
+    margin-bottom: 0.75rem !important;
+    padding: 0.75rem !important;
   }
 }
