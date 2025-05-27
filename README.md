@@ -23,6 +23,7 @@ Aurora Sky is a modern, beautiful, and performant client for [Bluesky](https://b
   - URL previews
   - Quoted posts
   - Thread view with optimized self-thread display
+  - AI-powered alt text generation for images
 - 🚀 **Performance Optimized**: 
   - Built with Preact for minimal bundle size
   - Lazy loading and code splitting
@@ -158,9 +159,11 @@ src/
 - Image galleries with lightbox viewer
 - Embedded content (YouTube, quoted posts, URL previews)
 - Advanced post composer with:
-  - Image uploads
+  - Image uploads with alt text
+  - AI-powered alt text generation using Google Gemini
   - Rich text support
   - Draft saving
+  - Mobile-optimized full-screen composer
 
 ### UI/UX
 - Modern glassmorphism design with animated particles
@@ -169,15 +172,19 @@ src/
 - Custom Aurora loading animations
 - Context menus for post actions
 - Floating settings panel
-- Toast notifications for user feedback
+- Snackbar notifications for user feedback
 - PWA support with offline capabilities
+- Enhanced mobile performance with optimized animations
+- Accessible alt text indicators for images
 
 ### Performance
-- Service Worker for offline functionality
+- Service Worker for offline functionality with CSP-compliant caching
 - Image caching with CachedAvatar component
 - Optimized thread rendering for self-threads
 - Code splitting for faster initial load
 - Progressive Web App (PWA) capabilities
+- Mobile-specific performance optimizations
+- Efficient image metadata removal and resizing
 
 ## 🔧 Development
 
@@ -281,6 +288,8 @@ This software is provided "as is". See [DISCLAIMER.md](DISCLAIMER.md) for more i
 
 - [Security Guidelines](docs/SECURITY.md)
 - [Security Best Practices](docs/SECURITY_BEST_PRACTICES.md)
+- [Deployment Guide](docs/DEPLOYMENT.md)
+- [Gemini API Setup](docs/GEMINI_SETUP.md)
 - [Claude AI Integration Notes](CLAUDE.md)
 
 ---
