@@ -4,6 +4,7 @@ import { useLanguagePreferences } from '../context/LanguagePreferences';
 import { AppIcon } from '../components/AppIcon';
 import { route } from 'preact-router';
 import { AuroraLoader } from '../components/AuroraLoader';
+import { getAISettings, updateAISettings } from '../lib/aiSettings';
 
 // 言語コードと表示名のマッピング
 const LANGUAGE_OPTIONS = [
@@ -27,12 +28,18 @@ export const ModernSettingsPage = () => {
   const [postLanguage, setPostLanguage] = useState<string>('ja');
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [altTextGenerationEnabled, setAltTextGenerationEnabled] = useState(false);
+  const hasGeminiKey = !!import.meta.env.VITE_GEMINI_API_KEY;
 
   useEffect(() => {
     // Update local state when context preferences change
     setPostLanguage(preferences.postLanguage);
     setContentLanguages(preferences.contentLanguages);
     setShowAllLanguages(preferences.showAllLanguages);
+    
+    // AISettings
+    const aiSettings = getAISettings();
+    setAltTextGenerationEnabled(aiSettings.altTextGenerationEnabled);
   }, [preferences]);
 
   const handleSave = async () => {
@@ -46,6 +53,11 @@ export const ModernSettingsPage = () => {
         postLanguage,
         contentLanguages,
         showAllLanguages,
+      });
+      
+      // AI設定を保存
+      updateAISettings({
+        altTextGenerationEnabled,
       });
 
       setSuccessMessage('設定を保存しました');
@@ -218,6 +230,72 @@ export const ModernSettingsPage = () => {
           </p>
         </div>
       </div>
+
+      {/* AIアシストセクション */}
+      {hasGeminiKey && (
+        <div className="glass-card p-6 mb-6 ambient-fade-in">
+          <div className="flex items-center mb-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-white mr-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+            <h2 className="text-xl font-semibold text-white">AIアシスト機能</h2>
+          </div>
+          
+          <div className="p-4 glass rounded-lg hover-lift">
+            <label className="flex items-center justify-between cursor-pointer">
+              <div>
+                <p className="text-white font-medium">画像の代替テキスト自動生成</p>
+                <p className="text-sm text-white/60 mt-1">
+                  AI（Google Gemini）を使用して画像の内容を分析し、適切な代替テキストを自動生成します
+                </p>
+                <p className="text-xs text-yellow-400 mt-2 flex items-center gap-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                  実験的機能：画像をAIプロバイダー（Gemini）へ送信します
+                </p>
+              </div>
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={altTextGenerationEnabled}
+                  onChange={(e) => setAltTextGenerationEnabled((e.target as HTMLInputElement).checked)}
+                  className="sr-only"
+                />
+                <div className={`w-14 h-8 rounded-full transition-colors ${
+                  altTextGenerationEnabled ? 'bg-blue-500' : 'bg-white/20'
+                }`}>
+                  <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                    altTextGenerationEnabled ? 'translate-x-6' : ''
+                  }`} />
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+      )}
 
       {/* アカウントセクション */}
       <div className="glass-card p-6 mb-6 ambient-fade-in">

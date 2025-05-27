@@ -7,6 +7,8 @@ import { resizeImageToUnder1MB, getImageFromPasteEvent } from '../utils/imageRes
 import type { Post } from '../types/post';
 import { useQueryClient } from '@tanstack/react-query';
 import { cacheKeys } from '../lib/cacheConfig';
+import { isAltTextGenerationEnabled } from '../lib/aiSettings';
+import { generateAltText } from '../lib/gemini';
 
 interface PostComposerProps {
   onPostSuccess?: () => void;
@@ -30,8 +32,11 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [previewIndex, setPreviewIndex] = useState<number>(-1);
+  const [isGeneratingAlt, setIsGeneratingAlt] = useState(false);
+  const [generatingIndex, setGeneratingIndex] = useState<number>(-1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const showAiButton = isAltTextGenerationEnabled();
 
   const handlePost = async () => {
     if (!text.trim() && images.length === 0) return;
@@ -158,6 +163,31 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
     const newImages = [...images];
     newImages[index].alt = alt;
     setImages(newImages);
+  };
+
+  const handleGenerateAlt = async (index: number) => {
+    const image = images[index];
+    if (!image || image.alt) return;
+
+    setIsGeneratingAlt(true);
+    setGeneratingIndex(index);
+    setError(null);
+
+    try {
+      // 現在の投稿言語を使用してALTテキストを生成
+      const altText = await generateAltText(image.file, preferences.postLanguage);
+      if (altText) {
+        updateImageAlt(index, altText);
+      } else {
+        setError('ALTテキストの生成に失敗しました');
+      }
+    } catch (err) {
+      console.error('Failed to generate alt text:', err);
+      setError('ALTテキストの生成中にエラーが発生しました');
+    } finally {
+      setIsGeneratingAlt(false);
+      setGeneratingIndex(-1);
+    }
   };
 
   // クリップボードから画像を貼り付ける処理
@@ -289,14 +319,69 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
                           </span>
                         )}
                       </label>
-                      <input
-                        type="text"
-                        placeholder="画像の内容を説明してください"
-                        value={img.alt}
-                        onInput={(e) => updateImageAlt(index, (e.target as HTMLInputElement).value)}
-                        className="glass-input text-sm w-full"
-                        maxLength={1000}
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="画像の内容を説明してください"
+                          value={img.alt}
+                          onInput={(e) => updateImageAlt(index, (e.target as HTMLInputElement).value)}
+                          className="glass-input text-sm flex-1"
+                          maxLength={1000}
+                          disabled={isGeneratingAlt && generatingIndex === index}
+                        />
+                        {showAiButton && !img.alt && (
+                          <button
+                            onClick={() => handleGenerateAlt(index)}
+                            disabled={isGeneratingAlt}
+                            className="glass-button glass-button-ghost px-3 py-1 text-sm flex items-center gap-1"
+                            title="AIで代替テキストを生成"
+                          >
+                            {isGeneratingAlt && generatingIndex === index ? (
+                              <>
+                                <svg
+                                  className="animate-spin h-4 w-4"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  ></circle>
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                  ></path>
+                                </svg>
+                                <span>生成中...</span>
+                              </>
+                            ) : (
+                              <>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                <span>ALTテキストの<br />AI生成</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                       <div className="text-xs text-white/40 mt-1">
                         {img.alt.length}/1000文字
                       </div>
