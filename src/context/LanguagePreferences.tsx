@@ -120,7 +120,6 @@ export const LanguagePreferencesProvider = ({
       showAllLanguages: boolean;
     }>
   ) => {
-    // 状態を更新
     if (prefs.postLanguage !== undefined) setPostLanguage(prefs.postLanguage);
     if (prefs.contentLanguages !== undefined) setContentLanguages(prefs.contentLanguages);
     if (prefs.showAllLanguages !== undefined) setShowAllLanguages(prefs.showAllLanguages);

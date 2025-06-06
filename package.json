@@ -15,8 +15,9 @@
     "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "type-check": "tsc --noEmit",
     "generate-icons": "node scripts/generate-pwa-icons.js",
-    "verify": "npm run format:check && npm run type-check && npm run lint",
-    "verify:fix": "npm run format && npm run type-check && npm run lint:fix"
+    "check-comments": "node scripts/check-comments.js",
+    "verify": "npm run format:check && npm run type-check && npm run lint && npm run check-comments",
+    "verify:fix": "npm run format && npm run type-check && npm run lint:fix && npm run check-comments"
   },
   "dependencies": {
     "@atproto/api": "^0.15.7",

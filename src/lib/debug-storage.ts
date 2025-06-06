@@ -26,7 +26,6 @@ export function debugStorage() {
     }
   });
 
-  // Check expiry
   const expiry =
     localStorage.getItem('bsky-session-expiry') || sessionStorage.getItem('bsky-session-expiry');
   if (expiry) {
@@ -43,7 +42,6 @@ export function debugStorage() {
     );
   }
 
-  // Check crypto availability
   console.log('\n--- Crypto API ---');
   console.log('crypto:', typeof crypto);
   console.log('crypto.subtle:', crypto?.subtle ? 'available' : 'not available');

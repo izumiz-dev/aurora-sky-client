@@ -98,7 +98,6 @@ const fileToBase64 = async (file: File): Promise<string> => {
     const reader = new FileReader();
     reader.onload = () => {
       const base64 = reader.result as string;
-      // data:image/jpeg;base64, の部分を削除
       const base64Data = base64.split(',')[1];
       resolve(base64Data);
     };

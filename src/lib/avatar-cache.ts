@@ -90,7 +90,6 @@ class AvatarCacheManager {
 
       return await response.blob();
     } catch (error) {
-      // Check if this is a CSP violation
       const err = error as Error;
       if (
         err.name === 'SecurityError' ||

@@ -45,7 +45,6 @@ export const fetchTimeline = async (
         limit: 100,
       });
 
-      // ページネーションを使って全フォローを取得
       let followsCursor = followsResponse.data.cursor;
       followsResponse.data.follows.forEach((follow) => followingDids.add(follow.did));
 

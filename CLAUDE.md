@@ -36,14 +36,21 @@ npm run type-check
 # 3. Run linter
 npm run lint:fix
 
-# 4. Build to ensure everything works
+# 4. Check for redundant comments
+npm run check-comments
+
+# 5. Build to ensure everything works
 npm run build
 ```
 
 For quick verification before committing:
 ```bash
-npm run format && npm run type-check && npm run lint
+npm run format && npm run type-check && npm run lint && npm run check-comments
 ```
+
+### Comment Quality Check
+- `npm run check-comments` - Detect redundant comments that restate obvious code
+- **IMPORTANT**: All detected redundant comments MUST be removed before committing
 
 ## Architecture & Key Technologies
 
@@ -74,3 +81,40 @@ This is AuroraSky, a beautiful Bluesky client built with Preact and Vite:
 2. API calls use getAgent() to ensure session is resumed
 3. React Query for data fetching with custom defaults (no refetch on focus, single retry)
 4. Japanese comments in code for layout and authentication modules
+
+## Code Comments Guidelines
+
+**IMPORTANT**: Do not write comments that simply restate what the code is already clearly doing. Focus on comments that add value by explaining:
+
+- **Why** something is being done (business logic, design decisions)
+- **Complex algorithms** or non-obvious implementation details
+- **Important context** that isn't obvious from the code
+- **Gotchas** or important considerations for future developers
+
+**Avoid these types of redundant comments:**
+- `// Set variable` before variable assignments
+- `// Get element` before DOM queries
+- `// Success` or `// Failed` after obvious operations
+- Comments that just repeat function/variable names
+- Comments describing what a single line of self-explanatory code does
+
+**Examples:**
+```typescript
+// ❌ Bad - obvious from code
+const user = getUser(); // Get user
+
+// ✅ Good - explains why
+const user = getUser(); // Required for auth context initialization
+
+// ❌ Bad - restates what's happening
+if (file.size > 1000000) {
+  // Resize image
+  processedFile = await resizeImage(file);
+}
+
+// ✅ Good - explains business rule
+if (file.size > 1000000) {
+  // Bluesky has a 1MB limit for image uploads
+  processedFile = await resizeImage(file);
+}
+```

@@ -84,7 +84,6 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
         });
 
         if (success && data) {
-          // プロフィール情報を取得
           try {
             const profile = await agent.getProfile({ actor: data.did });
             const sessionWithAvatar = {

@@ -21,8 +21,8 @@ export const FullThreadView: FunctionComponent<FullThreadViewProps> = ({ post })
     queryFn: () =>
       getPostThread({
         uri: post.uri,
-        depth: 10, // より深い階層を取得
-        parentHeight: 10, // より多くの親を取得
+        depth: 10,
+        parentHeight: 10,
       }),
   });
 

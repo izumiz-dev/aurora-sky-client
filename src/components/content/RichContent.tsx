@@ -205,7 +205,6 @@ interface ExternalEmbedProps {
 }
 
 const ExternalEmbed = ({ embed }: ExternalEmbedProps) => {
-  // Check if this is a YouTube URL for special handling
   const isYouTube = embed.uri.includes('youtube.com/watch') || embed.uri.includes('youtu.be/');
 
   // Extract YouTube video ID if it's a YouTube URL

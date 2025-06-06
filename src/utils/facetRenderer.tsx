@@ -28,14 +28,12 @@ export function renderTextWithFacets(text: string, facets?: Facet[]) {
   sortedFacets.forEach((facet, i) => {
     const { byteStart, byteEnd } = facet.index;
 
-    // Add text before this facet
     if (byteStart > lastIndex) {
       const beforeBytes = textBytes.slice(lastIndex, byteStart);
       const beforeText = new TextDecoder().decode(beforeBytes);
       elements.push(<span key={`text-${i}`}>{beforeText}</span>);
     }
 
-    // Get the facet text
     const facetBytes = textBytes.slice(byteStart, byteEnd);
     const facetText = new TextDecoder().decode(facetBytes);
 
@@ -72,7 +70,6 @@ export function renderTextWithFacets(text: string, facets?: Facet[]) {
     lastIndex = byteEnd;
   });
 
-  // Add remaining text
   if (lastIndex < textBytes.length) {
     const remainingBytes = textBytes.slice(lastIndex);
     const remainingText = new TextDecoder().decode(remainingBytes);

@@ -41,8 +41,8 @@ export const TimelineThread: FunctionComponent<TimelineThreadProps> = ({
     queryFn: () =>
       getPostThread({
         uri: post.uri,
-        depth: 10, // より深い階層を取得
-        parentHeight: 10, // より多くの親を取得
+        depth: 10,
+        parentHeight: 10,
       }),
     enabled: shouldFetchParent, // 親のコンテキストを隠す場合は無効化
     staleTime: 5 * 60 * 1000, // 5分間キャッシュ

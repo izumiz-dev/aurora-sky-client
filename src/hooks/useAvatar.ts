@@ -32,7 +32,6 @@ export const useAvatar = (
       setError(null);
 
       try {
-        // キャッシュマネージャーから画像を取得
         const cachedUrl = await avatarCache.getAvatar(originalUrl, handle);
 
         if (mounted) {

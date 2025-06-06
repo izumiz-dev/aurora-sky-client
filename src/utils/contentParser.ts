@@ -25,7 +25,6 @@ export function parseContent(text: string): ContentSegment[] {
     const url = match[0];
     const index = match.index || 0;
 
-    // Add text before URL
     if (index > lastIndex) {
       segments.push({
         type: 'text',
@@ -33,7 +32,6 @@ export function parseContent(text: string): ContentSegment[] {
       });
     }
 
-    // Check if it's a YouTube URL
     const youtubeMatch = url.match(YOUTUBE_REGEX);
     if (youtubeMatch) {
       const videoId = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1];
@@ -55,7 +53,6 @@ export function parseContent(text: string): ContentSegment[] {
     lastIndex = index + url.length;
   });
 
-  // Add remaining text
   if (lastIndex < text.length) {
     segments.push({
       type: 'text',

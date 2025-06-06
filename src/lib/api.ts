@@ -27,7 +27,6 @@ export const agent = new BskyAgent({
   persistSession: handleSessionChange,
 });
 
-// User-Agentヘッダーを設定
 if (agent.xrpc) {
   const originalCall = agent.xrpc.call.bind(agent.xrpc);
   agent.xrpc.call = async function (
@@ -58,7 +57,7 @@ export const getAgent = async () => {
         // 既にリフレッシュ中の場合は待機
         if (refreshMutex.has(did)) {
           await refreshMutex.get(did);
-          session = await SessionManager.getSession(); // 更新されたセッションを取得
+          session = await SessionManager.getSession();
         } else {
           // トークンをリフレッシュ
           const refreshPromise = refreshToken(session);
@@ -119,7 +118,6 @@ function checkTokenNeedsRefresh(token: string): boolean {
 // トークンをリフレッシュ
 async function refreshToken(session: SessionData): Promise<SessionData> {
   try {
-    // リフレッシュトークンを使用して新しいアクセストークンを取得
     const tempAgent = new BskyAgent({ service: 'https://bsky.social' });
 
     // refreshSessionを呼び出し
@@ -250,18 +248,15 @@ export const uploadImage = async (file: File) => {
   if (file.size > 1000000) {
     try {
       processedFile = await resizeImageToUnder1MB(file);
-      // リサイズ成功
     } catch (resizeError) {
       console.error('画像のリサイズに失敗しました:', resizeError);
       throw new Error('画像のリサイズに失敗しました');
     }
   }
 
-  // メタデータを削除
   let processedBlob: Blob;
   try {
     processedBlob = await removeJpegExif(processedFile);
-    // メタデータ削除成功
   } catch (error) {
     console.error('メタデータ削除に失敗しました。リサイズされたファイルを使用します:', error);
     processedBlob = processedFile;

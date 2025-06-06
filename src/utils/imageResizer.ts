@@ -20,7 +20,6 @@ export async function resizeImageToUnder1MB(file: File): Promise<File> {
 
     img.onload = async () => {
       try {
-        // 初期圧縮率を設定
         let quality = 0.9;
         let scaleFactor = 1;
         let blob: Blob | null = null;
@@ -101,7 +100,6 @@ export async function resizeImageToUnder1MB(file: File): Promise<File> {
       reject(new Error('画像の読み込みに失敗しました'));
     };
 
-    // 画像を読み込む
     const reader = new FileReader();
     reader.onload = (e) => {
       img.src = e.target?.result as string;

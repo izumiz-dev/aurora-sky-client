@@ -33,7 +33,6 @@ export class SessionManager {
       // セッションデータを暗号化
       const encrypted = await SessionCrypto.encrypt(JSON.stringify(sessionData));
 
-      // 有効期限を設定
       const expiry = Date.now() + this.SESSION_DURATION;
 
       if (persist) {
@@ -104,7 +103,6 @@ export class SessionManager {
             const parsed = JSON.parse(oldSession);
             // 旧セッションを新形式で保存
             await this.saveSession(parsed, true);
-            // 旧セッションを削除
             localStorage.removeItem('bsky-session');
             return parsed;
           } catch (e) {

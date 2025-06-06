@@ -65,7 +65,6 @@ export async function removeImageMetadata(file: File): Promise<Blob> {
         reject(new Error('Failed to load image'));
       };
 
-      // 画像を読み込む
       if (e.target?.result && typeof e.target.result === 'string') {
         img.src = e.target.result;
       } else {

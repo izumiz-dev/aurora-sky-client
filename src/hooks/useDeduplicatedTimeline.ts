@@ -27,13 +27,11 @@ export const useDeduplicatedTimeline = (posts: Post[]): DeduplicatedPost[] => {
         // 親投稿のURIを取得（複数ソースから確認）
         const parentUri = post.reply?.parent?.uri || post.record?.reply?.parent?.uri;
 
-        // 親が既にタイムラインに存在する場合はコンテキスト非表示フラグを設定
         if (parentUri && postUris.has(parentUri)) {
           // if (import.meta.env.DEV) {
           //   console.log('useDeduplicatedTimeline: Hiding parent context', {
           //     postUri: post.uri,
           //     parentUri,
-          //     parentInTimeline: true
           //   });
           // }
 

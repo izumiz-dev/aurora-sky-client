@@ -100,7 +100,6 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
       setText('');
       setImages([]);
 
-      // タイムラインを更新
       await queryClient.invalidateQueries({ queryKey: cacheKeys.timeline(session?.did) });
 
       if (onPostSuccess) {
@@ -143,7 +142,6 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
           if (file.size > 1000000) {
             try {
               processedFile = await resizeImageToUnder1MB(file);
-              // リサイズ成功
             } catch {
               throw new Error(`${file.name}のリサイズに失敗しました`);
             }
@@ -233,7 +231,6 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
         let processedFile = imageFile;
         if (imageFile.size > 1000000) {
           processedFile = await resizeImageToUnder1MB(imageFile);
-          // リサイズ成功
         }
 
         // プレビュー用のURLを作成
@@ -255,7 +252,6 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
     [images]
   );
 
-  // ペーストイベントのリスナーを設定
   useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
