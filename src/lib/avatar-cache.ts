@@ -33,7 +33,7 @@ class AvatarCacheManager {
   private async initDB(): Promise<void> {
     try {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
-      
+
       request.onerror = () => {
         console.error('Failed to open IndexedDB:', request.error);
       };
@@ -61,15 +61,15 @@ class AvatarCacheManager {
    */
   private isBlueskyAvatarUrl(url: string): boolean {
     if (!url) return false;
-    
+
     // Blueskyのアバター画像URL パターン
     const patterns = [
       /^https:\/\/cdn\.bsky\.app/,
       /^https:\/\/bsky\.social\/xrpc\/com\.atproto/,
       /^https:\/\/.*\.bsky\.network/,
     ];
-    
-    return patterns.some(pattern => pattern.test(url));
+
+    return patterns.some((pattern) => pattern.test(url));
   }
 
   /**
@@ -92,9 +92,13 @@ class AvatarCacheManager {
     } catch (error) {
       // Check if this is a CSP violation
       const err = error as Error;
-      if (err.name === 'SecurityError' || err.message?.includes('CSP') || err.message?.includes('blocked')) {
+      if (
+        err.name === 'SecurityError' ||
+        err.message?.includes('CSP') ||
+        err.message?.includes('blocked')
+      ) {
         console.error(`CSP violation for URL: ${url}, trying alternative method`, error);
-        
+
         // Alternative method: use img element and canvas
         try {
           return await this.fetchImageViaCanvas(url);
@@ -103,9 +107,9 @@ class AvatarCacheManager {
           throw new Error('CSP_VIOLATION');
         }
       }
-      
+
       if (retryCount < MAX_RETRIES) {
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)));
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)));
         return this.fetchImageAsBlob(url, retryCount + 1);
       }
       throw error;
@@ -119,37 +123,41 @@ class AvatarCacheManager {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      
+
       img.onload = async () => {
         try {
           const canvas = document.createElement('canvas');
           canvas.width = img.width;
           canvas.height = img.height;
-          
+
           const ctx = canvas.getContext('2d');
           if (!ctx) {
             reject(new Error('Failed to get canvas context'));
             return;
           }
-          
+
           ctx.drawImage(img, 0, 0);
-          
-          canvas.toBlob((blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error('Failed to convert canvas to blob'));
-            }
-          }, 'image/jpeg', 0.9);
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                resolve(blob);
+              } else {
+                reject(new Error('Failed to convert canvas to blob'));
+              }
+            },
+            'image/jpeg',
+            0.9
+          );
         } catch (error) {
           reject(error);
         }
       };
-      
+
       img.onerror = () => {
         reject(new Error('Failed to load image'));
       };
-      
+
       img.src = url;
     });
   }
@@ -198,7 +206,7 @@ class AvatarCacheManager {
       try {
         const transaction = this.db.transaction([DB_STORE_NAME], 'readwrite');
         const store = transaction.objectStore(DB_STORE_NAME);
-        
+
         const cachedAvatar: CachedAvatar = {
           url,
           blob,
@@ -223,7 +231,7 @@ class AvatarCacheManager {
       const transaction = this.db.transaction([DB_STORE_NAME], 'readwrite');
       const store = transaction.objectStore(DB_STORE_NAME);
       const index = store.index('timestamp');
-      
+
       const allKeys = await new Promise<string[]>((resolve, reject) => {
         const request = index.getAllKeys();
         request.onsuccess = () => resolve(request.result as string[]);
@@ -233,7 +241,7 @@ class AvatarCacheManager {
       // 古い順にソートして、制限を超えたら削除
       if (allKeys.length > MAX_CACHE_SIZE) {
         const keysToDelete = allKeys.slice(0, allKeys.length - MAX_CACHE_SIZE);
-        
+
         for (const key of keysToDelete) {
           store.delete(key);
           // メモリキャッシュからも削除
@@ -331,10 +339,12 @@ class AvatarCacheManager {
    * プリロード（タイムライン表示時の先読み）
    */
   public async preloadAvatars(urls: { url: string; handle?: string }[]): Promise<void> {
-    const promises = urls.map(({ url, handle }) => 
-      this.getAvatar(url, handle).catch(() => {/* エラーは無視 */})
+    const promises = urls.map(({ url, handle }) =>
+      this.getAvatar(url, handle).catch(() => {
+        /* エラーは無視 */
+      })
     );
-    
+
     await Promise.all(promises);
   }
 
@@ -353,7 +363,7 @@ class AvatarCacheManager {
    */
   public async clearAllCache(): Promise<void> {
     this.clearMemoryCache();
-    
+
     if (this.db) {
       const transaction = this.db.transaction([DB_STORE_NAME], 'readwrite');
       const store = transaction.objectStore(DB_STORE_NAME);

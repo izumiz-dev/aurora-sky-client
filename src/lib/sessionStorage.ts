@@ -13,13 +13,13 @@ export class FallbackSessionStorage {
     // console.log('[FallbackStorage] Saving session, persist:', persist);
     const expiry = Date.now() + this.SESSION_DURATION;
     const serialized = JSON.stringify(data);
-    
+
     if (persist) {
       localStorage.setItem(this.SESSION_KEY, serialized);
       localStorage.setItem(this.SESSION_EXPIRY_KEY, expiry.toString());
       // console.log('[FallbackStorage] Saved to localStorage');
     }
-    
+
     sessionStorage.setItem(this.SESSION_KEY, serialized);
     sessionStorage.setItem(this.SESSION_EXPIRY_KEY, expiry.toString());
     // console.log('[FallbackStorage] Saved to sessionStorage');
@@ -30,27 +30,27 @@ export class FallbackSessionStorage {
     let data = sessionStorage.getItem(this.SESSION_KEY);
     let expiry = sessionStorage.getItem(this.SESSION_EXPIRY_KEY);
     // console.log('[FallbackStorage] SessionStorage data:', data ? 'Found' : 'Not found');
-    
+
     if (!data) {
       data = localStorage.getItem(this.SESSION_KEY);
       expiry = localStorage.getItem(this.SESSION_EXPIRY_KEY);
       // console.log('[FallbackStorage] LocalStorage data:', data ? 'Found' : 'Not found');
-      
+
       if (data && expiry) {
         sessionStorage.setItem(this.SESSION_KEY, data);
         sessionStorage.setItem(this.SESSION_EXPIRY_KEY, expiry);
       }
     }
-    
+
     if (!data || !expiry) {
       return null;
     }
-    
+
     if (Date.now() > parseInt(expiry, 10)) {
       this.clear();
       return null;
     }
-    
+
     try {
       return JSON.parse(data);
     } catch (error) {

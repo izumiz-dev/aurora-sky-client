@@ -70,7 +70,7 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
   const posts = feedItems.map((item: any) => {
     // feedItemはpostとreplyの両方を含む可能性がある
     const post = item.post || item;
-    
+
     // デバッグ情報（開発環境のみ）
     // if (import.meta.env.DEV && post.record?.reply) {
     //   console.log('ModernProfile: Reply post detected', {
@@ -82,7 +82,7 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
     //     rawItem: item,
     //   });
     // }
-    
+
     // 自分自身への返信の場合でも、標準のreply情報を保持
     return {
       ...post,
@@ -90,7 +90,7 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
       reply: item.reply || post.reply || undefined,
     } as Post;
   });
-  
+
   // Apply deduplication logic
   const deduplicatedPosts = useDeduplicatedTimeline(posts);
   const threadGroups = useSelfThreads(deduplicatedPosts);
@@ -235,19 +235,13 @@ export const ModernProfilePage = ({ handle }: ProfilePageProps) => {
             <p className="text-white/70">このユーザーはまだ投稿していません</p>
           </div>
         ) : (
-          threadGroups.map((group) => (
+          threadGroups.map((group) =>
             group.type === 'thread' ? (
-              <SelfThreadItem 
-                key={group.id} 
-                posts={group.posts}
-              />
+              <SelfThreadItem key={group.id} posts={group.posts} />
             ) : (
-              <TimelineThread 
-                key={group.posts[0].uri} 
-                post={group.posts[0]} 
-              />
+              <TimelineThread key={group.posts[0].uri} post={group.posts[0]} />
             )
-          ))
+          )
         )}
       </div>
 

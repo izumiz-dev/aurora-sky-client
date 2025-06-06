@@ -10,22 +10,20 @@ interface SelfThreadItemProps {
 
 export const SelfThreadItem = ({ posts, isNew = false, onReplySuccess }: SelfThreadItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   if (posts.length === 0) return null;
-  
+
   const mainPost = posts[0];
   const threadCount = posts.length - 1;
-  
+
   return (
     <div className="relative">
       {/* スレッドインジケーター */}
-      {threadCount > 0 && (
-        <div className="absolute left-12 top-20 bottom-0 w-0.5 bg-white/20" />
-      )}
-      
+      {threadCount > 0 && <div className="absolute left-12 top-20 bottom-0 w-0.5 bg-white/20" />}
+
       {/* メイン投稿 */}
       <PostItem post={mainPost} isNew={isNew} onReplySuccess={onReplySuccess} />
-      
+
       {/* スレッド展開ボタン */}
       {threadCount > 0 && (
         <div className="relative z-10 ml-12 -mt-2 mb-2">
@@ -35,9 +33,7 @@ export const SelfThreadItem = ({ posts, isNew = false, onReplySuccess }: SelfThr
                        bg-black/50 hover:bg-black/70 rounded-full transition-all duration-200"
           >
             <svg
-              className={`w-4 h-4 transform transition-transform ${
-                isExpanded ? 'rotate-180' : ''
-              }`}
+              className={`w-4 h-4 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -49,16 +45,11 @@ export const SelfThreadItem = ({ posts, isNew = false, onReplySuccess }: SelfThr
                 d="M19 9l-7 7-7-7"
               />
             </svg>
-            <span>
-              {isExpanded 
-                ? 'スレッドを折りたたむ' 
-                : `続きを表示 (${threadCount}件)`
-              }
-            </span>
+            <span>{isExpanded ? 'スレッドを折りたたむ' : `続きを表示 (${threadCount}件)`}</span>
           </button>
         </div>
       )}
-      
+
       {/* スレッドの残りの投稿 */}
       {isExpanded && threadCount > 0 && (
         <div className="space-y-0">

@@ -30,7 +30,7 @@
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.75),
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
   border-radius: 1rem;
@@ -147,24 +147,24 @@
     -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
     background-color: rgba(0, 0, 0, 0.3) !important;
   }
-  
+
   /* モバイルでmodalコンテンツのブラー効果を軽減 */
   .thread-modal-content {
     backdrop-filter: blur(12px) saturate(140%) !important;
     -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
     /* 背景色は元の設定を維持してガラスモーフィズムの美しさを保つ */
   }
-  
+
   /* モバイルでグロー効果を無効化 */
   .thread-modal-content::after {
     display: none !important;
   }
-  
+
   /* モバイルでのアニメーション軽量化 */
   .thread-modal-content {
     animation-duration: 0.2s !important;
   }
-  
+
   /* Enhanced blur設定を上書き */
   @supports (backdrop-filter: blur(8px)) {
     .thread-modal-backdrop {

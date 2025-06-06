@@ -68,52 +68,55 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
     };
   }, []); // 空の依存配列で1回のみ実行
 
-  const login = useCallback(async (identifier: string, password: string, rememberMe: boolean = true) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const login = useCallback(
+    async (identifier: string, password: string, rememberMe: boolean = true) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const agent = new BskyAgent({
-        service: 'https://bsky.social',
-      });
+        const agent = new BskyAgent({
+          service: 'https://bsky.social',
+        });
 
-      const { success, data } = await agent.login({
-        identifier,
-        password,
-      });
+        const { success, data } = await agent.login({
+          identifier,
+          password,
+        });
 
-      if (success && data) {
-        // プロフィール情報を取得
-        try {
-          const profile = await agent.getProfile({ actor: data.did });
-          const sessionWithAvatar = {
-            ...data,
-            avatar: profile.data.avatar,
-            active: data.active ?? true,
-          };
+        if (success && data) {
+          // プロフィール情報を取得
+          try {
+            const profile = await agent.getProfile({ actor: data.did });
+            const sessionWithAvatar = {
+              ...data,
+              avatar: profile.data.avatar,
+              active: data.active ?? true,
+            };
 
-          setSession(sessionWithAvatar);
-          await SessionManager.saveSession(sessionWithAvatar, rememberMe);
-          // console.log('[AuthContext] Login successful, session saved');
-        } catch (profileError) {
-          // プロフィール取得に失敗してもログインは続行
-          console.error('Profile fetch failed:', profileError);
-          const sessionData = { ...data, active: data.active ?? true };
-          setSession(sessionData);
-          await SessionManager.saveSession(sessionData, rememberMe);
-          // console.log('[AuthContext] Login successful (without avatar), session saved');
+            setSession(sessionWithAvatar);
+            await SessionManager.saveSession(sessionWithAvatar, rememberMe);
+            // console.log('[AuthContext] Login successful, session saved');
+          } catch (profileError) {
+            // プロフィール取得に失敗してもログインは続行
+            console.error('Profile fetch failed:', profileError);
+            const sessionData = { ...data, active: data.active ?? true };
+            setSession(sessionData);
+            await SessionManager.saveSession(sessionData, rememberMe);
+            // console.log('[AuthContext] Login successful (without avatar), session saved');
+          }
+        } else {
+          throw new Error('ログインが成功しましたが、セッションデータが取得できませんでした');
         }
-      } else {
-        throw new Error('ログインが成功しましたが、セッションデータが取得できませんでした');
+      } catch (err) {
+        console.error('Login failed', err);
+        setError('ログインに失敗しました。IDまたはパスワードを確認してください。');
+        throw err;
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Login failed', err);
-      setError('ログインに失敗しました。IDまたはパスワードを確認してください。');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   const logout = useCallback(async () => {
     if (session) {

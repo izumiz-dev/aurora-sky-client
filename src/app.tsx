@@ -19,7 +19,7 @@ import { LanguagePreferencesProvider } from './context/LanguagePreferences';
 
 // スタイル - glass.cssを最後に読み込んで優先度を上げる
 import './modern.css';
-import './styles/mobile.css';  // mobile.cssをglass.cssの前に移動
+import './styles/mobile.css'; // mobile.cssをglass.cssの前に移動
 import './glass.css';
 import './styles/transitions.css';
 import './styles/aurora-loader.css';
@@ -74,10 +74,7 @@ export function App() {
                 </ModernLayout>
               )}
             />
-            <Route
-              path="/showcase"
-              component={AuroraLoaderShowcase}
-            />
+            <Route path="/showcase" component={AuroraLoaderShowcase} />
             <Route
               path="/:rest*"
               component={(props: { path?: string }) => (

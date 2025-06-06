@@ -97,7 +97,7 @@ export const ContextMenu = ({ items, position, onClose, onItemClick }: ContextMe
           {typeof item.icon === 'string' ? (
             <span className="w-4 h-4">{item.icon}</span>
           ) : (
-            createElement(item.icon, { className: "w-4 h-4" })
+            createElement(item.icon, { className: 'w-4 h-4' })
           )}
           <span className="flex-1 text-left">{item.label}</span>
         </button>

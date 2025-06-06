@@ -9,20 +9,20 @@ interface ThreadViewProps {
 
 export const ThreadView = ({ parentPost, onClose }: ThreadViewProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
-  
+
   // Prevent background scrolling when modal is open
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     const originalHeight = document.body.style.height;
     document.body.style.overflow = 'hidden';
     document.body.style.height = '100vh';
-    
+
     return () => {
       document.body.style.overflow = originalOverflow;
       document.body.style.height = originalHeight;
     };
   }, []);
-  
+
   // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -30,18 +30,15 @@ export const ThreadView = ({ parentPost, onClose }: ThreadViewProps) => {
         onClose();
       }
     };
-    
+
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
-  
+
   return (
     <div className="thread-modal-backdrop">
-      <div
-        className="fixed inset-0"
-        onClick={onClose}
-      />
-      
+      <div className="fixed inset-0" onClick={onClose} />
+
       {/* Modal container with proper centering */}
       <div className="flex items-center justify-center min-h-screen md:p-4 md:pt-20">
         <div className="thread-modal-content glass-card relative w-full max-w-3xl flex flex-col overflow-hidden">
@@ -68,12 +65,9 @@ export const ThreadView = ({ parentPost, onClose }: ThreadViewProps) => {
               </svg>
             </button>
           </div>
-          
+
           {/* Scrollable content */}
-          <div 
-            ref={contentRef}
-            className="flex-1 overflow-y-auto overscroll-contain relative"
-          >
+          <div ref={contentRef} className="flex-1 overflow-y-auto overscroll-contain relative">
             <div className="p-6 pb-20">
               <FullThreadView post={parentPost} />
             </div>

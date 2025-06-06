@@ -36,7 +36,7 @@ export const ModernSettingsPage = () => {
     setPostLanguage(preferences.postLanguage);
     setContentLanguages(preferences.contentLanguages);
     setShowAllLanguages(preferences.showAllLanguages);
-    
+
     // AISettings
     const aiSettings = getAISettings();
     setAltTextGenerationEnabled(aiSettings.altTextGenerationEnabled);
@@ -54,7 +54,7 @@ export const ModernSettingsPage = () => {
         contentLanguages,
         showAllLanguages,
       });
-      
+
       // AI設定を保存
       updateAISettings({
         altTextGenerationEnabled,
@@ -251,13 +251,14 @@ export const ModernSettingsPage = () => {
             </svg>
             <h2 className="text-xl font-semibold text-white">AIアシスト機能</h2>
           </div>
-          
+
           <div className="p-4 glass rounded-lg hover-lift">
             <label className="flex items-center justify-between cursor-pointer">
               <div>
                 <p className="text-white font-medium">画像の代替テキスト自動生成</p>
                 <p className="text-sm text-white/60 mt-1">
-                  AI（Google Gemini）を使用して画像の内容を分析し、適切な代替テキストを自動生成します
+                  AI（Google
+                  Gemini）を使用して画像の内容を分析し、適切な代替テキストを自動生成します
                 </p>
                 <p className="text-xs text-yellow-400 mt-2 flex items-center gap-1">
                   <svg
@@ -281,15 +282,21 @@ export const ModernSettingsPage = () => {
                 <input
                   type="checkbox"
                   checked={altTextGenerationEnabled}
-                  onChange={(e) => setAltTextGenerationEnabled((e.target as HTMLInputElement).checked)}
+                  onChange={(e) =>
+                    setAltTextGenerationEnabled((e.target as HTMLInputElement).checked)
+                  }
                   className="sr-only"
                 />
-                <div className={`w-14 h-8 rounded-full transition-colors ${
-                  altTextGenerationEnabled ? 'bg-blue-500' : 'bg-white/20'
-                }`}>
-                  <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
-                    altTextGenerationEnabled ? 'translate-x-6' : ''
-                  }`} />
+                <div
+                  className={`w-14 h-8 rounded-full transition-colors ${
+                    altTextGenerationEnabled ? 'bg-blue-500' : 'bg-white/20'
+                  }`}
+                >
+                  <div
+                    className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                      altTextGenerationEnabled ? 'translate-x-6' : ''
+                    }`}
+                  />
                 </div>
               </div>
             </label>

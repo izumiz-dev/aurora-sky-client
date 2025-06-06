@@ -126,29 +126,31 @@ export const generateAltText = async (file: File, language: string = 'ja'): Prom
 
   try {
     const base64Image = await fileToBase64(file);
-    
+
     // 言語に応じたプロンプトを選択
     const prompt = ALT_TEXT_PROMPTS[language] || ALT_TEXT_PROMPTS.default;
-    
+
     const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [
-            {
-              text: prompt,
-            },
-            {
-              inlineData: {
-                mimeType: file.type || 'image/jpeg',
-                data: base64Image,
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
               },
-            },
-          ],
-        }],
+              {
+                inlineData: {
+                  mimeType: file.type || 'image/jpeg',
+                  data: base64Image,
+                },
+              },
+            ],
+          },
+        ],
         generationConfig: {
           temperature: 0.1, // より一貫性のある出力のため低めに設定
           maxOutputTokens: 150, // 100文字制限に対応
@@ -165,10 +167,10 @@ export const generateAltText = async (file: File, language: string = 'ja'): Prom
 
     const data: GeminiResponse = await response.json();
     const altText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    
+
     // 改行や余分な空白を削除、100文字に切り詰め
     const cleanedText = altText.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ');
-    
+
     // WCAGガイドラインに従い100文字以内に制限
     if (cleanedText.length > 100) {
       // 最後の完全な単語で切る
@@ -176,7 +178,7 @@ export const generateAltText = async (file: File, language: string = 'ja'): Prom
       const lastSpace = truncated.lastIndexOf(' ');
       return lastSpace > 80 ? truncated.substring(0, lastSpace) : truncated;
     }
-    
+
     return cleanedText;
   } catch (error) {
     console.error('Failed to generate alt text:', error);
@@ -193,30 +195,30 @@ export const generateAltTextsForImages = async (
   onProgress?: (index: number) => void
 ): Promise<string[]> => {
   const results: string[] = [];
-  
+
   for (let i = 0; i < images.length; i++) {
     const image = images[i];
-    
+
     // すでにALTテキストがある場合はスキップ
     if (image.alt) {
       results.push(image.alt);
       continue;
     }
-    
+
     // 進捗通知
     if (onProgress) {
       onProgress(i);
     }
-    
+
     // ALTテキスト生成
     const altText = await generateAltText(image.file, language);
     results.push(altText);
-    
+
     // レート制限を考慮して少し待機
     if (i < images.length - 1) {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
   }
-  
+
   return results;
 };

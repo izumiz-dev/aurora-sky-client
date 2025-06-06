@@ -4,9 +4,46 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
+### Development
 - `npm run dev` - Start development server at port 3000 (auto-opens in browser)
 - `npm run build` - Build for production (runs TypeScript check then Vite build)
 - `npm run preview` - Preview production build
+
+### Code Quality & Verification
+IMPORTANT: Always run these commands before committing changes:
+
+1. **Format Check & Fix**:
+   - `npm run format:check` - Check if files are formatted correctly
+   - `npm run format` - Auto-format all source files
+
+2. **Type Checking**:
+   - `npm run type-check` - Run TypeScript compiler without emitting files
+
+3. **Linting**:
+   - `npm run lint` - Check for ESLint errors
+   - `npm run lint:fix` - Auto-fix ESLint errors where possible
+
+### Recommended Verification Flow
+When making changes, follow this verification sequence:
+
+```bash
+# 1. Format the code
+npm run format
+
+# 2. Check types
+npm run type-check
+
+# 3. Run linter
+npm run lint:fix
+
+# 4. Build to ensure everything works
+npm run build
+```
+
+For quick verification before committing:
+```bash
+npm run format && npm run type-check && npm run lint
+```
 
 ## Architecture & Key Technologies
 

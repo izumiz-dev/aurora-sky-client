@@ -5,14 +5,14 @@
 .aurora-gradient-text {
   background: linear-gradient(
     88deg,
-    #0c1e4d 0%,     /* 深夜の藍色 */
-    #164e63 14%,    /* ミッドナイトティール */
-    #047857 28%,    /* 深い森のグリーン */
-    #059669 42%,    /* エメラルド */
-    #10b981 56%,    /* シーグリーン */
-    #6ee7b7 70%,    /* ミントグリーン */
-    #93c5fd 84%,    /* ソフトスカイブルー */
-    #c7d2fe 100%    /* ラベンダーミスト */
+    #0c1e4d 0%,
+    /* 深夜の藍色 */ #164e63 14%,
+    /* ミッドナイトティール */ #047857 28%,
+    /* 深い森のグリーン */ #059669 42%,
+    /* エメラルド */ #10b981 56%,
+    /* シーグリーン */ #6ee7b7 70%,
+    /* ミントグリーン */ #93c5fd 84%,
+    /* ソフトスカイブルー */ #c7d2fe 100% /* ラベンダーミスト */
   );
   background-size: 150% 150%;
   background-clip: text;
@@ -31,7 +31,8 @@
 }
 
 @keyframes aurora-flow {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
     filter: hue-rotate(0deg);
   }
@@ -68,13 +69,13 @@
     --glass-bg: rgba(255, 255, 255, 0.08);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-shadow: rgba(0, 0, 0, 0.1);
-    
+
     /* モバイル用の変数 */
     --mobile-font-scale: 0.9;
     --mobile-padding-scale: 0.85;
     --mobile-blur-amount: 8px;
   }
-  
+
   /* モバイルデバイス用の調整 */
   @media (max-width: 640px) {
     :root {

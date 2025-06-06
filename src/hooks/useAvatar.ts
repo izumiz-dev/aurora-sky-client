@@ -9,7 +9,10 @@ interface UseAvatarOptions {
 /**
  * アバター画像のキャッシュと表示を管理するカスタムフック
  */
-export const useAvatar = (originalUrl: string | null | undefined, options: UseAvatarOptions = {}) => {
+export const useAvatar = (
+  originalUrl: string | null | undefined,
+  options: UseAvatarOptions = {}
+) => {
   const { fallback = 'https://via.placeholder.com/48', handle } = options;
   const [avatarUrl, setAvatarUrl] = useState<string>(originalUrl || fallback);
   const [loading, setLoading] = useState<boolean>(false);
@@ -31,7 +34,7 @@ export const useAvatar = (originalUrl: string | null | undefined, options: UseAv
       try {
         // キャッシュマネージャーから画像を取得
         const cachedUrl = await avatarCache.getAvatar(originalUrl, handle);
-        
+
         if (mounted) {
           setAvatarUrl(cachedUrl);
         }
@@ -65,13 +68,11 @@ export const useAvatar = (originalUrl: string | null | undefined, options: UseAv
 /**
  * 複数のアバターをプリロードするフック
  */
-export const useAvatarPreload = (
-  avatars: Array<{ url?: string | null; handle?: string }>
-) => {
+export const useAvatarPreload = (avatars: Array<{ url?: string | null; handle?: string }>) => {
   useEffect(() => {
     const validAvatars = avatars
-      .filter(avatar => avatar.url)
-      .map(avatar => ({ url: avatar.url!, handle: avatar.handle }));
+      .filter((avatar) => avatar.url)
+      .map((avatar) => ({ url: avatar.url!, handle: avatar.handle }));
 
     if (validAvatars.length > 0) {
       avatarCache.preloadAvatars(validAvatars);

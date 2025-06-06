@@ -10,7 +10,12 @@ interface PostComposerModalProps {
   onPostSuccess?: () => void;
 }
 
-export const PostComposerModal = ({ isOpen, onClose, replyTo, onPostSuccess }: PostComposerModalProps) => {
+export const PostComposerModal = ({
+  isOpen,
+  onClose,
+  replyTo,
+  onPostSuccess,
+}: PostComposerModalProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   // モーダルが開いているときは背景スクロールを防止
@@ -20,7 +25,7 @@ export const PostComposerModal = ({ isOpen, onClose, replyTo, onPostSuccess }: P
       const originalHeight = document.body.style.height;
       document.body.style.overflow = 'hidden';
       document.body.style.height = '100vh';
-      
+
       return () => {
         document.body.style.overflow = originalOverflow;
         document.body.style.height = originalHeight;
@@ -53,11 +58,8 @@ export const PostComposerModal = ({ isOpen, onClose, replyTo, onPostSuccess }: P
 
   return (
     <div className="thread-modal-backdrop">
-      <div
-        className="fixed inset-0"
-        onClick={onClose}
-      />
-      
+      <div className="fixed inset-0" onClick={onClose} />
+
       {/* Modal container with proper centering */}
       <div className="flex items-center justify-center min-h-screen md:p-4 md:pt-20">
         <div className="thread-modal-content glass-card relative w-full max-w-3xl flex flex-col overflow-hidden">
@@ -86,12 +88,9 @@ export const PostComposerModal = ({ isOpen, onClose, replyTo, onPostSuccess }: P
               </svg>
             </button>
           </div>
-          
+
           {/* Scrollable content */}
-          <div 
-            ref={contentRef}
-            className="flex-1 overflow-y-auto overscroll-contain relative"
-          >
+          <div ref={contentRef} className="flex-1 overflow-y-auto overscroll-contain relative">
             <div className="p-6">
               {/* リプライ先の投稿を表示 */}
               {replyTo && (
@@ -121,10 +120,7 @@ export const PostComposerModal = ({ isOpen, onClose, replyTo, onPostSuccess }: P
               )}
 
               {/* PostComposer */}
-              <PostComposer 
-                onPostSuccess={handlePostSuccess}
-                replyTo={replyTo}
-              />
+              <PostComposer onPostSuccess={handlePostSuccess} replyTo={replyTo} />
             </div>
           </div>
         </div>

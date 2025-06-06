@@ -18,7 +18,7 @@ export const getAISettings = (): AISettings => {
   try {
     const stored = localStorage.getItem(AI_SETTINGS_KEY);
     if (!stored) return DEFAULT_SETTINGS;
-    
+
     const settings = JSON.parse(stored);
     return {
       ...DEFAULT_SETTINGS,
@@ -36,7 +36,7 @@ export const updateAISettings = (updates: Partial<AISettings>): void => {
     ...updates,
     lastUpdated: new Date().toISOString(),
   };
-  
+
   localStorage.setItem(AI_SETTINGS_KEY, JSON.stringify(updated));
 };
 
@@ -45,6 +45,6 @@ export const isAltTextGenerationEnabled = (): boolean => {
   if (!import.meta.env.VITE_GEMINI_API_KEY) {
     return false;
   }
-  
+
   return getAISettings().altTextGenerationEnabled;
 };

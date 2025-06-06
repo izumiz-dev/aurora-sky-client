@@ -17,16 +17,16 @@ export const BackgroundParticles = () => {
     if (prefersReducedMotion) {
       return;
     }
-    
+
     // モバイルデバイスではパーティクルを無効化してパフォーマンス向上
-    const isMobile = window.innerWidth <= 640 || ('ontouchstart' in window);
+    const isMobile = window.innerWidth <= 640 || 'ontouchstart' in window;
     if (isMobile) {
       return;
     }
-    
+
     // デバイスの幅に応じて粒子の数を調整
     const particleCount = window.innerWidth < 768 ? 10 : 20;
-    
+
     // ランダムな位置に粒子を生成
     const newParticles: Particle[] = [];
     for (let i = 0; i < particleCount; i++) {

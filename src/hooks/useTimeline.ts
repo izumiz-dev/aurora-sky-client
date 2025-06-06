@@ -188,7 +188,7 @@ export const useTimeline = (session: SessionData | null, isAuthenticated: boolea
 
   // アバターのプリロード
   useAvatarPreload(
-    posts.map(post => ({
+    posts.map((post) => ({
       url: post.author.avatar,
       handle: post.author.handle,
     }))

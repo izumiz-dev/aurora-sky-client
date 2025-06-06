@@ -78,7 +78,9 @@ export const QuotedPost = ({ record }: QuotedPostProps) => {
         </div>
       )}
 
-      {text && <p className="text-xs sm:text-sm text-white/90 whitespace-pre-wrap break-words">{text}</p>}
+      {text && (
+        <p className="text-xs sm:text-sm text-white/90 whitespace-pre-wrap break-words">{text}</p>
+      )}
     </div>
   );
 };

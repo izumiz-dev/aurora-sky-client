@@ -18,20 +18,22 @@ export function sanitizeHTML(html: string): string {
 export function sanitizeURL(url: string): string {
   try {
     const parsed = new URL(url);
-    
+
     // 許可されたプロトコルのみを許可
     const allowedProtocols = ['http:', 'https:'];
     if (!allowedProtocols.includes(parsed.protocol)) {
       return '#';
     }
-    
+
     // データURLやJavaScriptプロトコルをブロック
-    if (url.toLowerCase().startsWith('javascript:') || 
-        url.toLowerCase().startsWith('data:') ||
-        url.toLowerCase().startsWith('vbscript:')) {
+    if (
+      url.toLowerCase().startsWith('javascript:') ||
+      url.toLowerCase().startsWith('data:') ||
+      url.toLowerCase().startsWith('vbscript:')
+    ) {
       return '#';
     }
-    
+
     return parsed.toString();
   } catch {
     // 無効なURLの場合は安全なデフォルト値を返す
@@ -58,10 +60,12 @@ export function sanitizeText(text: string): string {
 export function sanitizeFileName(fileName: string): string {
   // 危険な文字を除去
   const sanitized = fileName
-    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '')
+    .replace(/[<>:"/\\|?*]/g, '') // ファイルシステムで使用できない文字
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\x00-\x1f]/g, '') // 制御文字を別に処理
     .replace(/\.\./g, '')
     .trim();
-  
+
   // 最大長を制限
   const maxLength = 255;
   if (sanitized.length > maxLength) {
@@ -69,7 +73,7 @@ export function sanitizeFileName(fileName: string): string {
     const name = sanitized.substring(0, sanitized.lastIndexOf('.'));
     return name.substring(0, maxLength - extension.length) + extension;
   }
-  
+
   return sanitized;
 }
 
@@ -98,6 +102,6 @@ export function containsDangerousPatterns(text: string): boolean {
     /vbscript:/i,
     /data:text\/html/i,
   ];
-  
-  return dangerousPatterns.some(pattern => pattern.test(text));
+
+  return dangerousPatterns.some((pattern) => pattern.test(text));
 }

@@ -39,13 +39,13 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const showAiButton = isAltTextGenerationEnabled();
-  
+
   // モバイルデバイスの検出
   const [isMobile, setIsMobile] = useState(false);
-  
+
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 640 || ('ontouchstart' in window));
+      setIsMobile(window.innerWidth <= 640 || 'ontouchstart' in window);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -62,16 +62,18 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
       const postData = {
         text,
         langs: [preferences.postLanguage],
-        reply: replyTo ? {
-          root: {
-            uri: replyTo.record.reply?.root?.uri || replyTo.uri,
-            cid: replyTo.record.reply?.root?.cid || replyTo.cid,
-          },
-          parent: {
-            uri: replyTo.uri,
-            cid: replyTo.cid,
-          },
-        } : undefined,
+        reply: replyTo
+          ? {
+              root: {
+                uri: replyTo.record.reply?.root?.uri || replyTo.uri,
+                cid: replyTo.record.reply?.root?.cid || replyTo.cid,
+              },
+              parent: {
+                uri: replyTo.uri,
+                cid: replyTo.cid,
+              },
+            }
+          : undefined,
       };
 
       if (images.length > 0) {
@@ -84,7 +86,12 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
             return { alt: img.alt, blob: img.blob };
           })
         );
-        await createPostWithImages(text, uploadedImages, [preferences.postLanguage], postData.reply);
+        await createPostWithImages(
+          text,
+          uploadedImages,
+          [preferences.postLanguage],
+          postData.reply
+        );
       } else {
         // テキストのみ投稿
         await createPost(text, [preferences.postLanguage], postData.reply);
@@ -92,10 +99,10 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
 
       setText('');
       setImages([]);
-      
+
       // タイムラインを更新
       await queryClient.invalidateQueries({ queryKey: cacheKeys.timeline(session?.did) });
-      
+
       if (onPostSuccess) {
         onPostSuccess();
       }
@@ -156,7 +163,7 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
       setImages([...images, ...newImages]);
     } catch (err) {
       setError(
-        ((err instanceof Error ? err.message : String(err)) || '画像のアップロードに失敗しました')
+        (err instanceof Error ? err.message : String(err)) || '画像のアップロードに失敗しました'
       );
     } finally {
       setIsUploading(false);
@@ -205,45 +212,48 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
   };
 
   // クリップボードから画像を貼り付ける処理
-  const handlePaste = useCallback(async (e: ClipboardEvent) => {
-    const imageFile = getImageFromPasteEvent(e);
-    if (!imageFile) return;
+  const handlePaste = useCallback(
+    async (e: ClipboardEvent) => {
+      const imageFile = getImageFromPasteEvent(e);
+      if (!imageFile) return;
 
-    e.preventDefault();
+      e.preventDefault();
 
-    // 画像数の制限チェック
-    if (images.length >= 4) {
-      setError('画像は最大4枚まで添付できます');
-      return;
-    }
-
-    setIsUploading(true);
-    setError(null);
-
-    try {
-      // 1MBを超える場合はリサイズ
-      let processedFile = imageFile;
-      if (imageFile.size > 1000000) {
-        processedFile = await resizeImageToUnder1MB(imageFile);
-        // リサイズ成功
+      // 画像数の制限チェック
+      if (images.length >= 4) {
+        setError('画像は最大4枚まで添付できます');
+        return;
       }
 
-      // プレビュー用のURLを作成
-      const preview = URL.createObjectURL(processedFile);
+      setIsUploading(true);
+      setError(null);
 
-      const newImage: UploadedImage = {
-        file: processedFile,
-        preview,
-        alt: '',
-      };
+      try {
+        // 1MBを超える場合はリサイズ
+        let processedFile = imageFile;
+        if (imageFile.size > 1000000) {
+          processedFile = await resizeImageToUnder1MB(imageFile);
+          // リサイズ成功
+        }
 
-      setImages([...images, newImage]);
-    } catch {
-      setError('画像の処理に失敗しました');
-    } finally {
-      setIsUploading(false);
-    }
-  }, [images]);
+        // プレビュー用のURLを作成
+        const preview = URL.createObjectURL(processedFile);
+
+        const newImage: UploadedImage = {
+          file: processedFile,
+          preview,
+          alt: '',
+        };
+
+        setImages([...images, newImage]);
+      } catch {
+        setError('画像の処理に失敗しました');
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [images]
+  );
 
   // ペーストイベントのリスナーを設定
   useEffect(() => {
@@ -251,7 +261,7 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
     if (!textarea) return;
 
     const handlePasteEvent = (e: Event) => handlePaste(e as ClipboardEvent);
-    
+
     textarea.addEventListener('paste', handlePasteEvent);
     return () => {
       textarea.removeEventListener('paste', handlePasteEvent);
@@ -285,187 +295,167 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
           </div>
         )}
         <div className="flex gap-3">
-        <div className="avatar avatar-md flex-shrink-0">
-          <img
-            src={session?.avatar || '/default-avatar.png'}
-            alt={session?.handle || 'User'}
-            onError={(e) => {
-              console.error('Avatar load error:', e);
-              (e.target as HTMLImageElement).src = '/default-avatar.png';
-            }}
-          />
-        </div>
-        <div className="flex-1">
-          <textarea
-            ref={textareaRef}
-            className="glass-input resize-none"
-            rows={3}
-            placeholder={replyTo ? "返信を入力..." : "今どうしてる？"}
-            value={text}
-            onInput={(e) => setText((e.target as HTMLTextAreaElement).value)}
-            onKeyDown={handleKeyDown}
-            onFocus={handleMobileFocus}
-            disabled={isPosting}
-            readOnly={isMobile}
-          />
+          <div className="avatar avatar-md flex-shrink-0">
+            <img
+              src={session?.avatar || '/default-avatar.png'}
+              alt={session?.handle || 'User'}
+              onError={(e) => {
+                console.error('Avatar load error:', e);
+                (e.target as HTMLImageElement).src = '/default-avatar.png';
+              }}
+            />
+          </div>
+          <div className="flex-1">
+            <textarea
+              ref={textareaRef}
+              className="glass-input resize-none"
+              rows={3}
+              placeholder={replyTo ? '返信を入力...' : '今どうしてる？'}
+              value={text}
+              onInput={(e) => setText((e.target as HTMLTextAreaElement).value)}
+              onKeyDown={handleKeyDown}
+              onFocus={handleMobileFocus}
+              disabled={isPosting}
+              readOnly={isMobile}
+            />
 
-          {/* 画像プレビュー */}
-          {images.length > 0 && (
-            <div className="mt-3 space-y-3">
-              {images.map((img, index) => (
-                <div key={index} className="glass-card p-3">
-                  <div className="flex gap-3">
-                    <div className="relative flex-shrink-0">
-                      <img
-                        src={img.preview}
-                        alt={img.alt || `添付画像 ${index + 1}`}
-                        className="w-24 h-24 object-cover rounded-lg cursor-pointer hover:brightness-110 transition-all"
-                        onClick={() => setPreviewIndex(index)}
-                      />
-                      <button
-                        onClick={() => removeImage(index)}
-                        className="absolute -top-2 -right-2 p-1 bg-red-500/80 hover:bg-red-500 rounded-full text-white transition-colors"
-                        aria-label={`画像${index + 1}を削除`}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="flex-1">
-                      <label className="text-sm text-white/80 block mb-1">
-                        画像{index + 1}の代替テキスト
-                        {!img.alt && (
-                          <span className="text-yellow-400 text-xs ml-2">
-                            (推奨)
-                          </span>
-                        )}
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          placeholder="画像の内容を説明してください"
-                          value={img.alt}
-                          onInput={(e) => updateImageAlt(index, (e.target as HTMLInputElement).value)}
-                          className="glass-input text-sm flex-1"
-                          maxLength={1000}
-                          disabled={isGeneratingAlt && generatingIndex === index}
+            {/* 画像プレビュー */}
+            {images.length > 0 && (
+              <div className="mt-3 space-y-3">
+                {images.map((img, index) => (
+                  <div key={index} className="glass-card p-3">
+                    <div className="flex gap-3">
+                      <div className="relative flex-shrink-0">
+                        <img
+                          src={img.preview}
+                          alt={img.alt || `添付画像 ${index + 1}`}
+                          className="w-24 h-24 object-cover rounded-lg cursor-pointer hover:brightness-110 transition-all"
+                          onClick={() => setPreviewIndex(index)}
                         />
-                        {showAiButton && !img.alt && (
-                          <button
-                            onClick={() => handleGenerateAlt(index)}
-                            disabled={isGeneratingAlt}
-                            className="glass-button glass-button-ghost px-3 py-1 text-sm flex items-center gap-1"
-                            title="AIで代替テキストを生成"
+                        <button
+                          onClick={() => removeImage(index)}
+                          className="absolute -top-2 -right-2 p-1 bg-red-500/80 hover:bg-red-500 rounded-full text-white transition-colors"
+                          aria-label={`画像${index + 1}を削除`}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                           >
-                            {isGeneratingAlt && generatingIndex === index ? (
-                              <>
-                                <svg
-                                  className="animate-spin h-4 w-4"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <circle
-                                    className="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    strokeWidth="4"
-                                  ></circle>
-                                  <path
-                                    className="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                  ></path>
-                                </svg>
-                                <span>生成中...</span>
-                              </>
-                            ) : (
-                              <>
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                  />
-                                </svg>
-                                <span>ALTテキストの<br />AI生成</span>
-                              </>
-                            )}
-                          </button>
-                        )}
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
                       </div>
-                      <div className="text-xs text-white/40 mt-1">
-                        {img.alt.length}/1000文字
+                      <div className="flex-1">
+                        <label className="text-sm text-white/80 block mb-1">
+                          画像{index + 1}の代替テキスト
+                          {!img.alt && <span className="text-yellow-400 text-xs ml-2">(推奨)</span>}
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="画像の内容を説明してください"
+                            value={img.alt}
+                            onInput={(e) =>
+                              updateImageAlt(index, (e.target as HTMLInputElement).value)
+                            }
+                            className="glass-input text-sm flex-1"
+                            maxLength={1000}
+                            disabled={isGeneratingAlt && generatingIndex === index}
+                          />
+                          {showAiButton && !img.alt && (
+                            <button
+                              onClick={() => handleGenerateAlt(index)}
+                              disabled={isGeneratingAlt}
+                              className="glass-button glass-button-ghost px-3 py-1 text-sm flex items-center gap-1"
+                              title="AIで代替テキストを生成"
+                            >
+                              {isGeneratingAlt && generatingIndex === index ? (
+                                <>
+                                  <svg
+                                    className="animate-spin h-4 w-4"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle
+                                      className="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                      className="opacity-75"
+                                      fill="currentColor"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
+                                  </svg>
+                                  <span>生成中...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                    />
+                                  </svg>
+                                  <span>
+                                    ALTテキストの
+                                    <br />
+                                    AI生成
+                                  </span>
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
+                        <div className="text-xs text-white/40 mt-1">{img.alt.length}/1000文字</div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
 
-          {error && <div className="mt-2 text-red-400 text-sm">{error}</div>}
+            {error && <div className="mt-2 text-red-400 text-sm">{error}</div>}
 
-          <div className="flex items-center justify-between mt-3">
-            <div className="flex gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageSelect}
-                className="hidden"
-                disabled={isPosting || isUploading || images.length >= 4}
-              />
-              <button
-                className="glass-button glass-button-ghost icon-btn"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isPosting || isUploading || images.length >= 4}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            <div className="flex items-center justify-between mt-3">
+              <div className="flex gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageSelect}
+                  className="hidden"
+                  disabled={isPosting || isUploading || images.length >= 4}
+                />
+                <button
+                  className="glass-button glass-button-ghost icon-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isPosting || isUploading || images.length >= 4}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                {images.length > 0 && <span className="text-xs ml-1">{images.length}/4</span>}
-              </button>
-            </div>
-            <div className="flex items-center gap-2">
-              {images.length > 0 && images.some(img => !img.alt) && (
-                <span className="text-yellow-400 text-xs flex items-center gap-1">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
+                    className="h-5 w-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -474,73 +464,93 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
-                  ALTテキスト未入力
-                </span>
-              )}
-              <span className={`text-sm ${text.length > 300 ? 'text-red-400' : 'text-white/50'}`}>
-                {text.length}/300
-              </span>
-              <button
-                className="glass-button btn-primary"
-                onClick={handlePost}
-                disabled={isPosting || (!text.trim() && images.length === 0) || text.length > 300}
-              >
-                {isPosting ? (
-                  <span className="flex items-center">
+                  {images.length > 0 && <span className="text-xs ml-1">{images.length}/4</span>}
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                {images.length > 0 && images.some((img) => !img.alt) && (
+                  <span className="text-yellow-400 text-xs flex items-center gap-1">
                     <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                       xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
                       fill="none"
                       viewBox="0 0 24 24"
+                      stroke="currentColor"
                     >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
                       <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
                     </svg>
-                    投稿中...
+                    ALTテキスト未入力
                   </span>
-                ) : (
-                  '投稿する'
                 )}
-              </button>
+                <span className={`text-sm ${text.length > 300 ? 'text-red-400' : 'text-white/50'}`}>
+                  {text.length}/300
+                </span>
+                <button
+                  className="glass-button btn-primary"
+                  onClick={handlePost}
+                  disabled={isPosting || (!text.trim() && images.length === 0) || text.length > 300}
+                >
+                  {isPosting ? (
+                    <span className="flex items-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      投稿中...
+                    </span>
+                  ) : (
+                    '投稿する'
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* 画像プレビューモーダル */}
+        {previewIndex >= 0 && (
+          <ImagePreview
+            images={images.map((img) => ({ src: img.preview, alt: img.alt }))}
+            currentIndex={previewIndex}
+            onClose={() => setPreviewIndex(-1)}
+            onNavigate={setPreviewIndex}
+          />
+        )}
       </div>
 
-      {/* 画像プレビューモーダル */}
-      {previewIndex >= 0 && (
-        <ImagePreview
-          images={images.map((img) => ({ src: img.preview, alt: img.alt }))}
-          currentIndex={previewIndex}
-          onClose={() => setPreviewIndex(-1)}
-          onNavigate={setPreviewIndex}
+      {/* モバイル用フルスクリーンコンポーザー */}
+      {isMobile && (
+        <MobilePostComposer
+          isOpen={showMobileComposer}
+          onClose={() => setShowMobileComposer(false)}
+          replyTo={replyTo}
+          onPostSuccess={handleMobilePostSuccess}
         />
       )}
-    </div>
-    
-    {/* モバイル用フルスクリーンコンポーザー */}
-    {isMobile && (
-      <MobilePostComposer
-        isOpen={showMobileComposer}
-        onClose={() => setShowMobileComposer(false)}
-        replyTo={replyTo}
-        onPostSuccess={handleMobilePostSuccess}
-      />
-    )}
-  </>
+    </>
   );
 };

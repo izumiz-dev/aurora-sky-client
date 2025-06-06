@@ -16,7 +16,13 @@ interface PostItemProps {
   onReplySuccess?: () => void;
 }
 
-export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = false, onReplySuccess }: PostItemProps) => {
+export const PostItem = ({
+  post,
+  isNew = false,
+  hideReplyTo = false,
+  inModal = false,
+  onReplySuccess,
+}: PostItemProps) => {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [snackbar, setSnackbar] = useState<{ message: string } | null>(null);
   const [liked, setLiked] = useState(post.viewer?.like ?? false);
@@ -178,7 +184,12 @@ export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = f
               </div>
             </div>
             <div className="text-white text-sm sm:text-base">
-              <RichContent text={post.record.text} embed={post.embed} facets={post.record.facets} inModal={inModal} />
+              <RichContent
+                text={post.record.text}
+                embed={post.embed}
+                facets={post.record.facets}
+                inModal={inModal}
+              />
             </div>
           </div>
         </div>
@@ -193,10 +204,7 @@ export const PostItem = ({ post, isNew = false, hideReplyTo = false, inModal = f
       )}
       {snackbar && <Snackbar message={snackbar.message} onClose={() => setSnackbar(null)} />}
       {showThreadModal && (
-        <ThreadView 
-          parentPost={post} 
-          onClose={() => setShowThreadModal(false)} 
-        />
+        <ThreadView parentPost={post} onClose={() => setShowThreadModal(false)} />
       )}
       {showReplyModal && (
         <PostComposerModal

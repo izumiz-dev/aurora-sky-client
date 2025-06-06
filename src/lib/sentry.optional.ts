@@ -9,11 +9,11 @@
  */
 export function initSentry(): void {
   const dsn = import.meta.env.VITE_SENTRY_DSN;
-  
+
   if (!dsn || import.meta.env.DEV) {
     return;
   }
-  
+
   // Sentryがインストールされていない場合は何もしない
   if (import.meta.env.DEV) {
     // eslint-disable-next-line no-console
@@ -28,7 +28,7 @@ export function captureError(error: Error, context?: Record<string, unknown>): v
   if (!import.meta.env.VITE_SENTRY_DSN) {
     return;
   }
-  
+
   // 開発環境ではコンソールに出力
   if (import.meta.env.DEV) {
     console.error('Sentry captureError:', error, context);
@@ -38,11 +38,14 @@ export function captureError(error: Error, context?: Record<string, unknown>): v
 /**
  * カスタムメッセージを送信
  */
-export function captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info'): void {
+export function captureMessage(
+  message: string,
+  level: 'info' | 'warning' | 'error' = 'info'
+): void {
   if (!import.meta.env.VITE_SENTRY_DSN) {
     return;
   }
-  
+
   // 開発環境ではコンソールに出力
   if (import.meta.env.DEV) {
     // eslint-disable-next-line no-console

@@ -27,11 +27,11 @@ export const fetchTimeline = async (
 
   // フォローしているユーザーのリストを取得（キャッシュを活用）
   let followingDids: Set<string>;
-  
+
   const cachedFollowing = followingCache.get(session.did);
   const now = Date.now();
-  
-  if (cachedFollowing && (now - cachedFollowing.timestamp) < CACHE_DURATION) {
+
+  if (cachedFollowing && now - cachedFollowing.timestamp < CACHE_DURATION) {
     // キャッシュが有効な場合は使用
     followingDids = cachedFollowing.dids;
   } else {
@@ -40,29 +40,29 @@ export const fetchTimeline = async (
     followingDids.add(session.did); // 自分自身も含める
 
     try {
-      const followsResponse = await agent.getFollows({ 
-        actor: session.did, 
-        limit: 100 
+      const followsResponse = await agent.getFollows({
+        actor: session.did,
+        limit: 100,
       });
-      
+
       // ページネーションを使って全フォローを取得
       let followsCursor = followsResponse.data.cursor;
-      followsResponse.data.follows.forEach(follow => followingDids.add(follow.did));
-      
+      followsResponse.data.follows.forEach((follow) => followingDids.add(follow.did));
+
       while (followsCursor) {
-        const moreFollows = await agent.getFollows({ 
-          actor: session.did, 
+        const moreFollows = await agent.getFollows({
+          actor: session.did,
           cursor: followsCursor,
-          limit: 100 
+          limit: 100,
         });
-        moreFollows.data.follows.forEach(follow => followingDids.add(follow.did));
+        moreFollows.data.follows.forEach((follow) => followingDids.add(follow.did));
         followsCursor = moreFollows.data.cursor;
       }
-      
+
       // キャッシュに保存
       followingCache.set(session.did, {
         dids: followingDids,
-        timestamp: now
+        timestamp: now,
       });
     } catch (error) {
       console.error('Failed to fetch following list:', error);
@@ -85,11 +85,10 @@ const processTimeline = (
       feed: AppBskyFeedDefs.FeedViewPost[];
       cursor?: string;
     };
-  }, 
+  },
   _session: SessionData,
   followingDids?: Set<string>
 ): { feed: Post[]; cursor?: string } => {
-
   interface PostRecord {
     text?: string;
     createdAt?: string;
@@ -106,30 +105,35 @@ const processTimeline = (
   const filteredFeed = response.data.feed.filter((item: FeedItem) => {
     const post = item.post as AppBskyFeedDefs.PostView;
     const record = post.record as PostRecord;
-    
+
     // フィルタリングが無効な場合は全て表示
     if (!followingDids) {
       return true;
     }
-    
+
     // 返信ではない通常のポストは表示
     if (!record.reply) {
       return true;
     }
-    
+
     // 返信の場合、返信先を確認
-    if (item.reply && item.reply.parent && 'author' in item.reply.parent && item.reply.parent.author) {
+    if (
+      item.reply &&
+      item.reply.parent &&
+      'author' in item.reply.parent &&
+      item.reply.parent.author
+    ) {
       const parentAuthorDid = item.reply.parent.author.did;
-      
+
       // 返信先がフォローしているユーザー（または自分）の場合は表示
       if (followingDids.has(parentAuthorDid)) {
         return true;
       }
-      
+
       // 返信先がフォローしていないユーザーの場合は非表示
       return false;
     }
-    
+
     // その他の場合は表示（安全側に倒す）
     return true;
   });

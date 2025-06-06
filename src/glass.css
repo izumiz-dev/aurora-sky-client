@@ -90,7 +90,7 @@ body {
       );
   /* animation: aurora 360s ease-in-out infinite; */
   /* パフォーマンス向上のため、アニメーションを無効化 */
-  transform: translate(-25px, -40px) scale(1.05) rotate(5deg);  /* 静的な位置に固定 */
+  transform: translate(-25px, -40px) scale(1.05) rotate(5deg); /* 静的な位置に固定 */
   pointer-events: none;
   z-index: 0;
   filter: blur(40px);
@@ -220,14 +220,14 @@ body {
 
 /* モバイルでの入力欄の高さを確実に上書き */
 @media (max-width: 640px) {
-  input[type="text"].glass-input,
-  input[type="password"].glass-input,
-  input[type="email"].glass-input {
-    padding: 0.4375rem 0.75rem !important;  /* 上下7px、左右12px */
+  input[type='text'].glass-input,
+  input[type='password'].glass-input,
+  input[type='email'].glass-input {
+    padding: 0.4375rem 0.75rem !important; /* 上下7px、左右12px */
     min-height: unset !important;
-    height: 2.125rem !important;  /* 34px - フォントサイズ14pxに適切な高さ */
+    height: 2.125rem !important; /* 34px - フォントサイズ14pxに適切な高さ */
     line-height: 1.25 !important;
-    font-size: 0.875rem !important;  /* 14px */
+    font-size: 0.875rem !important; /* 14px */
     /* @tailwindcss/formsのスタイルをリセット */
     appearance: none !important;
     -webkit-appearance: none !important;
@@ -235,7 +235,7 @@ body {
     background-image: none !important;
     box-sizing: border-box !important;
   }
-  
+
   /* placeholderのフォントサイズも統一 */
   input.glass-input::placeholder {
     font-size: 0.875rem !important;
@@ -244,16 +244,16 @@ body {
 
 /* 小型モバイル用 */
 @media (max-width: 400px) {
-  input[type="text"].glass-input,
-  input[type="password"].glass-input,
-  input[type="email"].glass-input {
-    padding: 0.375rem 0.625rem !important;  /* 上下6px、左右10px */
+  input[type='text'].glass-input,
+  input[type='password'].glass-input,
+  input[type='email'].glass-input {
+    padding: 0.375rem 0.625rem !important; /* 上下6px、左右10px */
     min-height: unset !important;
-    height: 1.875rem !important;  /* 30px - フォントサイズ13pxに適切 */
+    height: 1.875rem !important; /* 30px - フォントサイズ13pxに適切 */
     line-height: 1.2 !important;
-    font-size: 0.8125rem !important;  /* 13px */
+    font-size: 0.8125rem !important; /* 13px */
   }
-  
+
   /* placeholderのフォントサイズも統一 */
   input.glass-input::placeholder {
     font-size: 0.8125rem !important;
@@ -273,18 +273,18 @@ body {
 
 /* フォーカス時の高さが変わらないように */
 @media (max-width: 640px) {
-  input[type="text"].glass-input:focus,
-  input[type="password"].glass-input:focus,
-  input[type="email"].glass-input:focus {
-    height: 2.125rem !important;  /* 34px - フォーカス時も同じ高さ */
+  input[type='text'].glass-input:focus,
+  input[type='password'].glass-input:focus,
+  input[type='email'].glass-input:focus {
+    height: 2.125rem !important; /* 34px - フォーカス時も同じ高さ */
   }
 }
 
 @media (max-width: 400px) {
-  input[type="text"].glass-input:focus,
-  input[type="password"].glass-input:focus,
-  input[type="email"].glass-input:focus {
-    height: 1.875rem !important;  /* 30px - フォーカス時も同じ高さ */
+  input[type='text'].glass-input:focus,
+  input[type='password'].glass-input:focus,
+  input[type='email'].glass-input:focus {
+    height: 1.875rem !important; /* 30px - フォーカス時も同じ高さ */
   }
 }
 
@@ -807,7 +807,7 @@ button {
   .animated-gradient {
     animation: none !important;
   }
-  
+
   .like-animation,
   .repost-animation,
   .ambient-fade-in,
@@ -815,7 +815,7 @@ button {
   .shimmer-text::after {
     animation: none !important;
   }
-  
+
   * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

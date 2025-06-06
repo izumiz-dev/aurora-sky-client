@@ -3,28 +3,19 @@
 
 /* Aurora gradient background - 実際のオーロラの色に基づく */
 .aurora-gradient-bg {
-  background: linear-gradient(112deg,
-      rgba(23, 35, 71, 0.5) 0%,
-      /* 深夜の空 */
-      rgba(2, 83, 133, 0.5) 12%,
-      /* ミッドナイトブルー */
-      rgba(25, 100, 106, 0.5) 24%,
-      /* ブルーサファイア（青色オーロラ） */
-      rgba(3, 130, 152, 0.5) 36%,
-      /* メタリックシーウィード */
-      rgba(14, 243, 197, 0.5) 48%,
-      /* シーグリーン（緑色オーロラ - 最も一般的） */
-      rgba(4, 226, 183, 0.5) 60%,
-      /* ロビンエッグブルー */
-      rgba(0, 207, 82, 0.5) 72%,
-      /* マラカイト */
-      rgba(136, 240, 241, 0.5) 84%,
-      /* 淡い青緑 */
-      rgba(244, 114, 182, 0.5) 92%,
-      /* 淡いピンク（低高度窒素） */
-      rgba(99, 0, 25, 0.5) 100%
-      /* 深い赤（高高度酸素） */
-    ) !important;
+  background: linear-gradient(
+    112deg,
+    rgba(23, 35, 71, 0.5) 0%,
+    /* 深夜の空 */ rgba(2, 83, 133, 0.5) 12%,
+    /* ミッドナイトブルー */ rgba(25, 100, 106, 0.5) 24%,
+    /* ブルーサファイア（青色オーロラ） */ rgba(3, 130, 152, 0.5) 36%,
+    /* メタリックシーウィード */ rgba(14, 243, 197, 0.5) 48%,
+    /* シーグリーン（緑色オーロラ - 最も一般的） */ rgba(4, 226, 183, 0.5) 60%,
+    /* ロビンエッグブルー */ rgba(0, 207, 82, 0.5) 72%,
+    /* マラカイト */ rgba(136, 240, 241, 0.5) 84%,
+    /* 淡い青緑 */ rgba(244, 114, 182, 0.5) 92%,
+    /* 淡いピンク（低高度窒素） */ rgba(99, 0, 25, 0.5) 100% /* 深い赤（高高度酸素） */
+  ) !important;
   background-size: 300% 300%;
   animation: aurora-dance 20s ease-in-out infinite;
   position: relative;
@@ -41,18 +32,19 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.1) 45%,
-      rgba(255, 255, 255, 0.2) 50%,
-      rgba(255, 255, 255, 0.1) 55%,
-      transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 55%,
+    transparent 100%
+  );
   animation: aurora-shimmer 8s ease-in-out infinite;
   pointer-events: none;
 }
 
 @keyframes aurora-dance {
-
   0%,
   100% {
     background-position: 0% 0%;
@@ -161,7 +153,6 @@
 }
 
 @layer components {
-
   /* Avatar Component */
   .avatar {
     position: relative;
@@ -196,8 +187,6 @@
     width: 5rem;
     height: 5rem;
   }
-
-
 
   /* Input Fields */
   .input {
@@ -296,13 +285,14 @@
     color: #ef4444;
   }
 
-
   /* Aurora gradient lite - snackbar用の簡易版 */
   .aurora-gradient-lite {
-    background: linear-gradient(135deg,
-        rgba(23, 35, 71, 0.7) 0%,
-        rgba(14, 243, 197, 0.6) 50%,
-        rgba(244, 114, 182, 0.6) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(23, 35, 71, 0.7) 0%,
+      rgba(14, 243, 197, 0.6) 50%,
+      rgba(244, 114, 182, 0.6) 100%
+    );
     background-size: 200% 200%;
     animation: aurora-flow-lite 10s ease-in-out infinite;
     backdrop-filter: blur(12px);
@@ -312,7 +302,6 @@
   }
 
   @keyframes aurora-flow-lite {
-
     0%,
     100% {
       background-position: 0% 50%;

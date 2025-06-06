@@ -5,7 +5,10 @@ interface AuroraLoaderProps {
   onMinDurationReached?: () => void;
 }
 
-export const AuroraLoader = ({ minDuration = 500, onMinDurationReached }: AuroraLoaderProps = {}) => {
+export const AuroraLoader = ({
+  minDuration = 500,
+  onMinDurationReached,
+}: AuroraLoaderProps = {}) => {
   const [hasMetMinDuration, setHasMetMinDuration] = useState(false);
 
   useEffect(() => {
@@ -24,10 +27,10 @@ export const AuroraLoader = ({ minDuration = 500, onMinDurationReached }: Aurora
       <div className="aurora-loader-container" data-min-duration-met={hasMetMinDuration}>
         {/* 背景の光の脈動 */}
         <div className="aurora-glow"></div>
-        
+
         {/* 縦の流れ */}
         <div className="aurora-vertical-wave"></div>
-        
+
         {/* メインのオーロラカーテン */}
         <div className="aurora-curtain">
           <div className="curtain-layer layer-1"></div>
@@ -36,7 +39,7 @@ export const AuroraLoader = ({ minDuration = 500, onMinDurationReached }: Aurora
           <div className="curtain-layer layer-4"></div>
           <div className="curtain-layer layer-5"></div>
         </div>
-        
+
         {/* きらめき効果 */}
         <div className="aurora-shimmer"></div>
       </div>

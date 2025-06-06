@@ -47,7 +47,7 @@ export async function resizeImageToUnder1MB(file: File): Promise<File> {
         while (quality > 0.1) {
           canvas.width = targetWidth;
           canvas.height = targetHeight;
-          
+
           // 画像を描画
           ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 

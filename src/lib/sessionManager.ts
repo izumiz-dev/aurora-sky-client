@@ -17,32 +17,32 @@ export class SessionManager {
   static async saveSession(sessionData: SessionData, persist: boolean = true): Promise<void> {
     try {
       console.log('[SessionManager] Saving session, persist:', persist);
-      console.log('[SessionManager] Session data:', { 
-        did: sessionData.did, 
+      console.log('[SessionManager] Session data:', {
+        did: sessionData.did,
         handle: sessionData.handle,
-        active: sessionData.active 
+        active: sessionData.active,
       });
-      
+
       // Web Crypto APIが利用可能かチェック
       if (!crypto || !crypto.subtle) {
         console.warn('[SessionManager] Web Crypto API not available, using fallback storage');
         FallbackSessionStorage.save(sessionData, persist);
         return;
       }
-      
+
       // セッションデータを暗号化
       const encrypted = await SessionCrypto.encrypt(JSON.stringify(sessionData));
-      
+
       // 有効期限を設定
       const expiry = Date.now() + this.SESSION_DURATION;
-      
+
       if (persist) {
         // localStorageを優先的に使用（ブラウザを閉じても保持される）
         localStorage.setItem(this.SESSION_KEY, encrypted);
         localStorage.setItem(this.SESSION_EXPIRY_KEY, expiry.toString());
         console.log('[SessionManager] Saved encrypted session to localStorage');
       }
-      
+
       // sessionStorageにも保存（現在のタブでの高速アクセス用）
       sessionStorage.setItem(this.SESSION_KEY, encrypted);
       sessionStorage.setItem(this.SESSION_EXPIRY_KEY, expiry.toString());
@@ -66,7 +66,7 @@ export class SessionManager {
     try {
       console.log('[SessionManager] Getting session...');
       console.log('[SessionManager] Crypto available:', !!crypto?.subtle);
-      
+
       // Web Crypto APIが利用できない場合はフォールバックを使用
       if (!crypto || !crypto.subtle) {
         console.warn('[SessionManager] Web Crypto API not available, using fallback storage');
@@ -74,28 +74,28 @@ export class SessionManager {
         console.log('[SessionManager] Fallback session:', fallbackSession ? 'Found' : 'Not found');
         return fallbackSession;
       }
-      
+
       // まずsessionStorageから取得を試みる（高速アクセス）
       let encrypted = sessionStorage.getItem(this.SESSION_KEY);
       let expiry = sessionStorage.getItem(this.SESSION_EXPIRY_KEY);
       console.log('[SessionManager] SessionStorage encrypted:', encrypted ? 'Found' : 'Not found');
-      
+
       // sessionStorageにない場合はlocalStorageから取得
       if (!encrypted) {
         encrypted = localStorage.getItem(this.SESSION_KEY);
         expiry = localStorage.getItem(this.SESSION_EXPIRY_KEY);
         console.log('[SessionManager] LocalStorage encrypted:', encrypted ? 'Found' : 'Not found');
-        
+
         // localStorageから取得できた場合、sessionStorageにもコピー
         if (encrypted && expiry) {
           sessionStorage.setItem(this.SESSION_KEY, encrypted);
           sessionStorage.setItem(this.SESSION_EXPIRY_KEY, expiry);
         }
       }
-      
+
       if (!encrypted || !expiry) {
         console.log('[SessionManager] No encrypted session found, checking fallback...');
-        
+
         // 旧形式のセッションをチェック（マイグレーション用）
         const oldSession = localStorage.getItem('bsky-session');
         console.log('[SessionManager] Old format session:', oldSession ? 'Found' : 'Not found');
@@ -111,25 +111,28 @@ export class SessionManager {
             console.error('Failed to migrate old session:', e);
           }
         }
-        
+
         // フォールバックストレージもチェック
         const fallbackSession = FallbackSessionStorage.get();
-        console.log('[SessionManager] Fallback storage check:', fallbackSession ? 'Found' : 'Not found');
+        console.log(
+          '[SessionManager] Fallback storage check:',
+          fallbackSession ? 'Found' : 'Not found'
+        );
         if (fallbackSession) {
           return fallbackSession;
         }
-        
+
         console.log('[SessionManager] No session found anywhere');
         return null;
       }
-      
+
       // 有効期限をチェック
       if (Date.now() > parseInt(expiry, 10)) {
         console.warn('Session expired');
         this.clearSession();
         return null;
       }
-      
+
       // 復号化
       const decrypted = await SessionCrypto.decrypt(encrypted);
       return JSON.parse(decrypted);
@@ -139,15 +142,18 @@ export class SessionManager {
       if (error instanceof Error) {
         console.error('Error details:', error.message);
       }
-      
+
       // 暗号化エラーの場合はフォールバックを試す
-      if (error instanceof Error && (error.message.includes('Failed to decrypt') || error.message.includes('Web Crypto API'))) {
+      if (
+        error instanceof Error &&
+        (error.message.includes('Failed to decrypt') || error.message.includes('Web Crypto API'))
+      ) {
         console.warn('Trying fallback storage due to crypto error');
         const fallbackSession = FallbackSessionStorage.get();
         if (fallbackSession) {
           return fallbackSession;
         }
-        
+
         // 暗号化キーが変更された可能性があるため、セッションをクリア
         this.clearSession();
       }
@@ -163,7 +169,7 @@ export class SessionManager {
     sessionStorage.removeItem(this.SESSION_EXPIRY_KEY);
     localStorage.removeItem(this.SESSION_KEY);
     localStorage.removeItem(this.SESSION_EXPIRY_KEY);
-    
+
     // フォールバックストレージもクリア
     FallbackSessionStorage.clear();
   }
@@ -176,14 +182,13 @@ export class SessionManager {
       // サーバー側でセッションを無効化
       const { BskyAgent } = await import('@atproto/api');
       const agent = new BskyAgent({ service: 'https://bsky.social' });
-      
+
       // セッションを復元してからログアウト
       await agent.resumeSession(session);
-      
+
       // サーバー側でセッションを削除（API v2では利用可能）
       // 現在のAPIでは明示的なログアウトエンドポイントがないため、
       // クライアント側でのクリアのみ行う
-      
     } catch (error) {
       console.error('Failed to invalidate session on server:', error);
     } finally {

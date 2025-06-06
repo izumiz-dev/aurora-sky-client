@@ -9,33 +9,32 @@ interface UseThreadPreloaderOptions {
   priority?: 'high' | 'low';
 }
 
-export const useThreadPreloader = ({ 
-  posts, 
+export const useThreadPreloader = ({
+  posts,
   enabled = true,
-  priority = 'low' 
+  priority = 'low',
 }: UseThreadPreloaderOptions) => {
   const queryClient = useQueryClient();
-  
+
   useEffect(() => {
     if (!enabled) return;
-    
+
     // スレッドを持つ投稿をフィルタリング
-    const postsWithReplies = posts.filter(post => 
-      (post.replyCount && post.replyCount > 0) || 
-      post.reply?.parent
+    const postsWithReplies = posts.filter(
+      (post) => (post.replyCount && post.replyCount > 0) || post.reply?.parent
     );
-    
+
     // プリロードを実行（バッチ処理）
     const preloadThreads = async () => {
       const batchSize = priority === 'high' ? 5 : 3;
       const delay = priority === 'high' ? 100 : 300;
-      
+
       for (let i = 0; i < postsWithReplies.length; i += batchSize) {
         const batch = postsWithReplies.slice(i, i + batchSize);
-        
+
         // バッチ内の各投稿のスレッドをプリフェッチ
         await Promise.all(
-          batch.map(post => 
+          batch.map((post) =>
             queryClient.prefetchQuery({
               queryKey: ['thread', post.uri],
               queryFn: () => getPostThread({ uri: post.uri }),
@@ -43,16 +42,16 @@ export const useThreadPreloader = ({
             })
           )
         );
-        
+
         // 次のバッチまで待機
         if (i + batchSize < postsWithReplies.length) {
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
     };
-    
+
     // 非同期でプリロードを開始
-    preloadThreads().catch(error => {
+    preloadThreads().catch((error) => {
       console.warn('Thread preloading failed:', error);
     });
   }, [posts, enabled, priority, queryClient]);

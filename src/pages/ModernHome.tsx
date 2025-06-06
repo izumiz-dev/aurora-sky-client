@@ -26,7 +26,7 @@ export const ModernHomePage = () => {
     handleCloseSnackbar,
     refreshTimeline,
   } = useTimeline(session, isAuthenticated);
-  
+
   // Apply deduplication logic
   const deduplicatedPosts = useDeduplicatedTimeline(posts);
   const threadGroups = useSelfThreads(deduplicatedPosts);
@@ -77,23 +77,23 @@ export const ModernHomePage = () => {
             <p className="text-white/70">フォローしているユーザーの投稿がここに表示されます</p>
           </div>
         ) : (
-          threadGroups.map((group) => (
+          threadGroups.map((group) =>
             group.type === 'thread' ? (
-              <SelfThreadItem 
-                key={group.id} 
-                posts={group.posts} 
-                isNew={group.posts.some(p => newPostIds.has(p.uri))}
+              <SelfThreadItem
+                key={group.id}
+                posts={group.posts}
+                isNew={group.posts.some((p) => newPostIds.has(p.uri))}
                 onReplySuccess={refreshTimeline}
               />
             ) : (
-              <TimelineThread 
-                key={group.posts[0].uri} 
-                post={group.posts[0]} 
-                isNew={newPostIds.has(group.posts[0].uri)} 
+              <TimelineThread
+                key={group.posts[0].uri}
+                post={group.posts[0]}
+                isNew={newPostIds.has(group.posts[0].uri)}
                 onReplySuccess={refreshTimeline}
               />
             )
-          ))
+          )
         )}
       </div>
 

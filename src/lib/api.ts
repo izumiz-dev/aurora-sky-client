@@ -30,7 +30,7 @@ export const agent = new BskyAgent({
 // User-Agentヘッダーを設定
 if (agent.xrpc) {
   const originalCall = agent.xrpc.call.bind(agent.xrpc);
-  agent.xrpc.call = async function(
+  agent.xrpc.call = async function (
     nsid: string,
     params?: Record<string, unknown>,
     data?: unknown,
@@ -51,10 +51,10 @@ export const getAgent = async () => {
     try {
       // トークンの有効期限をチェックして必要なら更新
       const needsRefresh = checkTokenNeedsRefresh(session.accessJwt);
-      
+
       if (needsRefresh) {
         const did = session.did;
-        
+
         // 既にリフレッシュ中の場合は待機
         if (refreshMutex.has(did)) {
           await refreshMutex.get(did);
@@ -63,7 +63,7 @@ export const getAgent = async () => {
           // トークンをリフレッシュ
           const refreshPromise = refreshToken(session);
           refreshMutex.set(did, refreshPromise);
-          
+
           try {
             session = await refreshPromise;
           } finally {
@@ -71,7 +71,7 @@ export const getAgent = async () => {
           }
         }
       }
-      
+
       const sessionWithDefaults = {
         ...session!,
         active: session!.active ?? true,
@@ -98,18 +98,18 @@ function checkTokenNeedsRefresh(token: string): boolean {
     // JWTのペイロードをデコード（簡易版）
     const parts = token.split('.');
     if (parts.length !== 3) return true;
-    
+
     const payload = JSON.parse(atob(parts[1]));
     const exp = payload.exp;
-    
+
     if (!exp) return true;
-    
+
     // 有効期限の5分前にリフレッシュ
     const expiresAt = exp * 1000;
     const now = Date.now();
     const fiveMinutes = 5 * 60 * 1000;
-    
-    return (expiresAt - now) < fiveMinutes;
+
+    return expiresAt - now < fiveMinutes;
   } catch (error) {
     console.error('Failed to parse JWT:', error);
     return true; // エラーの場合は安全のため更新
@@ -121,40 +121,42 @@ async function refreshToken(session: SessionData): Promise<SessionData> {
   try {
     // リフレッシュトークンを使用して新しいアクセストークンを取得
     const tempAgent = new BskyAgent({ service: 'https://bsky.social' });
-    
+
     // refreshSessionを呼び出し
     await tempAgent.resumeSession(session);
     const response = await tempAgent.com.atproto.server.refreshSession();
-    
+
     if (response.success) {
       const newSession: SessionData = {
         ...session,
         accessJwt: response.data.accessJwt,
         refreshJwt: response.data.refreshJwt,
       };
-      
+
       // 新しいセッションを保存
       await SessionManager.saveSession(newSession);
       return newSession;
     }
-    
+
     throw new Error('Token refresh failed');
   } catch (error) {
     console.error('Failed to refresh token:', error);
-    
+
     // リフレッシュトークンが無効な場合はセッションをクリア
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const errorStatus = (error as any)?.status;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const errorMessage = (error as any)?.message;
-    if (errorStatus === 400 || 
-        errorStatus === 401 || 
-        errorMessage?.includes('Invalid refresh token') ||
-        errorMessage?.includes('Token expired')) {
+    if (
+      errorStatus === 400 ||
+      errorStatus === 401 ||
+      errorMessage?.includes('Invalid refresh token') ||
+      errorMessage?.includes('Token expired')
+    ) {
       await SessionManager.clearSession();
       window.location.href = '/login';
     }
-    
+
     throw error;
   }
 }
@@ -165,26 +167,28 @@ const wrapApiCall = async <T>(apiCall: () => Promise<T>): Promise<T> => {
     return await apiCall();
   } catch (error) {
     const parsedError = parseApiError(error);
-    
+
     // 401エラー（認証エラー）の場合はセッションをクリアしてログイン画面へ
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const errorStatus = (error as any)?.status;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const errorMessage = (error as any)?.message;
-    if (parsedError.statusCode === 401 || 
-        errorStatus === 401 || 
-        errorMessage?.toLowerCase().includes('unauthorized') ||
-        errorMessage?.toLowerCase().includes('invalid token')) {
+    if (
+      parsedError.statusCode === 401 ||
+      errorStatus === 401 ||
+      errorMessage?.toLowerCase().includes('unauthorized') ||
+      errorMessage?.toLowerCase().includes('invalid token')
+    ) {
       await SessionManager.clearSession();
       // ログインページへリダイレクト
       window.location.href = '/login';
       throw new Error('セッションの有効期限が切れました。再度ログインしてください。');
     }
-    
+
     // エラーに追加情報を含めて再スロー
     const enrichedError = Object.assign(new Error(parsedError.message), {
       ...parsedError,
-      originalError: error
+      originalError: error,
     });
     throw enrichedError;
   }
@@ -200,16 +204,20 @@ export const fetchTimeline = async (params: { limit?: number; cursor?: string } 
   });
 };
 
-export const createPost = async (text: string, langs?: string[], reply?: { root: { uri: string; cid: string }; parent: { uri: string; cid: string } }) => {
+export const createPost = async (
+  text: string,
+  langs?: string[],
+  reply?: { root: { uri: string; cid: string }; parent: { uri: string; cid: string } }
+) => {
   const agent = await getAgent();
-  
+
   // RichTextを使って自動的にリンクとメンションを検出
   const richText = new RichText({
     text: text,
   });
-  
+
   await richText.detectFacets(agent);
-  
+
   return agent.post({
     text: richText.text,
     facets: richText.facets,
@@ -283,7 +291,7 @@ export const createPostWithImages = async (
   const richText = new RichText({
     text: text,
   });
-  
+
   await richText.detectFacets(agent);
 
   const embed = {

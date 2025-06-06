@@ -10,10 +10,8 @@ export class Logger {
     WARN: 2,
     ERROR: 3,
   };
-  
-  private static currentLevel = this.isDevelopment 
-    ? this.logLevels.DEBUG 
-    : this.logLevels.ERROR;
+
+  private static currentLevel = this.isDevelopment ? this.logLevels.DEBUG : this.logLevels.ERROR;
 
   /**
    * デバッグログ
@@ -49,7 +47,7 @@ export class Logger {
     if (this.currentLevel <= this.logLevels.ERROR) {
       const timestamp = new Date().toISOString();
       const errorData = this.extractErrorData(error);
-      
+
       if (this.isDevelopment) {
         // 開発環境では詳細なエラー情報を表示
         console.error(`[${timestamp}] ERROR: ${message}`, error);
@@ -81,7 +79,7 @@ export class Logger {
     stack?: string;
   } {
     if (!error) return {};
-    
+
     if (error instanceof Error) {
       const anyError = error as any;
       return {
@@ -92,7 +90,7 @@ export class Logger {
         retryAfter: anyError.retryAfter,
       };
     }
-    
+
     return {};
   }
 
@@ -102,7 +100,7 @@ export class Logger {
   static security(message: string, data?: unknown): void {
     // セキュリティログは常に記録
     const logMessage = `[SECURITY] ${message}`;
-    
+
     if (this.isDevelopment) {
       console.warn(logMessage, data);
     } else {
@@ -165,21 +163,24 @@ export class Logger {
       }
       return;
     }
-    
+
     // Sentryが利用できない場合の代替実装
     if (!this.isDevelopment && import.meta.env.VITE_SECURITY_MONITORING_URL) {
       const errorData = {
         message,
-        error: error instanceof Error ? {
-          name: error.name,
-          message: error.message,
-          stack: error.stack,
-        } : String(error),
+        error:
+          error instanceof Error
+            ? {
+                name: error.name,
+                message: error.message,
+                stack: error.stack,
+              }
+            : String(error),
         url: window.location.href,
         userAgent: navigator.userAgent,
         timestamp: new Date().toISOString(),
       };
-      
+
       // カスタムエラーレポートAPIへの送信
       fetch(import.meta.env.VITE_SECURITY_MONITORING_URL + '/errors', {
         method: 'POST',
@@ -199,14 +200,17 @@ export class Logger {
     if (!this.isDevelopment && import.meta.env.VITE_SECURITY_MONITORING_URL) {
       const securityEvent = {
         message,
-        data: data instanceof Error ? {
-          name: data.name,
-          message: data.message,
-        } : data,
+        data:
+          data instanceof Error
+            ? {
+                name: data.name,
+                message: data.message,
+              }
+            : data,
         url: window.location.href,
         timestamp: new Date().toISOString(),
       };
-      
+
       // セキュリティイベントAPIへの送信
       fetch(import.meta.env.VITE_SECURITY_MONITORING_URL + '/security-events', {
         method: 'POST',
@@ -227,15 +231,15 @@ export class Logger {
    */
   private static incrementRateLimitCounter(): void {
     const now = Date.now();
-    
+
     // リセット時間を過ぎたらカウンターをリセット
     if (now > this.rateLimitResetTime) {
       this.rateLimitCount = 0;
       this.rateLimitResetTime = now + 3600000;
     }
-    
+
     this.rateLimitCount++;
-    
+
     // 10回以上レート制限に達した場合は警告
     if (this.rateLimitCount >= 10) {
       this.warn(`Rate limit hit ${this.rateLimitCount} times in the last hour`);
@@ -248,7 +252,7 @@ export class Logger {
   static getErrorStats() {
     return {
       rateLimitCount: this.rateLimitCount,
-      rateLimitResetTime: new Date(this.rateLimitResetTime).toISOString()
+      rateLimitResetTime: new Date(this.rateLimitResetTime).toISOString(),
     };
   }
 
@@ -262,7 +266,7 @@ export class Logger {
       endpoint,
       params,
       response: response ? { status: response.status, data: response.data } : undefined,
-      error: error ? this.extractErrorData(error) : undefined
+      error: error ? this.extractErrorData(error) : undefined,
     };
 
     if (this.isDevelopment) {

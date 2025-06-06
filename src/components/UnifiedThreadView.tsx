@@ -23,21 +23,21 @@ interface ThreadNodeProps {
   previousPost?: ThreadViewPost | null;
 }
 
-const ThreadNode = ({ 
-  node, 
-  currentDepth, 
-  maxDepth, 
+const ThreadNode = ({
+  node,
+  currentDepth,
+  maxDepth,
   showConnectors,
   isMainPost,
-  previousPost
+  previousPost,
 }: ThreadNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasReplies = node.replies && node.replies.length > 0;
   const isAtMaxDepth = currentDepth >= maxDepth;
-  
+
   // 直接の返信かどうかをチェック
-  const isDirectReply = previousPost && 
-    node.post.record?.reply?.parent?.uri === previousPost.post.uri;
+  const isDirectReply =
+    previousPost && node.post.record?.reply?.parent?.uri === previousPost.post.uri;
 
   return (
     <div className="relative">
@@ -45,21 +45,17 @@ const ThreadNode = ({
       {showConnectors && !isMainPost && (
         <div className="absolute left-8 -top-4 h-4 w-0.5 bg-gradient-to-b from-white/20 to-white/30" />
       )}
-      
+
       {/* 下への接続線（返信がある場合） */}
       {showConnectors && hasReplies && isExpanded && (
         <div className="absolute left-8 top-[60px] bottom-0 w-0.5 bg-gradient-to-b from-white/30 to-white/10" />
       )}
-      
+
       {/* 投稿本体 */}
       <div className={isMainPost ? '' : 'mt-4'}>
-        <PostItem 
-          post={node.post}
-          hideReplyTo={isDirectReply || false}
-          isNew={false}
-        />
+        <PostItem post={node.post} hideReplyTo={isDirectReply || false} isNew={false} />
       </div>
-      
+
       {/* 返信の展開/折りたたみボタン */}
       {hasReplies && !isAtMaxDepth && (
         <div className="mt-2 ml-16">
@@ -81,16 +77,11 @@ const ThreadNode = ({
                 d="M19 9l-7 7-7-7"
               />
             </svg>
-            <span>
-              {isExpanded 
-                ? '返信を隠す' 
-                : `返信を表示 (${node.replies!.length}件)`
-              }
-            </span>
+            <span>{isExpanded ? '返信を隠す' : `返信を表示 (${node.replies!.length}件)`}</span>
           </button>
         </div>
       )}
-      
+
       {/* 返信の表示 */}
       {hasReplies && isExpanded && !isAtMaxDepth && (
         <div className="space-y-0">
@@ -107,7 +98,7 @@ const ThreadNode = ({
           ))}
         </div>
       )}
-      
+
       {/* 深さ制限に達した場合のメッセージ */}
       {hasReplies && isAtMaxDepth && (
         <div className="mt-2 ml-16 text-sm text-white/50">
@@ -118,33 +109,30 @@ const ThreadNode = ({
   );
 };
 
-export const UnifiedThreadView = ({ 
-  post, 
-  isNew = false, 
+export const UnifiedThreadView = ({
+  post,
+  isNew = false,
   mode = 'inline',
   onClose,
   showConnectors = true,
-  depth = 3
+  depth = 3,
 }: UnifiedThreadViewProps) => {
   const [isThreadVisible, setIsThreadVisible] = useState(mode === 'expanded');
-  
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['thread', post.uri],
     queryFn: () => getPostThread({ uri: post.uri, depth }),
     enabled: isThreadVisible || mode === 'modal',
   });
-  
+
   const hasReplies = (post.replyCount ?? 0) > 0;
   const isReply = !!post.reply?.parent || !!post.record?.reply;
   const showThreadButton = (hasReplies || isReply) && mode === 'inline';
-  
+
   if (mode === 'modal') {
     return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50">
-        <div
-          className="absolute inset-0"
-          onClick={onClose}
-        />
+        <div className="absolute inset-0" onClick={onClose} />
         <div className="relative z-10 max-w-4xl mx-auto h-full overflow-y-auto">
           <div className="sticky top-0 bg-black/80 backdrop-blur-md p-4 border-b border-white/10">
             <div className="flex items-center justify-between">
@@ -169,23 +157,17 @@ export const UnifiedThreadView = ({
               </button>
             </div>
           </div>
-          <div className="p-4">
-            {renderThreadContent()}
-          </div>
+          <div className="p-4">{renderThreadContent()}</div>
         </div>
       </div>
     );
   }
-  
+
   function renderThreadContent() {
     if (error) {
-      return (
-        <div className="text-red-400 text-center py-4">
-          スレッドの読み込みに失敗しました
-        </div>
-      );
+      return <div className="text-red-400 text-center py-4">スレッドの読み込みに失敗しました</div>;
     }
-    
+
     if (isLoading) {
       return (
         <div className="flex justify-center py-8">
@@ -193,11 +175,11 @@ export const UnifiedThreadView = ({
         </div>
       );
     }
-    
+
     if (!data?.data.thread || !('post' in data.data.thread)) {
       return <PostItem post={post} isNew={isNew} />;
     }
-    
+
     return (
       <ThreadNode
         node={data.data.thread}
@@ -209,12 +191,12 @@ export const UnifiedThreadView = ({
       />
     );
   }
-  
+
   return (
     <div className="relative">
       {/* メイン投稿 */}
       <PostItem post={post} isNew={isNew} />
-      
+
       {/* スレッド表示ボタン（インラインモードのみ） */}
       {showThreadButton && (
         <div className="mt-3 ml-16">
@@ -222,12 +204,7 @@ export const UnifiedThreadView = ({
             onClick={() => setIsThreadVisible(!isThreadVisible)}
             className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -240,13 +217,9 @@ export const UnifiedThreadView = ({
           </button>
         </div>
       )}
-      
+
       {/* スレッド表示 */}
-      {isThreadVisible && (
-        <div className="mt-4">
-          {renderThreadContent()}
-        </div>
-      )}
+      {isThreadVisible && <div className="mt-4">{renderThreadContent()}</div>}
     </div>
   );
 };

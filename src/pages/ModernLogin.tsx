@@ -49,7 +49,7 @@ export const ModernLoginPage = () => {
       <div className="max-w-md w-full relative">
         {/* 開発中の注意書き */}
         <DevelopmentNotice />
-        
+
         {/* ロゴセクション */}
         <div className="text-center mb-8">
           <AppIcon size="lg" withGradientBg={false} className="mb-2" />

@@ -33,16 +33,16 @@ export const LanguagePreferencesProvider = ({
   const [isLoading, setIsLoading] = useState(true);
 
   interface LanguagesPref {
-  $type: string;
-  primaryLanguages?: string[];
-  contentLanguages?: string[];
-}
+    $type: string;
+    primaryLanguages?: string[];
+    contentLanguages?: string[];
+  }
 
-interface PrefsWithPreferences {
-  preferences?: LanguagesPref[];
-}
+  interface PrefsWithPreferences {
+    preferences?: LanguagesPref[];
+  }
 
-// ローカルストレージから設定を読み込む
+  // ローカルストレージから設定を読み込む
   useEffect(() => {
     const loadFromLocalStorage = () => {
       const savedPrefs = localStorage.getItem('language-preferences');

@@ -45,7 +45,7 @@ export const RichContent = ({ text, embed, facets, inModal = false }: RichConten
     external?: unknown;
     images?: unknown[];
   };
-  
+
   const embedType = embedTyped?.$type;
 
   // Check for view formats (AT Protocol returns data in view format)
@@ -88,50 +88,61 @@ export const RichContent = ({ text, embed, facets, inModal = false }: RichConten
               <ContentRenderer
                 key={index}
                 segment={segment}
-                skipUrlPreview={!!externalData && segment.content === (externalData as {uri: string}).uri}
+                skipUrlPreview={
+                  !!externalData && segment.content === (externalData as { uri: string }).uri
+                }
               />
             ))}
       </div>
 
       {/* Handle quoted posts */}
-      {quotedRecord && 
-        typeof quotedRecord === 'object' && 
-        'uri' in quotedRecord && 
+      {quotedRecord &&
+        typeof quotedRecord === 'object' &&
+        'uri' in quotedRecord &&
         'cid' in quotedRecord && (
-          <QuotedPost record={quotedRecord as {
-            $type?: string;
-            uri: string;
-            cid: string;
-            author?: {
-              did: string;
-              handle: string;
-              displayName?: string;
-              avatar?: string;
-            };
-            value?: {
-              $type?: string;
-              text?: string;
-              createdAt?: string;
-              [key: string]: unknown;
-            };
-            record?: {
-              text?: string;
-              createdAt?: string;
-              [key: string]: unknown;
-            };
-          }} />
+          <QuotedPost
+            record={
+              quotedRecord as {
+                $type?: string;
+                uri: string;
+                cid: string;
+                author?: {
+                  did: string;
+                  handle: string;
+                  displayName?: string;
+                  avatar?: string;
+                };
+                value?: {
+                  $type?: string;
+                  text?: string;
+                  createdAt?: string;
+                  [key: string]: unknown;
+                };
+                record?: {
+                  text?: string;
+                  createdAt?: string;
+                  [key: string]: unknown;
+                };
+              }
+            }
+          />
         )}
 
       {/* Handle external embeds (link cards) */}
       {externalData && (
-        <ExternalEmbed 
-          embed={externalData as { uri: string; title: string; description: string; thumb?: string }} 
+        <ExternalEmbed
+          embed={
+            externalData as { uri: string; title: string; description: string; thumb?: string }
+          }
         />
       )}
 
       {/* Handle images */}
       {imageData && Array.isArray(imageData) && imageData.length > 0 && (
-        <ImageViewer images={imageData as Array<{fullsize: string; thumb: string; alt: string}>} inModal={inModal} />
+        <ImageViewer
+          images={imageData as Array<{ fullsize: string; thumb: string; alt: string }>}
+          inModal={inModal}
+        />
       )}
     </div>
   );
