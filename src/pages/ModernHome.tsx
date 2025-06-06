@@ -11,7 +11,7 @@ import { DevelopmentNotice } from '../components/DevelopmentNotice';
 import { AuroraLoader } from '../components/AuroraLoader';
 
 export const ModernHomePage = () => {
-  const { isAuthenticated, session } = useAuth();
+  const { isAuthenticated, session, loading: authLoading } = useAuth();
   const {
     posts,
     isLoading,
@@ -30,6 +30,15 @@ export const ModernHomePage = () => {
   // Apply deduplication logic
   const deduplicatedPosts = useDeduplicatedTimeline(posts);
   const threadGroups = useSelfThreads(deduplicatedPosts);
+
+  // Don't show the "please login" message while auth is still loading
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] fade-enter">
+        <AuroraLoader />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (

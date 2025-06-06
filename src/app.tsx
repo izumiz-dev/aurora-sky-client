@@ -14,8 +14,9 @@ import { NotFoundPage } from './pages/NotFound';
 import { AuroraLoaderShowcase } from './components/AuroraLoaderShowcase';
 
 // 認証
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguagePreferencesProvider } from './context/LanguagePreferences';
+import { AuroraLoader } from './components/AuroraLoader';
 
 // スタイル - glass.cssを最後に読み込んで優先度を上げる
 import './modern.css';
@@ -36,54 +37,72 @@ const queryClient = new QueryClient({
   },
 });
 
+// App router component that handles authentication loading state
+function AppRouter() {
+  const { loading } = useAuth();
+
+  // Show loading screen while authentication is being initialized
+  if (loading) {
+    return (
+      <div className="min-h-screen animated-bg flex items-center justify-center">
+        <AuroraLoader />
+      </div>
+    );
+  }
+
+  return (
+    <Router>
+      <Route
+        path="/login"
+        component={(props: { path?: string }) => (
+          <ModernLayout path={props.path}>
+            <ModernLoginPage />
+          </ModernLayout>
+        )}
+      />
+      <Route
+        path="/"
+        component={(props: { path?: string }) => (
+          <ModernLayout path={props.path}>
+            <ModernHomePage />
+          </ModernLayout>
+        )}
+      />
+      <Route
+        path="/settings"
+        component={(props: { path?: string }) => (
+          <ModernLayout path={props.path}>
+            <ModernSettingsPage />
+          </ModernLayout>
+        )}
+      />
+      <Route
+        path="/profile/:handle"
+        component={(props: { handle?: string; path?: string }) => (
+          <ModernLayout path={props.path}>
+            <ModernProfilePage handle={props.handle} />
+          </ModernLayout>
+        )}
+      />
+      <Route path="/showcase" component={AuroraLoaderShowcase} />
+      <Route
+        path="/:rest*"
+        component={(props: { path?: string }) => (
+          <ModernLayout path={props.path}>
+            <NotFoundPage />
+          </ModernLayout>
+        )}
+      />
+    </Router>
+  );
+}
+
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <LanguagePreferencesProvider>
-          <Router>
-            <Route
-              path="/login"
-              component={(props: { path?: string }) => (
-                <ModernLayout path={props.path}>
-                  <ModernLoginPage />
-                </ModernLayout>
-              )}
-            />
-            <Route
-              path="/"
-              component={(props: { path?: string }) => (
-                <ModernLayout path={props.path}>
-                  <ModernHomePage />
-                </ModernLayout>
-              )}
-            />
-            <Route
-              path="/settings"
-              component={(props: { path?: string }) => (
-                <ModernLayout path={props.path}>
-                  <ModernSettingsPage />
-                </ModernLayout>
-              )}
-            />
-            <Route
-              path="/profile/:handle"
-              component={(props: { handle?: string; path?: string }) => (
-                <ModernLayout path={props.path}>
-                  <ModernProfilePage handle={props.handle} />
-                </ModernLayout>
-              )}
-            />
-            <Route path="/showcase" component={AuroraLoaderShowcase} />
-            <Route
-              path="/:rest*"
-              component={(props: { path?: string }) => (
-                <ModernLayout path={props.path}>
-                  <NotFoundPage />
-                </ModernLayout>
-              )}
-            />
-          </Router>
+          <AppRouter />
           <Toaster
             position="bottom-right"
             toastOptions={{
