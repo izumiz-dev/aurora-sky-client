@@ -13,8 +13,14 @@ export const useAvatar = (
   originalUrl: string | null | undefined,
   options: UseAvatarOptions = {}
 ) => {
-  const { fallback = 'https://via.placeholder.com/48', handle } = options;
-  const [avatarUrl, setAvatarUrl] = useState<string>(originalUrl || fallback);
+  const { fallback, handle } = options;
+  const [avatarUrl, setAvatarUrl] = useState<string>(() => {
+    // 初期値の検証
+    if (!originalUrl || originalUrl === '/default-avatar.png') {
+      return ''; // フォールバックはコンポーネント側で処理
+    }
+    return originalUrl;
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -22,9 +28,20 @@ export const useAvatar = (
     let mounted = true;
 
     const loadAvatar = async () => {
-      // URLが無い場合はフォールバックを使用
-      if (!originalUrl) {
-        setAvatarUrl(fallback);
+      if (!originalUrl || originalUrl === '/default-avatar.png') {
+        setAvatarUrl('');
+        return;
+      }
+
+      // 有効なURLかチェック
+      try {
+        const url = new URL(originalUrl);
+        // httpsまたはhttpのみ許可
+        if (!['https:', 'http:'].includes(url.protocol)) {
+          throw new Error('Invalid protocol');
+        }
+      } catch {
+        setAvatarUrl('');
         return;
       }
 
@@ -40,7 +57,7 @@ export const useAvatar = (
       } catch (err) {
         if (mounted) {
           setError(err as Error);
-          setAvatarUrl(fallback);
+          setAvatarUrl('');
         }
       } finally {
         if (mounted) {
@@ -60,7 +77,7 @@ export const useAvatar = (
     avatarUrl,
     loading,
     error,
-    isPlaceholder: avatarUrl === fallback,
+    isPlaceholder: !avatarUrl || avatarUrl === fallback,
   };
 };
 

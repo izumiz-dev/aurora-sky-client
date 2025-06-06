@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { AppIcon } from '../components/AppIcon';
 import { BackgroundParticles } from '../components/BackgroundParticles';
 import { FloatingSettings } from '../components/FloatingSettings';
+import { useSessionActivity } from '../hooks/useSessionActivity';
+import { useSessionSync } from '../hooks/useSessionSync';
+import { useConditionalSessionMonitor } from '../hooks/useConditionalSessionMonitor';
 
 interface ModernLayoutProps {
   children?: preact.ComponentChildren;
@@ -20,6 +23,15 @@ export const ModernLayout: FunctionalComponent<ModernLayoutProps & RouteComponen
 }) => {
   const { isAuthenticated } = useAuth();
   const isLoginPage = path === '/login';
+
+  // アクティブユーザーのセッション延長を有効化
+  useSessionActivity();
+
+  // マルチタブ間のセッション同期を有効化
+  useSessionSync();
+
+  // セッション状態の監視（開発環境でのデバッグ用）
+  useConditionalSessionMonitor();
 
   return (
     <>

@@ -30,10 +30,33 @@ export class SessionCrypto {
         console.error(
           '[Crypto] Please set VITE_SESSION_KEY in your deployment environment variables.'
         );
+        console.error('[Crypto] Generate a secure key using: node scripts/generate-session-key.js');
+        // 本番環境では警告を表示し続ける
+        const warningElement = document.createElement('div');
+        warningElement.style.cssText =
+          'position:fixed;top:0;left:0;right:0;background:#ff0000;color:white;padding:10px;text-align:center;z-index:9999;';
+        warningElement.textContent =
+          '⚠️ セキュリティ警告: セッション暗号化キーが設定されていません';
+        document.body.appendChild(warningElement);
       } else {
         console.warn('[Crypto] Using default development key.');
       }
     }
+
+    const storedKeyHash = localStorage.getItem('aurora-sky-key-hash');
+    const currentKeyHash = await this.hashKey(keyString || 'default-dev-key-for-development-only');
+
+    if (storedKeyHash && storedKeyHash !== currentKeyHash) {
+      console.warn(
+        '[Crypto] Encryption key has changed. Existing sessions may become inaccessible.'
+      );
+      // 既存のセッションをクリアすることを検討
+      if (import.meta.env.PROD) {
+        console.error('[Crypto] Critical: Encryption key change detected in production!');
+      }
+    }
+
+    localStorage.setItem('aurora-sky-key-hash', currentKeyHash);
 
     const encoder = new TextEncoder();
     const keyData = encoder.encode(keyString || 'default-dev-key-for-development-only');
@@ -130,5 +153,16 @@ export class SessionCrypto {
       }
       throw new Error('Failed to decrypt data');
     }
+  }
+
+  /**
+   * キーのハッシュを生成（キー変更検出用）
+   */
+  private static async hashKey(key: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(key);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
   }
 }

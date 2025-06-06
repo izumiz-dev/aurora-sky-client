@@ -108,16 +108,30 @@ function checkTokenNeedsRefresh(token: string): boolean {
     const now = Date.now();
     const fiveMinutes = 5 * 60 * 1000;
 
-    return expiresAt - now < fiveMinutes;
+    const timeUntilExpiry = expiresAt - now;
+    const needsRefresh = timeUntilExpiry < fiveMinutes;
+
+    if (needsRefresh) {
+      console.log(`[API] Token expires in ${Math.floor(timeUntilExpiry / 1000)}s, needs refresh`);
+    }
+
+    return needsRefresh;
   } catch (error) {
     console.error('Failed to parse JWT:', error);
     return true; // エラーの場合は安全のため更新
   }
 }
 
-// トークンをリフレッシュ
-async function refreshToken(session: SessionData): Promise<SessionData> {
+// トークンリフレッシュのリトライ回数
+const MAX_REFRESH_RETRIES = 3;
+const REFRESH_RETRY_DELAY = 1000; // 1秒
+
+// トークンをリフレッシュ（リトライ機能付き）
+async function refreshToken(session: SessionData, retryCount = 0): Promise<SessionData> {
   try {
+    console.log(
+      `[API] Attempting token refresh (attempt ${retryCount + 1}/${MAX_REFRESH_RETRIES})`
+    );
     const tempAgent = new BskyAgent({ service: 'https://bsky.social' });
 
     // refreshSessionを呼び出し
@@ -133,12 +147,20 @@ async function refreshToken(session: SessionData): Promise<SessionData> {
 
       // 新しいセッションを保存
       await SessionManager.saveSession(newSession);
+      console.log('[API] Token refresh successful');
       return newSession;
     }
 
     throw new Error('Token refresh failed');
   } catch (error) {
     console.error('Failed to refresh token:', error);
+
+    // ネットワークエラーの場合はリトライ
+    if (isNetworkError(error) && retryCount < MAX_REFRESH_RETRIES - 1) {
+      console.log(`[API] Network error, retrying in ${REFRESH_RETRY_DELAY}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, REFRESH_RETRY_DELAY * (retryCount + 1)));
+      return refreshToken(session, retryCount + 1);
+    }
 
     // リフレッシュトークンが無効な場合はセッションをクリア
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -151,12 +173,29 @@ async function refreshToken(session: SessionData): Promise<SessionData> {
       errorMessage?.includes('Invalid refresh token') ||
       errorMessage?.includes('Token expired')
     ) {
+      console.error('[API] Invalid refresh token, clearing session');
       await SessionManager.clearSession();
       window.location.href = '/login';
     }
 
     throw error;
   }
+}
+
+// ネットワークエラーかどうかを判定
+function isNetworkError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    return (
+      message.includes('network') ||
+      message.includes('fetch') ||
+      message.includes('timeout') ||
+      message.includes('connection')
+    );
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const errorType = (error as any)?.type;
+  return errorType === 'NetworkError' || errorType === 'FetchError';
 }
 
 // APIコールをエラーハンドリング付きでラップ

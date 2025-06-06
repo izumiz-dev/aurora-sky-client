@@ -291,16 +291,6 @@ export const PostComposer = ({ onPostSuccess, replyTo }: PostComposerProps) => {
           </div>
         )}
         <div className="flex gap-3">
-          <div className="avatar avatar-md flex-shrink-0">
-            <img
-              src={session?.avatar || '/default-avatar.png'}
-              alt={session?.handle || 'User'}
-              onError={(e) => {
-                console.error('Avatar load error:', e);
-                (e.target as HTMLImageElement).src = '/default-avatar.png';
-              }}
-            />
-          </div>
           <div className="flex-1">
             <textarea
               ref={textareaRef}
