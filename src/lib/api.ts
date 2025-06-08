@@ -243,10 +243,13 @@ async function refreshToken(session: SessionData, retryCount = 0): Promise<Sessi
         // ログインページにリダイレクトせず、ここで自動ログインを試みる
         // 実際のログイン処理はAuthContextで行われるため、リロードする
         window.location.reload();
-        return;
+        // Never actually reaches here due to reload, but TypeScript needs a return
+        throw new Error('Reloading for auto-login');
       }
 
       window.location.href = '/login';
+      // Never actually reaches here due to redirect, but TypeScript needs a return
+      throw new Error('Redirecting to login');
     }
 
     throw error;

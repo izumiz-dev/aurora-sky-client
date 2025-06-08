@@ -42,7 +42,10 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
               password: credentials.password,
             });
 
-            const newSession: SessionData = response.data;
+            const newSession: SessionData = {
+              ...response.data,
+              active: response.data.active ?? true, // Default to true if not provided
+            };
             await SessionManager.saveSession(newSession, true);
             setSession(newSession);
             console.log('[AuthContext] Auto-login successful');
