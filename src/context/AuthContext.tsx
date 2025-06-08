@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useContext } from 'preact/hooks';
 import { BskyAgent } from '@atproto/api';
 import type { SessionData } from '../types/session';
 import { SessionManager } from '../lib/sessionManager';
+import { CredentialStorage } from '../lib/credentialStorage';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -27,6 +28,33 @@ export const AuthProvider = ({ children }: { children: preact.ComponentChildren 
       // console.log('[AuthContext] Loading session...');
       const storedSession = await SessionManager.getSession();
       // console.log('[AuthContext] Stored session:', storedSession ? 'Found' : 'Not found');
+
+      // セッションが無い場合、自動ログインを試みる
+      if (!storedSession && mounted) {
+        const credentials = await CredentialStorage.get();
+        if (credentials) {
+          console.log('[AuthContext] Auto-login credentials found, attempting login...');
+          try {
+            // 自動ログインを実行
+            const agent = new BskyAgent({ service: 'https://bsky.social' });
+            const response = await agent.login({
+              identifier: credentials.identifier,
+              password: credentials.password,
+            });
+
+            const newSession: SessionData = response.data;
+            await SessionManager.saveSession(newSession, true);
+            setSession(newSession);
+            console.log('[AuthContext] Auto-login successful');
+            return;
+          } catch (error) {
+            console.error('[AuthContext] Auto-login failed:', error);
+            // 自動ログインが失敗した場合、保存されたクレデンシャルをクリア
+            CredentialStorage.clear();
+          }
+        }
+      }
+
       if (storedSession && mounted) {
         try {
           // アバターが無い場合は取得を試みる

@@ -47,10 +47,15 @@ export class SessionManager {
       sessionStorage.setItem(this.SESSION_EXPIRY_KEY, expiry.toString());
       console.log('[SessionManager] Saved encrypted session to sessionStorage');
     } catch (error) {
-      console.error('Failed to save session:', error);
+      console.error('[SessionManager] Failed to save session:', {
+        error,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        persist,
+        timestamp: new Date().toISOString(),
+      });
       // 暗号化に失敗した場合はフォールバックを使用
       if (error instanceof Error && error.message.includes('Web Crypto API')) {
-        console.warn('Falling back to unencrypted storage');
+        console.warn('[SessionManager] Falling back to unencrypted storage');
         FallbackSessionStorage.save(sessionData, persist);
         return;
       }
@@ -135,11 +140,12 @@ export class SessionManager {
       const decrypted = await SessionCrypto.decrypt(encrypted);
       return JSON.parse(decrypted);
     } catch (error) {
-      console.error('Failed to get session:', error);
-      // エラーの詳細をログ
-      if (error instanceof Error) {
-        console.error('Error details:', error.message);
-      }
+      console.error('[SessionManager] Failed to get session:', {
+        error,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorType: error instanceof Error ? error.constructor.name : typeof error,
+        timestamp: new Date().toISOString(),
+      });
 
       // 暗号化エラーの場合はフォールバックを試す
       if (

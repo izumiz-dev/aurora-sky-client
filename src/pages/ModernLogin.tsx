@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { AppIcon } from '../components/AppIcon';
 import { DevelopmentNotice } from '../components/DevelopmentNotice';
 import { AuroraLoader } from '../components/AuroraLoader';
+import { CredentialStorage } from '../lib/credentialStorage';
 
 export const ModernLoginPage = () => {
   const [identifier, setIdentifier] = useState('');
@@ -11,6 +12,8 @@ export const ModernLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(true); // デフォルトでチェック
+  const [enableAutoLogin, setEnableAutoLogin] = useState(false); // 自動ログイン
+  const [showAutoLoginWarning, setShowAutoLoginWarning] = useState(false);
 
   const { isAuthenticated, loading: authLoading, login } = useAuth();
 
@@ -20,6 +23,15 @@ export const ModernLoginPage = () => {
     }
   }, [isAuthenticated]);
 
+  // 自動ログインチェックボックスの変更時
+  const handleAutoLoginChange = (e: Event) => {
+    const checked = (e.target as HTMLInputElement).checked;
+    setEnableAutoLogin(checked);
+    if (checked) {
+      setShowAutoLoginWarning(true);
+    }
+  };
+
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     setError(null);
@@ -27,6 +39,13 @@ export const ModernLoginPage = () => {
 
     try {
       await login(identifier, password, rememberMe);
+
+      // 自動ログインが有効な場合、クレデンシャルを保存
+      if (enableAutoLogin) {
+        await CredentialStorage.save(identifier, password);
+        console.log('[Login] Auto-login credentials saved');
+      }
+
       route('/');
     } catch (err) {
       setError('ログインに失敗しました。IDまたはパスワードを確認してください。');
@@ -92,25 +111,81 @@ export const ModernLoginPage = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe((e.target as HTMLInputElement).checked)}
-                  className="w-4 h-4 text-blue-600 border-white/30 rounded focus:ring-blue-500 bg-white/10"
-                />
-                <span className="ml-2 text-sm text-white/60">ログイン状態を保持</span>
-              </label>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe((e.target as HTMLInputElement).checked)}
+                    className="w-4 h-4 text-blue-600 border-white/30 rounded focus:ring-blue-500 bg-white/10"
+                  />
+                  <span className="ml-2 text-sm text-white/60">ログイン状態を保持</span>
+                </label>
 
-              <a
-                href="https://bsky.app/settings/app-passwords"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-blue-400 hover:underline"
-              >
-                App パスワードの取得 →
-              </a>
+                <a
+                  href="https://bsky.app/settings/app-passwords"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-400 hover:underline"
+                >
+                  App パスワードの取得 →
+                </a>
+              </div>
+
+              {/* 自動ログインオプション */}
+              <div className="border-t border-white/10 pt-3">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={enableAutoLogin}
+                    onChange={handleAutoLoginChange}
+                    className="w-4 h-4 text-orange-600 border-white/30 rounded focus:ring-orange-500 bg-white/10"
+                  />
+                  <span className="ml-2 text-sm text-orange-400">
+                    自動ログインを有効にする（推奨されません）
+                  </span>
+                </label>
+              </div>
+
+              {/* 警告メッセージ */}
+              {showAutoLoginWarning && enableAutoLogin && (
+                <div className="p-4 glass border border-orange-500/30 rounded-lg animate-fadeIn">
+                  <div className="flex items-start">
+                    <svg
+                      className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                    <div className="ml-3 text-sm">
+                      <p className="font-semibold text-orange-400 mb-1">
+                        セキュリティに関する重要な警告
+                      </p>
+                      <ul className="text-white/70 space-y-1 list-disc list-inside">
+                        <li>パスワードが暗号化されてこのデバイスに保存されます</li>
+                        <li>共有PCや公共の端末では絶対に使用しないでください</li>
+                        <li>7日ごとに再認証が必要になります</li>
+                        <li>セキュリティリスクを理解した上でご利用ください</li>
+                      </ul>
+                      <button
+                        type="button"
+                        onClick={() => setShowAutoLoginWarning(false)}
+                        className="mt-3 text-xs text-orange-400 hover:text-orange-300 underline"
+                      >
+                        警告を閉じる
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <button

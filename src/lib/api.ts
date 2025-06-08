@@ -1,6 +1,6 @@
 import { BskyAgent, RichText } from '@atproto/api';
 import type { AtpSessionEvent, AtpSessionData } from '@atproto/api';
-import { parseApiError } from './api-error-handler';
+import { parseApiError, RateLimitError } from './api-error-handler';
 import { SessionManager } from './sessionManager';
 import { removeJpegExif } from '../utils/imageMetadataRemover';
 import { resizeImageToUnder1MB } from '../utils/imageResizer';
@@ -43,9 +43,22 @@ if (agent.xrpc) {
 
 // トークンリフレッシュのミューテックス
 const refreshMutex = new Map<string, Promise<SessionData>>();
+// agentのキャッシュ（同じセッションではagentを再利用）
+let cachedSession: SessionData | null = null;
+let lastSessionCheck = 0;
+const SESSION_CHECK_INTERVAL = 5000; // 5秒ごとにセッションを再チェック
 
 export const getAgent = async () => {
-  let session = await SessionManager.getSession();
+  const now = Date.now();
+
+  // キャッシュされたセッションを使用するか、新しく取得するか判断
+  let session = cachedSession;
+  if (!session || now - lastSessionCheck > SESSION_CHECK_INTERVAL) {
+    session = await SessionManager.getSession();
+    cachedSession = session;
+    lastSessionCheck = now;
+  }
+
   if (session) {
     try {
       // トークンの有効期限をチェックして必要なら更新
@@ -56,8 +69,9 @@ export const getAgent = async () => {
 
         // 既にリフレッシュ中の場合は待機
         if (refreshMutex.has(did)) {
-          await refreshMutex.get(did);
-          session = await SessionManager.getSession();
+          console.log('[API] Token refresh already in progress, waiting...');
+          session = await refreshMutex.get(did)!;
+          cachedSession = session;
         } else {
           // トークンをリフレッシュ
           const refreshPromise = refreshToken(session);
@@ -65,6 +79,11 @@ export const getAgent = async () => {
 
           try {
             session = await refreshPromise;
+            cachedSession = session;
+          } catch (error) {
+            // リフレッシュ失敗時はキャッシュをクリア
+            cachedSession = null;
+            throw error;
           } finally {
             refreshMutex.delete(did);
           }
@@ -76,15 +95,29 @@ export const getAgent = async () => {
         active: session!.active ?? true,
       };
       if (sessionWithDefaults.refreshJwt) {
-        await agent.resumeSession(sessionWithDefaults);
+        // agentが既に正しいセッションを持っているか確認
+        if (!agent.session || agent.session.accessJwt !== sessionWithDefaults.accessJwt) {
+          await agent.resumeSession(sessionWithDefaults);
+        }
       } else {
         // リフレッシュトークンがない場合はセッションをクリアしてログイン画面へ
+        cachedSession = null;
         await SessionManager.clearSession();
         throw new Error('No refresh token available');
       }
     } catch (error) {
-      console.error('Failed to resume session:', error);
+      console.error('[API] Failed to resume session:', {
+        error,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        errorName: (error as any)?.error,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        errorMessage: (error as any)?.message,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        status: (error as any)?.status,
+        timestamp: new Date().toISOString(),
+      });
       // セッションの復元に失敗した場合、クリアする
+      cachedSession = null;
       await SessionManager.clearSession();
     }
   }
@@ -103,13 +136,13 @@ function checkTokenNeedsRefresh(token: string): boolean {
 
     if (!exp) return true;
 
-    // 有効期限の5分前にリフレッシュ
+    // 有効期限の30分前にリフレッシュ（より早めに更新）
     const expiresAt = exp * 1000;
     const now = Date.now();
-    const fiveMinutes = 5 * 60 * 1000;
+    const thirtyMinutes = 30 * 60 * 1000;
 
     const timeUntilExpiry = expiresAt - now;
-    const needsRefresh = timeUntilExpiry < fiveMinutes;
+    const needsRefresh = timeUntilExpiry < thirtyMinutes;
 
     if (needsRefresh) {
       console.log(`[API] Token expires in ${Math.floor(timeUntilExpiry / 1000)}s, needs refresh`);
@@ -125,6 +158,7 @@ function checkTokenNeedsRefresh(token: string): boolean {
 // トークンリフレッシュのリトライ回数
 const MAX_REFRESH_RETRIES = 3;
 const REFRESH_RETRY_DELAY = 1000; // 1秒
+const REFRESH_TIMEOUT = 30000; // 30秒のタイムアウト
 
 // トークンをリフレッシュ（リトライ機能付き）
 async function refreshToken(session: SessionData, retryCount = 0): Promise<SessionData> {
@@ -134,9 +168,17 @@ async function refreshToken(session: SessionData, retryCount = 0): Promise<Sessi
     );
     const tempAgent = new BskyAgent({ service: 'https://bsky.social' });
 
-    // refreshSessionを呼び出し
-    await tempAgent.resumeSession(session);
-    const response = await tempAgent.com.atproto.server.refreshSession();
+    // タイムアウト付きでrefreshSessionを呼び出し
+    const refreshPromise = (async () => {
+      await tempAgent.resumeSession(session);
+      return await tempAgent.com.atproto.server.refreshSession();
+    })();
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Token refresh timeout')), REFRESH_TIMEOUT);
+    });
+
+    const response = (await Promise.race([refreshPromise, timeoutPromise])) as any;
 
     if (response.success) {
       const newSession: SessionData = {
@@ -151,14 +193,31 @@ async function refreshToken(session: SessionData, retryCount = 0): Promise<Sessi
       return newSession;
     }
 
-    throw new Error('Token refresh failed');
+    throw new Error('Token refresh failed: unsuccessful response');
   } catch (error) {
-    console.error('Failed to refresh token:', error);
+    console.error('[API] Failed to refresh token:', {
+      error,
+      retryCount,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      errorType: (error as any)?.constructor?.name,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      errorMessage: (error as any)?.message,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      errorStatus: (error as any)?.status,
+      timestamp: new Date().toISOString(),
+    });
 
-    // ネットワークエラーの場合はリトライ
-    if (isNetworkError(error) && retryCount < MAX_REFRESH_RETRIES - 1) {
-      console.log(`[API] Network error, retrying in ${REFRESH_RETRY_DELAY}ms...`);
-      await new Promise((resolve) => setTimeout(resolve, REFRESH_RETRY_DELAY * (retryCount + 1)));
+    // ネットワークエラーまたはタイムアウトの場合はリトライ
+    const shouldRetry =
+      (isNetworkError(error) ||
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (error as any)?.message?.includes('timeout')) &&
+      retryCount < MAX_REFRESH_RETRIES - 1;
+
+    if (shouldRetry) {
+      const delay = REFRESH_RETRY_DELAY * Math.pow(2, retryCount); // 指数バックオフ
+      console.log(`[API] Network/timeout error, retrying in ${delay}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
       return refreshToken(session, retryCount + 1);
     }
 
@@ -175,6 +234,18 @@ async function refreshToken(session: SessionData, retryCount = 0): Promise<Sessi
     ) {
       console.error('[API] Invalid refresh token, clearing session');
       await SessionManager.clearSession();
+
+      // 自動ログインを試みる
+      const { CredentialStorage } = await import('./credentialStorage');
+      const credentials = await CredentialStorage.get();
+      if (credentials) {
+        console.log('[API] Attempting auto-login after session expiry...');
+        // ログインページにリダイレクトせず、ここで自動ログインを試みる
+        // 実際のログイン処理はAuthContextで行われるため、リロードする
+        window.location.reload();
+        return;
+      }
+
       window.location.href = '/login';
     }
 
@@ -190,32 +261,93 @@ function isNetworkError(error: unknown): boolean {
       message.includes('network') ||
       message.includes('fetch') ||
       message.includes('timeout') ||
-      message.includes('connection')
+      message.includes('connection') ||
+      message.includes('econnreset') ||
+      message.includes('econnrefused') ||
+      message.includes('enotfound') ||
+      message.includes('dns')
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const errorType = (error as any)?.type;
-  return errorType === 'NetworkError' || errorType === 'FetchError';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const errorCode = (error as any)?.code;
+  return (
+    errorType === 'NetworkError' ||
+    errorType === 'FetchError' ||
+    errorCode === 'ECONNRESET' ||
+    errorCode === 'ETIMEDOUT' ||
+    errorCode === 'ECONNREFUSED' ||
+    errorCode === 'ENOTFOUND'
+  );
 }
 
 // APIコールをエラーハンドリング付きでラップ
-const wrapApiCall = async <T>(apiCall: () => Promise<T>): Promise<T> => {
+const wrapApiCall = async <T>(apiCall: () => Promise<T>, retryCount = 0): Promise<T> => {
   try {
     return await apiCall();
   } catch (error) {
     const parsedError = parseApiError(error);
+
+    // 詳細なエラーログを記録
+    console.error('[API] API call failed:', {
+      error,
+      parsedError,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      status: (error as any)?.status,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      statusText: (error as any)?.statusText,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      message: (error as any)?.message,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      errorName: (error as any)?.error,
+      retryCount,
+      timestamp: new Date().toISOString(),
+      stackTrace: error instanceof Error ? error.stack : undefined,
+    });
+
+    // レート制限エラーの場合はリトライしない（待機時間が長いため）
+    if (parsedError.isRateLimit) {
+      console.warn('[API] Rate limit hit, not retrying');
+      throw new RateLimitError(parsedError.message, parsedError.retryAfter);
+    }
+
+    // ネットワークエラーの場合はリトライ
+    if (isNetworkError(error) && retryCount < 2) {
+      const delay = 1000 * Math.pow(2, retryCount);
+      console.log(`[API] Network error, retrying in ${delay}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return wrapApiCall(apiCall, retryCount + 1);
+    }
 
     // 401エラー（認証エラー）の場合はセッションをクリアしてログイン画面へ
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const errorStatus = (error as any)?.status;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const errorMessage = (error as any)?.message;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const errorName = (error as any)?.error;
+
+    // 一時的なネットワークエラーではログアウトしない
+    const isTemporaryError = isNetworkError(error) || parsedError.isRateLimit;
+
     if (
-      parsedError.statusCode === 401 ||
-      errorStatus === 401 ||
-      errorMessage?.toLowerCase().includes('unauthorized') ||
-      errorMessage?.toLowerCase().includes('invalid token')
+      !isTemporaryError &&
+      (parsedError.statusCode === 401 ||
+        errorStatus === 401 ||
+        errorMessage?.toLowerCase().includes('unauthorized') ||
+        errorMessage?.toLowerCase().includes('invalid token') ||
+        errorName === 'InvalidToken' ||
+        errorName === 'ExpiredToken' ||
+        errorName === 'AuthenticationRequired')
     ) {
+      console.error('[API] Authentication failed, clearing session:', {
+        parsedErrorCode: parsedError.statusCode,
+        errorStatus,
+        errorMessage,
+        errorName,
+      });
+      cachedSession = null;
       await SessionManager.clearSession();
       // ログインページへリダイレクト
       window.location.href = '/login';

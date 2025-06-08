@@ -5,6 +5,7 @@ import { AppIcon } from '../components/AppIcon';
 import { route } from 'preact-router';
 import { AuroraLoader } from '../components/AuroraLoader';
 import { getAISettings, updateAISettings } from '../lib/aiSettings';
+import { CredentialStorage } from '../lib/credentialStorage';
 
 // 言語コードと表示名のマッピング
 const LANGUAGE_OPTIONS = [
@@ -323,6 +324,40 @@ export const ModernSettingsPage = () => {
           </svg>
           <h2 className="text-xl font-semibold text-white">アカウント</h2>
         </div>
+
+        {/* 自動ログイン設定 */}
+        {CredentialStorage.exists() && (
+          <div className="p-4 glass rounded-lg hover-lift mb-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-white font-medium">自動ログイン設定</p>
+                <p className="text-sm text-orange-400 mt-1">自動ログインが有効になっています</p>
+                <p className="text-xs text-white/60 mt-2">
+                  セキュリティのため、7日ごとに再認証が必要です
+                </p>
+                {CredentialStorage.needsReauthentication() && (
+                  <p className="text-xs text-yellow-400 mt-1">
+                    24時間以上経過しています。次回ログイン時に再認証が必要です
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  if (confirm('自動ログインを無効にしますか？')) {
+                    CredentialStorage.clear();
+                    setSuccessMessage('自動ログインを無効にしました');
+                    // コンポーネントを再レンダリング
+                    window.location.reload();
+                  }
+                }}
+                className="glass-button bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 px-4 py-2"
+              >
+                無効にする
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-between items-center p-4 glass rounded-lg hover-lift">
           <div>
             <p className="text-white font-medium">ログアウト</p>
